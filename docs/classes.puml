@@ -1,0 +1,89 @@
+@startuml
+
+package knesset {
+
+  class KnessetMember {
+    name
+    image
+    imageCredit
+    knessetWebPage
+    gender
+    party
+    contactOptions
+    isActive
+  }
+
+  class ContactOption {
+    platform
+    title
+    details
+    note
+  }
+
+  class Party {
+    name
+    officialWebPage
+  }
+
+  class MKGroup {
+    name
+  }
+
+  KnessetMember "1" *- "0..*" ContactOption
+  Party "1" *- "1..*" KnessetMember
+  MKGroup "0..*" o-- "0..*" KnessetMember
+
+}
+
+package campaigns {
+  class Campaign {
+    title
+    subtitle
+    slogan
+    officialWebPage
+    backgroundImage
+    themeData
+    cannedMessage:Map<[Position,Gender,Platform] → String>
+    labelText:Map<[Position,Location,Gender] → String>
+    relevantGroups
+    contactEmail
+  }
+
+  enum Position {
+    Against, Undecided, Neutral, For
+  }
+
+  class MKPosition {
+    mk
+    position
+    campgaign
+  }
+
+  class MKAction {
+    type
+    date
+    title
+    details
+    link
+  }
+
+  MKPosition "*..0" - "1" Position
+}
+
+package users {
+  class User {
+    username
+    hashedPasswd
+    name
+    role
+  }
+}
+
+User "0..*" -- "*..0" Campaign: participates
+MKPosition "1" -- "1" KnessetMember
+MKAction "1" -- "1" KnessetMember
+
+Campaign *- "*" MKAction
+Campaign *- "*" MKPosition
+Campaign *-- "*" MKGroup: relevantGroups
+@enduml

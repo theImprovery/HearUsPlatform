@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="509px" preserveAspectRatio="none"
+    style="width:509px;height:509px;" version="1.1" viewBox="0 0 509 509" width="509px" zoomAndPan="magnify">
+    <defs>
+        <filter height="300%" id="f1kmkxq0m1dq97" width="300%" x="-1" y="-1">
+            <feGaussianBlur result="blurOut" stdDeviation="2.0" />
+            <feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0" />
+            <feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3" />
+            <feBlend in="SourceGraphic" in2="blurOut3" mode="normal" />
+        </filter>
+    </defs>
+    <g>
+        <!--cluster knesset-->
+        <polygon fill="#FFFFFF" filter="url(#f1kmkxq0m1dq97)" points="224.5,16,286.5,16,293.5,38.4883,487.5,38.4883,487.5,497,224.5,497,224.5,16" style="stroke: #000000; stroke-width: 1.5;" />
+        <line style="stroke: #000000; stroke-width: 1.5;" x1="224.5" x2="293.5" y1="38.4883" y2="38.4883" /><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="56" x="228.5" y="31.5352">knesset</text>
+        <!--class KnessetMember-->
+        <rect fill="#FEFECE" filter="url(#f1kmkxq0m1dq97)" height="151.6406" id="KnessetMember" style="stroke: #A80036; stroke-width: 1.5;" width="125" x="293" y="177" />
+        <ellipse cx="308" cy="193" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;" />
+        <path d="M310.9731,198.6431 Q310.3921,198.9419 309.7529,199.0913 Q309.1138,199.2407 308.4082,199.2407 Q305.9014,199.2407 304.5815,197.5889 Q303.2617,195.937 303.2617,192.8159 Q303.2617,189.6865 304.5815,188.0347 Q305.9014,186.3828 308.4082,186.3828 Q309.1138,186.3828 309.7612,186.5322 Q310.4087,186.6816 310.9731,186.9805 L310.9731,189.7031 Q310.3423,189.1221 309.7488,188.8523 Q309.1553,188.5825 308.5244,188.5825 Q307.1797,188.5825 306.4949,189.6492 Q305.8101,190.7158 305.8101,192.8159 Q305.8101,194.9077 306.4949,195.9744 Q307.1797,197.041 308.5244,197.041 Q309.1553,197.041 309.7488,196.7712 Q310.3423,196.5015 310.9731,195.9204 Z " /><text
+            fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="93" x="322" y="197.5352">KnessetMember</text>
+        <line style="stroke: #A80036; stroke-width: 1.5;" x1="294" x2="417" y1="209" y2="209" /><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="29" x="299" y="223.6348">name</text><text fill="#000000"
+            font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="32" x="299" y="236.5898">image</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="65" x="299"
+            y="249.5449">imageCredit</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="88" x="299" y="262.5">knessetWebPage</text><text fill="#000000" font-family="sans-serif" font-size="11"
+            lengthAdjust="spacingAndGlyphs" textLength="38" x="299" y="275.4551">gender</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="28" x="299" y="288.4102">party</text><text fill="#000000"
+            font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="83" x="299" y="301.3652">contactOptions</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="42"
+            x="299" y="314.3203">isActive</text>
+        <line style="stroke: #A80036; stroke-width: 1.5;" x1="294" x2="417" y1="320.6406" y2="320.6406" />
+        <!--class ContactOption-->
+        <rect fill="#FEFECE" filter="url(#f1kmkxq0m1dq97)" height="99.8203" id="ContactOption" style="stroke: #A80036; stroke-width: 1.5;" width="113" x="299" y="389" />
+        <ellipse cx="314" cy="405" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;" />
+        <path d="M316.9731,410.6431 Q316.3921,410.9419 315.7529,411.0913 Q315.1138,411.2407 314.4082,411.2407 Q311.9014,411.2407 310.5815,409.5889 Q309.2617,407.937 309.2617,404.8159 Q309.2617,401.6865 310.5815,400.0347 Q311.9014,398.3828 314.4082,398.3828 Q315.1138,398.3828 315.7612,398.5322 Q316.4087,398.6816 316.9731,398.9805 L316.9731,401.7031 Q316.3423,401.1221 315.7488,400.8523 Q315.1553,400.5825 314.5244,400.5825 Q313.1797,400.5825 312.4949,401.6492 Q311.8101,402.7158 311.8101,404.8159 Q311.8101,406.9077 312.4949,407.9744 Q313.1797,409.041 314.5244,409.041 Q315.1553,409.041 315.7488,408.7712 Q316.3423,408.5015 316.9731,407.9204 Z " /><text
+            fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="81" x="328" y="409.5352">ContactOption</text>
+        <line style="stroke: #A80036; stroke-width: 1.5;" x1="300" x2="411" y1="421" y2="421" /><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="46" x="305" y="435.6348">platform</text><text
+            fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="20" x="305" y="448.5898">title</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs"
+            textLength="35" x="305" y="461.5449">details</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="24" x="305" y="474.5">note</text>
+        <line style="stroke: #A80036; stroke-width: 1.5;" x1="300" x2="411" y1="480.8203" y2="480.8203" />
+        <!--class Party-->
+        <rect fill="#FEFECE" filter="url(#f1kmkxq0m1dq97)" height="73.9102" id="Party" style="stroke: #A80036; stroke-width: 1.5;" width="95" x="384" y="43" />
+        <ellipse cx="414.3" cy="59" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;" />
+        <path d="M417.2731,64.6431 Q416.6921,64.9419 416.0529,65.0913 Q415.4138,65.2407 414.7082,65.2407 Q412.2014,65.2407 410.8815,63.5889 Q409.5617,61.937 409.5617,58.8159 Q409.5617,55.6865 410.8815,54.0347 Q412.2014,52.3828 414.7082,52.3828 Q415.4138,52.3828 416.0612,52.5322 Q416.7087,52.6816 417.2731,52.9805 L417.2731,55.7031 Q416.6423,55.1221 416.0488,54.8523 Q415.4553,54.5825 414.8244,54.5825 Q413.4797,54.5825 412.7949,55.6492 Q412.1101,56.7158 412.1101,58.8159 Q412.1101,60.9077 412.7949,61.9744 Q413.4797,63.041 414.8244,63.041 Q415.4553,63.041 416.0488,62.7712 Q416.6423,62.5015 417.2731,61.9204 Z " /><text
+            fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="29" x="431.7" y="63.5352">Party</text>
+        <line style="stroke: #A80036; stroke-width: 1.5;" x1="385" x2="478" y1="75" y2="75" /><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="29" x="390" y="89.6348">name</text><text fill="#000000"
+            font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="83" x="390" y="102.5898">officialWebPage</text>
+        <line style="stroke: #A80036; stroke-width: 1.5;" x1="385" x2="478" y1="108.9102" y2="108.9102" />
+        <!--class MemberGroup-->
+        <rect fill="#FEFECE" filter="url(#f1kmkxq0m1dq97)" height="60.9551" id="MemberGroup" style="stroke: #A80036; stroke-width: 1.5;" width="116" x="232.5" y="49.5" />
+        <ellipse cx="247.5" cy="65.5" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;" />
+        <path d="M250.4731,71.1431 Q249.8921,71.4419 249.2529,71.5913 Q248.6138,71.7407 247.9082,71.7407 Q245.4014,71.7407 244.0815,70.0889 Q242.7617,68.437 242.7617,65.3159 Q242.7617,62.1865 244.0815,60.5347 Q245.4014,58.8828 247.9082,58.8828 Q248.6138,58.8828 249.2612,59.0322 Q249.9087,59.1816 250.4731,59.4805 L250.4731,62.2031 Q249.8423,61.6221 249.2488,61.3523 Q248.6553,61.0825 248.0244,61.0825 Q246.6797,61.0825 245.9949,62.1492 Q245.3101,63.2158 245.3101,65.3159 Q245.3101,67.4077 245.9949,68.4744 Q246.6797,69.541 248.0244,69.541 Q248.6553,69.541 249.2488,69.2712 Q249.8423,69.0015 250.4731,68.4204 Z " /><text
+            fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="84" x="261.5" y="70.0352">MemberGroup</text>
+        <line style="stroke: #A80036; stroke-width: 1.5;" x1="233.5" x2="347.5" y1="81.5" y2="81.5" /><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="29" x="238.5" y="96.1348">name</text>
+        <line style="stroke: #A80036; stroke-width: 1.5;" x1="233.5" x2="347.5" y1="102.4551" y2="102.4551" />
+        <polygon fill="#FFFFFF" filter="url(#f1kmkxq0m1dq97)" points="6,53.5,89,53.5,96,75.9883,103,75.9883,103,106.4766,6,106.4766,6,53.5" style="stroke: #000000; stroke-width: 1.5;" />
+        <line style="stroke: #000000; stroke-width: 1.5;" x1="6" x2="96" y1="75.9883" y2="75.9883" /><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="77" x="10" y="69.0352">campaigns</text>
+        <polygon fill="#FFFFFF" filter="url(#f1kmkxq0m1dq97)" points="138,53.5,183,53.5,190,75.9883,197,75.9883,197,106.4766,138,106.4766,138,53.5" style="stroke: #000000; stroke-width: 1.5;" />
+        <line style="stroke: #000000; stroke-width: 1.5;" x1="138" x2="190" y1="75.9883" y2="75.9883" /><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="39" x="142" y="69.0352">users</text>
+        <!--link KnessetMember to ContactOption-->
+        <path d="M355.5,342.5386 C355.5,358.5173 355.5,374.6326 355.5,388.9939 " fill="none" id="KnessetMember-ContactOption" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="355.5,329.19,351.5,335.19,355.5,341.19,359.5,335.19,355.5,329.19" style="stroke: #A80036; stroke-width: 1.0;" /><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs"
+            textLength="8" x="347.1438" y="349.2418">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="22" x="331.8844" y="378.1521">0..*</text>
+        <!--link Party to KnessetMember-->
+        <path d="M409.9257,129.1098 C403.4009,143.9623 396.0761,160.636 388.966,176.8207 " fill="none" id="Party-KnessetMember" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="415.1961,117.1128,409.1207,120.9973,410.3696,128.0994,416.445,124.2149,415.1961,117.1128" style="stroke: #A80036; stroke-width: 1.0;" /><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs"
+            textLength="8" x="403.7064" y="137.3834">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="22" x="369.1775" y="166.1849">1..*</text>
+        <!--link MemberGroup to KnessetMember-->
+        <path d="M306.6265,122.9214 C312.7419,139.1978 319.9043,158.2606 326.8312,176.6968 " fill="none" id="MemberGroup-KnessetMember" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="301.9711,110.5307,300.337,117.5542,306.1917,121.764,307.8258,114.7405,301.9711,110.5307" style="stroke: #A80036; stroke-width: 1.0;" /><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs"
+            textLength="22" x="280.0683" y="130.9795">0..*</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="22" x="301.0503" y="166.3096">0..*</text>
+        <!--
+@startuml
+
+package knesset {
+
+  class KnessetMember {
+    name
+    image
+    imageCredit
+    knessetWebPage
+    gender
+    party
+    contactOptions
+    isActive
+  }
+
+  class ContactOption {
+    platform
+    title
+    details
+    note
+  }
+
+  class Party {
+    name
+    officialWebPage
+  }
+
+  class MemberGroup {
+    name
+  }
+
+  KnessetMember "1" *- - "0..*" ContactOption
+  Party "1" *- - "1..*" KnessetMember
+  MemberGroup "0..*" *- - "0..*" KnessetMember
+
+}
+
+package campaigns {
+
+}
+
+package users {
+
+}
+
+@enduml
+
+PlantUML version 1.2018.10(Sat Aug 25 20:02:59 IDT 2018)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Java Version: 9+181
+Operating System: Mac OS X
+OS Version: 10.13.6
+Default Encoding: UTF-8
+Language: en
+Country: IL
+-->
+    </g>
+</svg>
