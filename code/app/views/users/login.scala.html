@@ -1,0 +1,53 @@
+@(form:Form[LoginFormData])(implicit request: RequestHeader, msgs:MessagesProvider)
+
+@scripts = {
+  <script lang="Javascript">
+          $(document).ready( function(){
+            $("#usernameInput").focus();
+          } );
+  </script>
+}
+
+@extraHead = {
+  <meta name="robots" content="noindex, nofollow">
+}
+
+@templates.bsBase("Log in", extraHead, scripts ){
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h1>Site Management Log In</h1>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col col-md-6 offset-md-3">
+        <form action="@routes.UserCtrl.doLogin" method="POST">
+          @helper.CSRF.formField
+          @for( m <- form.globalErrors ){
+            <div class="form-group has-error">
+              <div class="alert alert-danger">@m.message</div>
+            </div>
+          }
+          <div class="form-group">
+            <label for="usernameInput" class="control-label">Username</label>
+            <input type="text" class="form-control" id="usernameInput" name="username" value="@form("username").value" placeholder="username">
+          </div>
+
+          <div class="form-group">
+            <label for="passwordInput" class="control-label">Password</label>
+            <input type="password" class="form-control" id="passwordInput" name="password" placeholder="password">
+          </div>
+
+          <div class="form-group mt-3">
+            <a href="@routes.UserCtrl.showForgotPassword()">forgot password?</a>
+            <div class="pull-right">
+              <a class="btn btn-default" href="/">Cancel</a>
+              <button type="submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log In</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+}

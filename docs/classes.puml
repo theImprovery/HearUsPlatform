@@ -32,7 +32,7 @@ package knesset {
   KnessetMember "1" *- "0..*" ContactOption
   Party "1" *- "1..*" KnessetMember
   MKGroup "0..*" o-- "0..*" KnessetMember
-
+  Party -|> MKGroup
 }
 
 package campaigns {
@@ -41,6 +41,7 @@ package campaigns {
     subtitle
     slogan
     officialWebPage
+    socialMediaAccounts
     backgroundImage
     themeData
     cannedMessage:Map<[Position,Gender,Platform] → String>
