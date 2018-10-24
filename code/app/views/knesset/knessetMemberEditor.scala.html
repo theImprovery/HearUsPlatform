@@ -44,7 +44,7 @@
           @if( km("id").value.isDefined ) {
             <a class="nav-link" data-toggle="pill" href="#contactOptions">Contact Options</a>
           } else {
-            <a class="nav-link disabled" data-toggle="pill" href="#contactOptions"></a>
+            <a class="nav-link disabled" data-toggle="pill" href="#contactOptions">Contact Options</a>
           }
         </li>
       </ul>
@@ -147,7 +147,7 @@
           <div class="row">
             <div class="col-md-12">
               <div class="text-right">
-                <button onclick="updateContactOptions(@km("id").value.get)" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> Update</button>
+                <button onclick="updateContactOptions(@km("id").value.getOrElse("-1"))" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> Update</button>
               </div>
               <div class="noData p-4" id="noContact" style="display:none">
                 This knesset member has no contact options.
