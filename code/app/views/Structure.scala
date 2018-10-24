@@ -30,6 +30,7 @@ object PublicSections extends Enumeration {
 object BackOfficeSections extends Enumeration {
   val Home = Value("Home")
   val Users = Value("Users")
+  val Knesset = Value("Knesset")
 }
 
 
@@ -63,6 +64,10 @@ object Structure {
       PageSectionItem("Invite Users", routes.UserCtrl.showInviteUser()),
       PageSectionItem("Users", routes.UserCtrl.showUserList()),
       PageSectionItem("Edit Profile", routes.UserCtrl.showNewUserPage())
+    )),
+    MultiPageSection("Knesset", BackOfficeSections.Knesset, Seq(
+      PageSectionItem("parties", routes.KnessetMemberCtrl.showParties()),
+      PageSectionItem("Knesset Members", routes.KnessetMemberCtrl.showKms())
     ))
   )
   

@@ -1,0 +1,15 @@
+@(subjectId: Long, callbackName:String)
+<script language="Javascript">
+        var uploader;
+        $(document).ready( function(){
+          uploader = FineUploaderHelper.create({
+            elementId: "uploader",
+            subjectId: @subjectId,
+            onComplete: function(id, name, json, xhr) {
+              uploader.cancel(id);
+              @{callbackName}(json);
+            }
+          });
+
+        });
+</script>

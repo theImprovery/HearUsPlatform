@@ -71,9 +71,20 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
     Action { implicit request =>
       Ok(
         routing.JavaScriptReverseRouter("beRoutes")(
+          routes.javascript.Assets.versioned,
           routes.javascript.UserCtrl.apiAddUser,
           routes.javascript.UserCtrl.apiReInviteUser,
-          routes.javascript.UserCtrl.apiDeleteInvitation
+          routes.javascript.UserCtrl.apiDeleteInvitation,
+          routes.javascript.FilesCtrl.apiAddFile,
+          routes.javascript.FilesCtrl.apiFilesForKm,
+          routes.javascript.FilesCtrl.apiGetImage,
+          routes.javascript.KnessetMemberCtrl.showEditKM,
+          routes.javascript.KnessetMemberCtrl.doEditKM,
+          routes.javascript.KnessetMemberCtrl.deleteKM,
+          routes.javascript.KnessetMemberCtrl.getContactOptionForKm,
+          routes.javascript.KnessetMemberCtrl.updateContactOption,
+          routes.javascript.KnessetMemberCtrl.updateParty,
+          routes.javascript.KnessetMemberCtrl.deleteParty
         )).as("text/javascript")
     }
   }

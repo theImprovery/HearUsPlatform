@@ -1,0 +1,189 @@
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import Helpers._
+
+@import dataaccess.Platform.Platform
+@import dataaccess.KnessetMemberDAO
+@(km:Form[KnessetMember], prefix:String, parties:Map[Long,String], platforms: Seq[Platform])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+
+
+@head = {
+  <link rel="stylesheet" href="@routes.Assets.versioned("css/contactOption.min.css")">
+  @comps.upload.headUpload()
+}
+
+@scripts = {
+
+  <script src="@routes.HomeCtrl.backEndRoutes()?113"></script>
+  <script> var urlPrefix = "@prefix" </script>
+  @comps.upload.bottom(km("id").value.getOrElse("-1").toLong, "fileUploadComplete")
+  <script src="@routes.Assets.versioned("js/kmPage.js")"></script>
+}
+
+@templates.backEndBase(km("name").value.getOrElse("New Knesset Member"), views.BackOfficeSections.Knesset, head, scripts){
+  <div class="row">
+    <div class="col">
+      <h1>
+        @km("name").value.getOrElse("New Knesset Member")
+      </h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-9">
+      <ul class="nav nav-tabs justify-content-center" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-toggle="pill" href="#kmDetails">Details</a>
+        </li>
+        <li class="nav-item">
+          @if( km("id").value.isDefined ) {
+            <a class="nav-link" data-toggle="pill" href="#imagePane">Files</a>
+          } else {
+            <a class="nav-link disabled" data-toggle="pill" href="#imagePane">Image</a>
+          }
+        </li>
+        <li class="nav-item">
+          @if( km("id").value.isDefined ) {
+            <a class="nav-link" data-toggle="pill" href="#contactOptions">Contact Options</a>
+          } else {
+            <a class="nav-link disabled" data-toggle="pill" href="#contactOptions"></a>
+          }
+        </li>
+      </ul>
+
+      <div class="tab-content pt-2">
+        <div class="tab-pane active" id="kmDetails">
+          <form id="editKMForm"  method="POST" action="@routes.KnessetMemberCtrl.doEditKM()">
+            @helper.CSRF.formField
+            <input type="hidden" id="id" name="id" value="@km("id").value.getOrElse("-1")">
+            <input type="hidden" id="partyId" name="partyId" value="@km("partyIdid").value.getOrElse("")">
+            <div class="form-group row @Helpers.fieldStatus(km("name"))">
+              <label for="name" class="col-sm-2 control-label">Name</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="name" name="name" value="@km("name").value.getOrElse("")">
+                @formErrors(km("name"))
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="gender" class="col-sm-2 control-label">Gender</label>
+              <div class="col-sm-10">
+                <input type="radio" name="gender" value="Male" id="male" checked><label for="male">Male</label>
+                <input type="radio" name="gender" value="Female" id="female"><label for="female">Female</label>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="gender" class="col-sm-2 control-label">Web Page</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="webPage" id="webPage" value="@km("webPage").value.getOrElse("")">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="gender" class="col-sm-2 control-label">Party</label>
+              <div class="col-sm-10">
+                <select name="parties" id="parties">
+                  @for((partyId, partyName) <- parties) {
+                    @if(partyId == km("partyId").value.getOrElse("-1").toLong){
+                      <option name="partiesList" value="@partyId" selected>@partyName</option>
+                    } else {
+                      <option name="partiesList" value="@partyId">@partyName</option>
+                    }
+                  }
+                </select>
+              </div>
+            </div>
+            <div class="col text-right">
+              <a href="@routes.KnessetMemberCtrl.showKms()" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+            </div>
+          </form>
+        </div>
+        <div class="tab-pane" id="imagePane">
+          <div class="row">
+            <div class="col">
+              <h3>
+                Image
+              </h3>
+            </div>
+          </div>
+          <div class="row slideUpPanel" style="display:none" id="fileEditorPanel">
+            <div class="col">
+              <div id="uploader"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="noData p-4" id="noImagePanel" style="display:none">
+                This knesset member has no image. You can <a href="javascript:showAddImage()">add</a>.
+              </div>
+              <div class="noData" id="loadingImagePanel">
+                <i class="fa fa-spin fa-refresh"></i> loading image...
+              </div>
+              <div id="imageCtnr" class="imageCtnr">
+                <div class="imageCard" data-role="imageTemplate">
+                  <div class="imagePreviewCtnr">
+                    <a href="" data-role="linkToFull" target="_blank">
+                      <img class="imagePreview" data-role="image" src="" alt="">
+                    </a>
+                  </div>
+                  <div class="creditCtnr">
+                    <input type="text" data-role="credit">
+                    <div class="buttonInlineCtnr">
+                      <button class="btn btn-sm btn-outline-secondary" type="button" data-role="updateCredit"><i class="fa fa-save"></i> Update</button>
+                      <button class="btn btn-sm btn-outline-danger" type="button" data-role="deleteFile"><i class="fa fa-trash"></i> Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="tab-pane" id="contactOptions">
+          <div class="row">
+            <div class="col-md-12">
+              <h3>
+                Contact Options
+              </h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="text-right">
+                <button onclick="updateContactOptions(@km("id").value.get)" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> Update</button>
+              </div>
+              <div class="noData p-4" id="noContact" style="display:none">
+                This knesset member has no contact options.
+              </div>
+              <div class="noData" id="loadingContactOptions">
+                <i class="fa fa-spin fa-refresh"></i> loading contact options...
+              </div>
+              <div class="optionsCtnr">
+                <ul id="platformList" style="list-style-type:none">
+                  <li id="optionTemplate">
+                    <select name="contactType">
+                      @for(platform <- platforms){
+                        <option name="@platform.toString" value="@platform">@platform.toString</option>
+                      }
+                    </select>
+                    <label name="title"> <input type="text" name="title" placeholder=""> <span>Title</span> </label>
+                    <label name="note"> <input type="text" name="note" placeholder=""> <span>Note</span> </label>
+                    <label name="details"> <input type="text" name="details" placeholder=""> <span>Details</span> </label>
+                    <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fa fa-minus"></i></button>
+                  </li>
+                </ul>
+                <div>
+                  <input type="button" class="btn-info buttonLike" onclick="addPlatform()" value="Add" align="right">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-2">
+        @if(km("id").value.isDefined) {
+          <button type="button" class="btn btn-danger" onclick="deleteKM(@km("id").value.getOrElse("-1"))"><i class="fa fa-trash-o"></i> Delete Knesset Member</button>
+        }
+        </div>
+      </div>
+    </div>
+  </div>
+}

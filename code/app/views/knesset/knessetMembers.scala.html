@@ -1,0 +1,47 @@
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+
+@(knessetMembers:Seq[KnessetMember])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@templates.backEndBase("Knesset Members", views.BackOfficeSections.Knesset, Html("")) {
+  <div class="row">
+    <div class="col">
+      <h1>
+        <div class="pull-right">
+          <a href="@routes.KnessetMemberCtrl.showNewKM()" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> Add</a>
+        </div>
+        Knesset Members
+      </h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      @if(knessetMembers.isEmpty) {
+        <div class="noData">
+          At the moment, the system contains no knesset members.
+        </div>
+      } else {
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Party</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for( km <- knessetMembers ) {
+                <tr>
+                  <td><a href="@routes.KnessetMemberCtrl.showEditKM(km.id)">@km.name</a>
+                    @*<a class="btn btn-sm btn-default" href="@routes.UserCtrl.showEditUserPage(u.username)"><i class="fa fa-edit"></i>*@
+                      @*Edit</a>*@
+                  </td>
+                  <td data-role="kmParty-@km.partyId"></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+}
