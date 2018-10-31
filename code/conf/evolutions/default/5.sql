@@ -8,8 +8,8 @@ create TABLE knesset_members (
   is_active   Boolean,
   web_page    VARCHAR(128),
   party_id    INTEGER,
-  FOREIGN KEY (party_id) REFERENCES parties(id)
+  FOREIGN KEY (party_id) REFERENCES parties(id) ON DELETE RESTRICT
 );
 
 # --- !Downs
-DROP TABLE knesset_member;
+DROP TABLE knesset_members;

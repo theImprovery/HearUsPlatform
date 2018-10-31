@@ -42,7 +42,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
       case None => Future(NotFound("file not found"))
       case Some(file) => {
         images.deleteFile(file).map(count => {
-          val filePath = Paths.get(config.get[String]("km.folder")).resolve(file.kmId.toString).resolve(fileId.toString + "." + file.suffix)
+          val filePath = Paths.get(config.get[String]("hear_us.files.km.folder")).resolve(file.kmId.toString).resolve(fileId.toString + "." + file.suffix)
           Files.delete(filePath)
           Ok(Json.toJson(count))
         })
@@ -56,17 +56,11 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
   //  }
 
   def apiFilesForKm( kmId:Long ) = Action.async{ req =>
-    images.getFile(kmId).map(image => Ok(Json.toJson(image)))
+    images.getFileForKM(kmId).map(image => Ok(Json.toJson(image)))
   }
 
-  def apiUpdateCredit(id:Long) = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
-    req.body.validate[String].fold(
-      errors => {
-        Logger.warn("Error parsing JSON request: " + errors.seq.map(_.toString()).mkString("\n"))
-        Future( BadRequest("Cannot parse JSON") )
-      },
-      credit =>
-        images.updateCredit(id, credit).map(count => Ok(Json.toJson(count))))
+  def apiUpdateCredit(id:Long) = deadbolt.SubjectPresent()(cc.parsers.tolerantText) { implicit req =>
+        images.updateCredit(id, req.body).map(count => Ok(Json.toJson(count)))
   }
 
   def apiGetImage(id:Long) = deadbolt.SubjectPresent()() { implicit req =>

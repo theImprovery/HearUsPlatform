@@ -66,7 +66,7 @@ object Structure {
       PageSectionItem("Edit Profile", routes.UserCtrl.showNewUserPage())
     )),
     MultiPageSection("Knesset", BackOfficeSections.Knesset, Seq(
-      PageSectionItem("parties", routes.KnessetMemberCtrl.showParties()),
+      PageSectionItem("Parties", routes.KnessetMemberCtrl.showParties()),
       PageSectionItem("Knesset Members", routes.KnessetMemberCtrl.showKms())
     ))
   )

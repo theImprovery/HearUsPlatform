@@ -8,7 +8,7 @@ create TABLE contact_options (
   note        text,
   details     VARCHAR(128),
   PRIMARY KEY (km_id, platform),
-  FOREIGN KEY (km_id) REFERENCES knesset_members(id)
+  FOREIGN KEY (km_id) REFERENCES knesset_members(id) ON DELETE CASCADE
 );
 
 # --- !Downs

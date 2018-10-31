@@ -76,6 +76,8 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.UserCtrl.apiReInviteUser,
           routes.javascript.UserCtrl.apiDeleteInvitation,
           routes.javascript.FilesCtrl.apiAddFile,
+          routes.javascript.FilesCtrl.apiUpdateCredit,
+          routes.javascript.FilesCtrl.deleteFile,
           routes.javascript.FilesCtrl.apiFilesForKm,
           routes.javascript.FilesCtrl.apiGetImage,
           routes.javascript.KnessetMemberCtrl.showEditKM,
@@ -84,7 +86,8 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.KnessetMemberCtrl.getContactOptionForKm,
           routes.javascript.KnessetMemberCtrl.updateContactOption,
           routes.javascript.KnessetMemberCtrl.updateParty,
-          routes.javascript.KnessetMemberCtrl.deleteParty
+          routes.javascript.KnessetMemberCtrl.deleteParty,
+          routes.javascript.KnessetMemberCtrl.showKms
         )).as("text/javascript")
     }
   }

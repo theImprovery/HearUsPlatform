@@ -25,6 +25,12 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
     } map { _.headOption}
   }
 
+  def getFileForKM( kmId:Long ):Future[Option[KMImage]] = {
+    db.run {
+      images.filter( _.kmId === kmId ).result
+    } map { _.headOption}
+  }
+
   def updateFile( i:KMImage ):Future[KMImage] = {
     db.run {
       images.filter(_.id === i.id).update(i)

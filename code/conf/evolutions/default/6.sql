@@ -8,7 +8,7 @@ create TABLE images (
   mime_type   VARCHAR(64),
   date        TIMESTAMP,
   credit      VARCHAR(64),
-  FOREIGN KEY (km_id) REFERENCES knesset_members(id)
+  FOREIGN KEY (km_id) REFERENCES knesset_members(id) ON DELETE CASCADE
 );
 
 # --- !Downs

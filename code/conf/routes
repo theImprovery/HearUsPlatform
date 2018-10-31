@@ -33,7 +33,7 @@ POST    /bkofc/newUserInvitation/    controllers.UserCtrl.doNewUserInvitation
 POST    /bkofc/changePassword        controllers.UserCtrl.doChangePassword
 
 GET     /bkof/parties                controllers.KnessetMemberCtrl.showParties
-POST    /bkof/party                  controllers.KnessetMemberCtrl.updateParty
+PATCH   /bkof/party                  controllers.KnessetMemberCtrl.updateParty
 DELETE  /bkof/party/:id              controllers.KnessetMemberCtrl.deleteParty(id:Long)
 GET     /bkof/knessetMembers         controllers.KnessetMemberCtrl.showKms
 GET     /bkof/KnessetMember          controllers.KnessetMemberCtrl.showNewKM
@@ -41,7 +41,7 @@ GET     /bkof/KnessetMember/:id      controllers.KnessetMemberCtrl.showEditKM(id
 POST    /bkof/KnessetMember          controllers.KnessetMemberCtrl.doEditKM()
 DELETE  /bkof/KnessetMember/:id      controllers.KnessetMemberCtrl.deleteKM(id:Long)
 GET     /bkof/contactOptions/:id     controllers.KnessetMemberCtrl.getContactOptionForKm(id:Long)
-POST    /bkof/contactOption/:id      controllers.KnessetMemberCtrl.updateContactOption(id:Long)
+PUT     /bkof/contactOption/:id      controllers.KnessetMemberCtrl.updateContactOption(id:Long)
 
 # Images
 POST    /api/mk/:id/addImage         controllers.FilesCtrl.apiAddFile(id:String)

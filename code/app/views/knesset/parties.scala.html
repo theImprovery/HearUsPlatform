@@ -9,35 +9,33 @@
 @templates.backEndBase("parties", views.BackOfficeSections.Knesset, Html(""), head){
   <div class="row">
     <div class="col-md-12">
+      <div class="pull-right">
+        <a href="javascript:addRow()" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> Add</a>
+      </div>
       <h1>Parties</h1>
     </div>
   </div>
   <div class="row">
-    <div class="col">
-    @if(parties.isEmpty){
-      @comps.noData{
-        No parties currently defined. You can <input type="button" class="addButton" onclick="test()" value="add one">.
+    <div class="col" id="partiesCtnr">
+      @if(parties.isEmpty){
+        @comps.noData{
+          No parties currently defined. You can <input type="button" class="addButton" onclick="addRow()" value="add one">.
       }
     }else{
-      <div id="partiesCtnr">
         <ul id="partiesList">
           @for(party <- parties){
             <li>
-              <form action="@routes.KnessetMemberCtrl.updateParty()" method="POST">
                 @helper.CSRF.formField
                 <input type="hidden" name="id" value="@party.id">
-                <input type="text" name="name" value="@party.name">
-                <a href="@party.webPage">@party.webPage</a>
-                <input type="hidden" name="webPage" value="@party.webPage">
-                <button type="button" onclick="editParty(this);" class="btn btn-sm btn-default"><i class="fa fa-edit"></i></button>
-                <button type="submit" class="btn btn-sm btn-primary hidden"><i class="fa fa-save"></i></button>
-              <button type="button" onclick="deleteParty(@party.id);" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-              </form>
+                <input type="text" name="name" value="@party.name" disabled="disabled">
+                <a href="@party.webPage" target="_blank">@party.webPage</a>
+                <input type="text" name="webPage" class="hidden" value="@party.webPage">
+                <button type="button" name="editBtn" onclick="editParty(this);" class="btn btn-sm btn-default"><i class="fa fa-edit"></i></button>
+                <button type="button" name="saveBtn" onclick="saveParty(this);" class="btn btn-sm btn-primary hidden"><i class="fa fa-save"></i></button>
+                <button type="button" name="deleteBtn" onclick="deleteParty(@party.id);" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
             </li>
           }
         </ul>
-      </div>
-
     }
     </div>
   </div>
