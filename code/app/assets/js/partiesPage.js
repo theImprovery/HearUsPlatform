@@ -1,11 +1,52 @@
 var partiesList;
+
+var prevPartyData = {};
+
+// returns party data from an
+// li element in a jquery.
+function getPartyData( $li ) {
+    return {
+        id: Number($li.find("[name=id]").val()),
+        name: $li.find(".partyName")[0].innerText,
+        webPage: $li.find(".partyWebPage")[0].innerText
+    };
+}
+
+function setPartyData( $li, data ){
+    $li.find("[name=id]")[0].value=data.id;
+    $li.find(".partyName")[0].innerText = data.name;
+    $li.find(".partyWebPage")[0].innerText = data.webPage;
+    $li.find(".partyWebPage").attr("href", data.webPage );
+}
+
+function setEditable( $li, shouldBeEditable ) {
+    $li.find("a").attr("contentEditable", shouldBeEditable);
+    $li.find("div.partyName").attr("contentEditable", shouldBeEditable);
+
+    if ( shouldBeEditable ) {
+        $li.find("[name=saveBtn]").removeClass("hidden");
+        $li.find("[name=cancelEditBtn]").removeClass("hidden");
+        $li.find("[name=editBtn]").addClass("hidden");
+
+    } else {
+        $li.find("[name=saveBtn]").addClass("hidden");
+        $li.find("[name=cancelEditBtn]").addClass("hidden");
+        $li.find("[name=editBtn]").removeClass("hidden");
+    }
+}
+
 function editParty(sender) {
     var $parent = $(sender.parentNode);
-    $($parent.find("[name=saveBtn]")[0]).removeClass("hidden");
-    $(sender).addClass("hidden");
-    $parent.find("a").addClass("hidden");
-    $parent.find("[name=webPage]").removeClass("hidden");
-    $parent.find("[name=name]").prop('disabled', false);
+    var partyData = getPartyData($parent);
+    prevPartyData[partyData.id] = partyData;
+    setEditable( $parent, true );
+}
+
+function cancelEdit(sender) {
+    var $parent = $(sender.parentNode);
+    var partyId = getPartyData($parent).id;
+    setEditable( $parent, false );
+    setPartyData( $parent, prevPartyData[partyId] );
 }
 
 function deleteParty(id) {
@@ -36,60 +77,66 @@ function addRow(){
     if(!partiesList){
         partiesList = document.createElement('ul');
         partiesList.setAttribute('id', 'partiesList');
-        // var partiesCtnr = document.createElement('div');
-        // partiesCtnr.setAttribute('id', 'partiesCtnr');
-        // console.log("not", document.getElementById("partiesCtnrs"));
+        partiesList.addClass('editableList');
+        var div = document.getElementById('partiesCtnr');
+        div.appendChild(partiesList);
+
         $(".card.noData").slideUp();
     }
-    var li = document.createElement("li");
-    var i_id = createElementWithAttr("input", {"type":"hidden", "name":"id"});
-    var i_name = createElementWithAttr("input", {"type":"text", "name":"name"});
-    var i_web = createElementWithAttr("input", {"type":"text", "name":"webPage"});
-    var webLink = createElementWithAttr("a", {"href":"", "class":"hidden", "target":"_blank"});
+    var idHidden = createElementWithAttr("input", {"type":"hidden", "name":"id"});
+    var partyName = createElementWithAttr("div", {"class":"partyName"});
+    var webLink = createElementWithAttr("a", {"href":"", "class":"partyWebPage", "target":"_blank"});
+    var cancelIcon = createElementWithAttr("i", {"class": "fa fa-close"});
+    var cancelEditButton = createElementWithAttr("button",
+        {"type":"button", "name":"cancelEditBtn", "class":"btn btn-sm btn-secondary", "onclick":"cancelEdit(this);"});
+    cancelEditButton.appendChild(cancelIcon);
+
     var saveIcon = createElementWithAttr("i", {"class": "fa fa-save"});
     var saveButton = createElementWithAttr("button",
         {"type":"button", "name":"saveBtn", "class":"btn btn-sm btn-primary", "onclick":"saveParty(this);"});
     saveButton.appendChild(saveIcon);
+
     var editIcon = createElementWithAttr("i", {"class": "fa fa-edit"});
     var editButton = createElementWithAttr("button",
-        {"type":"button", "name":"editBtn", "class":"btn btn-sm btn-primary hidden", "onclick":"editParty(this);"});
+        {"type":"button", "name":"editBtn", "class":"btn btn-sm btn-default hidden", "onclick":"editParty(this);"});
     editButton.appendChild(editIcon);
+
     var deleteIcon = createElementWithAttr("i", {"class": "fa fa-trash"});
     var deleteButton = createElementWithAttr("button",
         {"type":"button", "name":"deleteBtn", "class":"btn btn-sm btn-danger hidden"});
     deleteButton.appendChild(deleteIcon);
-    // var csrf = document.getElementById("Playjax_csrfTokenValue").innerText;
-    // var csrf_input = createElementWithAttr("input", {"style":"display:none", "value":csrf, "name":"csrfToken"});
-    var formChild = [i_id, i_name, i_web, webLink, saveButton, editButton, deleteButton];
-    for (var i = 0; i < formChild.length; i++) {
-        li.appendChild(formChild[i]);
+
+    var liElements = [idHidden, partyName, webLink, editButton, cancelEditButton, saveButton, deleteButton];
+    var li = document.createElement("li");
+    for (var i = 0; i < liElements.length; i++) {
+        li.appendChild(liElements[i]);
+        li.appendChild(createFiller());
     }
     partiesList.appendChild(li);
-    var div = document.getElementById('partiesCtnr');
-    div.appendChild(partiesList);
-
+    setPartyData($(li), {id:0, name:"name", webPage:"http://party.org.il"});
+    setEditable($(li),true);
 }
-
+function createFiller() {
+    return document.createTextNode("\n                 ");
+}
 function createElementWithAttr(name, attr) {
     var emt = document.createElement(name);
-    jQuery.each(attr, function(i, val) {
-        emt.setAttribute(i, val);
+    Object.keys(attr).forEach(function(key) {
+        emt.setAttribute(key, attr[key]);
     });
     return emt;
 }
 
 function saveParty(sender) {
     var $parentLi = $(sender.parentNode);
-    var data = {};
-    data.id = Number($parentLi.find("[name=id]")[0].value);
-    data.name = $parentLi.find("[name=name]")[0].value;
-    data.webPage = $parentLi.find("[name=webPage]")[0].value;
-    console.log("data", data);
+    var data = getPartyData($parentLi);
+    setEditable($parentLi, false);
     patch(data, sender);
 }
 
 function patch(data, sender) {
     var msgDiv = Informationals.showBackgroundProcess("Updating..");
+    var $parent = $(sender.parentNode);
     new Playjax(beRoutes)
         .using(function (c) {
             return c.KnessetMemberCtrl.updateParty();
@@ -99,22 +146,15 @@ function patch(data, sender) {
             if (res.ok) {
                 msgDiv.success();
                 res.json().then(function (json){
-                    var $parent = $(sender.parentNode);
-                    $($parent.find("[name=saveBtn]")[0]).addClass("hidden");
-                    $($parent.find("[name=deleteBtn]")[0]).removeClass("hidden");
-                    console.log("dlele", $parent.find("[name=deleteBtn]"));
-                    $($parent.find("[name=deleteBtn]")[0]).attr("onclick", "deleteParty("+ json.id +");");
-                    $($parent.find("[name=editBtn]")[0]).removeClass("hidden");
-                    $parent.find("[name=webPage]")[0].value=json.webPage;
-                    $($parent.find("[name=webPage]")[0]).addClass("hidden");
-                    $parent.find("a")[0].innerText = json.webPage;
-                    $parent.find("a").prop("href", json.webPage);
-                    $parent.find("a").removeClass("hidden");
-                    $parent.find("[name=name]").prop('disabled', true);
+                    setPartyData($parent, json);
+                    prevPartyData[json.id]=undefined;
+                    $parent.find("[name=deleteBtn]").slideDown();
                 });
+
             } else {
                 msgDiv.dismiss();
                 Informationals.makeWarning("Update Party " + data.name, "Failed", 1500);
+                setPartyData($parent, prevPartyData[data.id]);
             }
         });
 }

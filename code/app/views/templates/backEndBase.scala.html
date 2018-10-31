@@ -5,6 +5,7 @@
 )(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @internalExtraHead = {
+  <link rel="stylesheet" href="@routes.Assets.versioned("css/backend.min.css")">
 <meta name="robots" content="noindex, nofollow">
   @extraHead
 }

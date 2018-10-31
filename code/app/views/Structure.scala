@@ -41,33 +41,33 @@ object Structure {
   
   val publicItems:Seq[TopSiteSection[PublicSections.Value]] = Seq(
     PageSection("Public Home", PublicSections.Home, routes.HomeCtrl.index),
-    PageSection("Login", PublicSections.Login, routes.UserCtrl.showLogin),
-    MultiPageSection("Components", PublicSections.Components,
-      Seq(
-        PageSectionItem("Pager", routes.HomeCtrl.pager(1)),
-        PageSectionItem("Informationals", routes.HomeCtrl.informationals),
-        PageSectionItem("Styled Inputs", routes.HomeCtrl.styledInputs)
-      )
-    ),
-    MultiPageSection("Other", PublicSections.Others,
-      Seq(
-        PageSectionItem("Login", routes.UserCtrl.showLogin),
-        SeparatorSectionItem,
-        PageSectionItem("Public Home", routes.HomeCtrl.index)
-      )
-    )
+    PageSection("Login", PublicSections.Login, routes.UserCtrl.showLogin)
+//    MultiPageSection("Components", PublicSections.Components,
+//      Seq(
+//        PageSectionItem("Pager", routes.HomeCtrl.pager(1)),
+//        PageSectionItem("Informationals", routes.HomeCtrl.informationals),
+//        PageSectionItem("Styled Inputs", routes.HomeCtrl.styledInputs)
+//      )
+//    ),
+//    MultiPageSection("Other", PublicSections.Others,
+//      Seq(
+//        PageSectionItem("Login", routes.UserCtrl.showLogin),
+//        SeparatorSectionItem,
+//        PageSectionItem("Public Home", routes.HomeCtrl.index)
+//      )
+//    )
   )
   
   val backOfficeSections:Seq[TopSiteSection[BackOfficeSections.Value]] = Seq(
     PageSection("BackEnd Home", BackOfficeSections.Home, routes.UserCtrl.userHome() ),
+    MultiPageSection("Knesset", BackOfficeSections.Knesset, Seq(
+      PageSectionItem("Parties", routes.KnessetMemberCtrl.showParties()),
+      PageSectionItem("Knesset Members", routes.KnessetMemberCtrl.showKms())
+    )),
     MultiPageSection("Users", BackOfficeSections.Users, Seq(
       PageSectionItem("Invite Users", routes.UserCtrl.showInviteUser()),
       PageSectionItem("Users", routes.UserCtrl.showUserList()),
       PageSectionItem("Edit Profile", routes.UserCtrl.showNewUserPage())
-    )),
-    MultiPageSection("Knesset", BackOfficeSections.Knesset, Seq(
-      PageSectionItem("Parties", routes.KnessetMemberCtrl.showParties()),
-      PageSectionItem("Knesset Members", routes.KnessetMemberCtrl.showKms())
     ))
   )
   

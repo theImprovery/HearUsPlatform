@@ -1,6 +1,6 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
-application.title=PSPS Seed
-navbar.title=PSPS Seed
+application.title=תשמעו אותנו
+navbar.title=תשמעו אותנו
 navbar.logout=Logout
 inviteEmail.title=Invitation to Open an Account in a PSPS Server
 inviteEmail.body=You have been invited to open an account on a PSPS server. To accept the invitation, please click the link below.\n{0}
@@ -24,6 +24,8 @@ error.invitation.doesNotExist=Invitation does not exist
 error.password=Passwords must match, and cannot be empty
 error.password.incorrect=Incorrect password
 knessetMember.update=Knesset Member updated successfully
+
+parties.title=מפלגות
 
 pager.title=Pager
 informationals.title=Informationals

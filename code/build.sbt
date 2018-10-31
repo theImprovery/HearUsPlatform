@@ -1,6 +1,6 @@
-name := """base-app"""
+name := """hear-us"""
 
-organization := "com.example"
+organization := "il.org.drm"
 
 version := "1.0-SNAPSHOT"
 

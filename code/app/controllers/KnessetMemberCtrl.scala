@@ -35,19 +35,11 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     )(KnessetMember.apply)(KnessetMember.unapply)
   )
 
-  val partyForm = Form(
-    mapping(
-      "id"->number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
-      "name"->text,
-      "webPage"->text
-    )(Party.apply)(Party.unapply)
-  )
-
   def showParties = deadbolt.SubjectPresent()() { implicit req =>
     for {
       parties <- kms.getAllParties
     } yield {
-      Ok( views.html.knesset.parties(parties) )
+      Ok( views.html.knesset.parties(parties.sortBy(_.name)) )
     }
   }
 
