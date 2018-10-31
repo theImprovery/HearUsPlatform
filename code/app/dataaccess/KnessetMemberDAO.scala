@@ -71,6 +71,10 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
     }.map( insertRes => insertRes.getOrElse(co) )
   }
 
+  def addContactOption( cos: Seq[ContactOption] ):Future[Seq[ContactOption]] = {
+    Future.sequence(cos.map(co => addContactOption(co)))
+  }
+
   def getContactOptions( kmId: Long ):Future[Seq[ContactOption]] = {
     db.run{
       contactOptions.filter( _.kmId === kmId ).result

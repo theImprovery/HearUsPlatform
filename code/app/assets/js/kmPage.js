@@ -3,7 +3,6 @@ $(document).ready( function() {
     var kmId = $("#id").val();
     loadFiles(kmId);
     setupContactOptions(kmId);
-
 });
 
 function showAddImage() {
@@ -12,7 +11,7 @@ function showAddImage() {
 }
 
 function hideFileEditor() {
-    $("#noImagePanel").slideDown();
+    $("#fileEditorPanel").slideUp();
 }
 
 var fileCardCtnr, template;
@@ -29,9 +28,7 @@ function loadFiles(kmId) {
             if ( !data ) {
                 $("#noImagePanel").slideDown();
             } else {
-                for (var di in data){
-                    createCard(data[di]);
-                }
+                    createCard(data);
             }
         });
 }
@@ -39,20 +36,21 @@ function loadFiles(kmId) {
 function loadSingleFile(imageId) {
     $.ajax(beRoutes.controllers.FilesCtrl.apiGetImage(imageId))
         .done( function (data) {
+            console.log("image data", data);
             $("#noImagePanel").hide(); // in case this is the first file.
             createCard(data);
         });
 }
 
 function createCard(data){
-    var imageLink = urlPrefix + data.relatedType + "/" + data.relatedId + "/" + data.id + "." + data.suffix;
+    var imageLink = urlPrefix + "km/" + data.kmId + "/" + data.id + "." + data.suffix;
     var newFileCard = template.clone();
     newFileCard.data("fileId", data.id);
     newFileCard.find("img[data-role='image']").attr('src', imageLink);
     newFileCard.find("a[data-role='linkToFull']").attr('href', imageLink);
     newFileCard.find("[data-role='credit']").val(data.credit);
     newFileCard.find("[data-role='updateCredit']").click(function() {
-        updateFileCaptions(newFileCard);
+        updateFileCredits(newFileCard);
     });
     newFileCard.find("[data-role='deleteFile']").click(function() {
         deleteFile(newFileCard);
@@ -69,6 +67,7 @@ function createCard(data){
 
             if (response.status===200) {
                 newFileCard.find("img[data-role='image']").attr('src', imageLink);
+                Informationals.loader.dismiss();
             } else {
                 console.log("reloading image at '" + imageLink + "'");
                 window.setTimeout(imageLoader, 1000);
@@ -78,48 +77,61 @@ function createCard(data){
     window.setTimeout(imageLoader, 1000);
 }
 
-function updateFileCaptions(fileCard) {
-    //id, captions
-    var update = {};
-    eachLang(function (lang) {
-        update[lang] = fileCard.find("[data-role='credit']").val();
-    });
+function updateFileCredits(fileCard) {
+    //id, credit
+    var update = fileCard.find("[data-role='credit']").val();
     var msgDiv = Informationals.showBackgroundProcess("Updating file");
-    var call = beRoutes.controllers.FilesCtrl.apiUpdateCaption(fileCard.data("fileId"));
-    return $.ajax({ url: call.url,
-        type: call.type,
-        data: JSON.stringify(update),
-        dataType: "json",
-        contentType: "application/json; charset=utf-8"
-    }).done(function(){
-        msgDiv.success();
-    }).always(function(){
-        msgDiv.dismiss();
-    }).fail( function(req, status, error){
-        if ( req.readyState === 4 ) {
-            // don't fire if we're navigating away from the page.
-            console.log("Error");
-            console.log( req );
-            console.log( status );
-            console.log( error );
-            Informationals.show( Informationals.makeDanger("Error updating knesset member", status + "\n" + error));
-        }
-    });
+    new Playjax(beRoutes)
+        .using(function (c) {
+            return c.FilesCtrl.apiUpdateCredit(fileCard.data("fileId"));})
+        .fetch(update)
+        .then(function (res) {
+            if (res.ok){
+                msgDiv.success();
+            } else {
+                alert("baa");
+            }
+        });
 }
 
 function fileUploadComplete(json) {
+    Informationals.loader("Uploading image");
     loadSingleFile(json.id);
     hideFileEditor();
 }
 
 function deleteCard(fileCard) {
     fileCard.remove();
+    $("#noImagePanel").slideDown();
 }
 
 function deleteFile(fileCard) {
-    var dialog = makeShowDeleteDialogWithCallback(beRoutes.controllers.FilesCtrl.deleteFile, "file", deleteCard);
-    dialog(fileCard.data("fileId"), fileCard.find("[data-role='credit']").val(), fileCard);
-    $("#fileEditorPanel").slideDown();
+    // var dialog = makeShowDeleteDialogWithCallback(beRoutes.controllers.FilesCtrl.deleteFile, "file", deleteCard);
+    // dialog(fileCard.data("fileId"), fileCard.find("[data-role='credit']").val(), fileCard);
+    // $("#fileEditorPanel").slideDown();
+    swal({
+        title:"Are you sure you want to delete this knesset member's image?",
+        icon:"warning",
+        buttons: {
+            cancel:true,
+            confirm:true
+        }
+    }).then( function(willDelete){
+        if(willDelete) {
+            // Informationals.loader("Deleting file..");
+            new Playjax(beRoutes)
+                .using(function(c){
+                    return c.FilesCtrl.deleteFile(fileCard.data("fileId"));}).fetch()
+                .then( function(res){
+                    if (res.ok) {
+                        deleteCard(fileCard);
+                        // Informationals.loader.dismiss();
+                    } else {
+                        Informationals.makeDanger("Deletion of knesset member's image "+ id +" failed", "See server log for details", 1500).show();
+                    }
+                });
+        }
+    });
 }
 
 function preProcessFormAndSend() {
@@ -142,8 +154,8 @@ function preProcessFormAndSend() {
     return false;
 }
 $('#editKMForm').submit(function() {
-    var choosenParty = $("#parties option:selected").val();
-    $("#partyId").val(choosenParty);
+    var chosenParty = $("#parties option:selected").val();
+    $("#partyId").val(chosenParty);
 
 });
 
@@ -162,7 +174,7 @@ function deleteKM(id){
                     return c.KnessetMemberCtrl.deleteKM(id);}).fetch()
                 .then( function(res){
                     if (res.ok) {
-                        document.location=beRoutes.knessetMemberCtrl.showKms();
+                         window.location = beRoutes.controllers.KnessetMemberCtrl.showKms().url;
                     } else {
                         Informationals.makeDanger("Deletion of knesset member "+ id +" failed", "See server log for details", 1500).show();
                     }
@@ -181,7 +193,7 @@ function setupContactOptions(kmId) {
             .done( function (data) {
                 $("#loadingContactOptions").remove();
                 if ( !data ) {
-                    $("#noImagePanel").slideDown();
+                    $("#noContact").slideDown();
                 } else {
                     for (var di in data){
                         addPlatform(data[di].platform, data[di].details, data[di].note, data[di].title);
@@ -195,9 +207,9 @@ function addPlatform(platform, details, note, title) {
     var newPlatform = optionTemplate.cloneNode(true);
     if(platform) {
         $(newPlatform).find("select").val(platform);
-        $(newPlatform).find("input [placeholder='details']").val(details);
-        $(newPlatform).find("input [placeholder='note']").val(note);
-        $(newPlatform).find("input [placeholder='title']").val(title);
+        $(newPlatform).find("input[name='details']").val(details);
+        $(newPlatform).find("input[name='note']").val(note);
+        $(newPlatform).find("input[name='title']").val(title);
     }
     platformList.appendChild(newPlatform);
 }
@@ -213,25 +225,23 @@ function updateContactOptions(id){
         var option = {};
         values.forEach(function (val) {
             $(emt).find("label [name="+ val +"]").each( function() {
-                option[val] = $(emt).find("input").val();
+                option[val] = $(this).val();
             });
+            option.platform = $(emt).find("#contactType option:selected").val();
         });
+        option.kmId = Number($("#id").val());
         data.push(option);
     });
-    console.log("before ajax");
-    console.log(data);
-    $.ajax({
-        url: beRoutes.controllers.KnessetMemberCtrl.updateContactOption(Number(id)).url,
-        type: "POST",
-        data: JSON.stringify(data),
-        dataType: "json",
-        contentType: "application/json; charset=utf-8"
-    }).done(function (data, status, xhr) {
-        console.log(data);
-        if (dataObj.id === -1) {
-            // window.location = jsRoutes.controllers.RoutesCtrl.showRouteEditorPage(data.id).url;
-        } else {
-            // window.location = jsRoutes.controllers.RoutesCtrl.index(null, null, null, null).url;
-        }
-    });
+    new Playjax(beRoutes)
+                .using(function (c) {
+                    return c.KnessetMemberCtrl.updateContactOption(Number(id));
+                })
+                .fetch(data)
+                .then( function (res) {
+                    if (res.ok) {
+                        Informationals.makeSuccess("Updated Contact Options", "", 1000).show();
+                    } else {
+                        Informationals.makeWarning("Something went wrong", "Each platform can appear once", 1500).show();
+                    }
+                });
 }

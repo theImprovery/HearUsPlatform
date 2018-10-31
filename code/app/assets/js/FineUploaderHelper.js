@@ -15,7 +15,8 @@ var FineUploaderHelper = (function(){
             },
             element: document.getElementById(options.elementId),
             request: {
-                endpoint:beRoutes.controllers.FilesCtrl.apiAddFile(options.subjectId).url
+                endpoint:beRoutes.controllers.FilesCtrl.apiAddFile(options.subjectId).url,
+                customHeaders:{"Csrf-Token": document.getElementById("Playjax_csrfTokenValue").innerText}
             },
             callbacks: {
                 onComplete: options.onComplete

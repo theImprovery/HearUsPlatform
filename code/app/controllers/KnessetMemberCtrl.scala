@@ -43,8 +43,6 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     )(Party.apply)(Party.unapply)
   )
 
-
-
   def showParties = deadbolt.SubjectPresent()() { implicit req =>
     for {
       parties <- kms.getAllParties
@@ -112,30 +110,41 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   }
 
   def updateContactOption(id:Long) = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
-    Logger.info("update")
     req.body.validate[Seq[ContactOption]].fold(
       errors => Future(BadRequest(Json.obj("status"->"error", "data"->JsError.toJson(errors)))),
       cos => {
-        Logger.info("ans " + cos.mkString("\n"))
-        Future(Ok("ok"))
+        kms.addContactOption(cos).map(ans => Ok(Json.toJson(ans)))
       }
     )
   }
 
-  def updateParty() = deadbolt.SubjectPresent()() { implicit req =>
-    partyForm.bindFromRequest().fold(
+  def updateParty() = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
+    req.body.validate[Party].fold(
       errors => {
         for {
           parties <- kms.getAllParties
         } yield {
-          Logger.info( errors.errors.mkString("\n") )
+          Logger.info( errors.mkString("\n") )
           BadRequest( views.html.knesset.parties(parties))
         }
       },
       party => {
-        kms.addParty(party).map(newP => Redirect(routes.KnessetMemberCtrl.showParties()))
+        kms.addParty(party).map(newP => Ok(Json.toJson(newP)))
       }
     )
+//    partyForm.bindFromRequest().fold(
+//      errors => {
+//        for {
+//          parties <- kms.getAllParties
+//        } yield {
+//          Logger.info( errors.errors.mkString("\n") )
+//          BadRequest( views.html.knesset.parties(parties))
+//        }
+//      },
+//      party => {
+//        kms.addParty(party).map(newP => Redirect(routes.KnessetMemberCtrl.showParties()))
+//      }
+//    )
   }
 
   def deleteParty(id:Long) = deadbolt.SubjectPresent()() { implicit req =>

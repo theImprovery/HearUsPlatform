@@ -70,3 +70,64 @@ ul.errors{
 .input-group-text {
   height: 100%;
 }
+
+.filesCtnr {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+@fcPadding:.25em;
+.imageCard {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  align-content: stretch;
+  margin: 0.5em;
+  border: 1px solid #888;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.25);
+
+  .imagePreviewCtnr{
+    background-color: #DDD;
+    width: 140px;
+    height: 152px;
+    overflow: hidden;
+    padding: @fcPadding;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    a {
+      display: block;
+      transition: 1s transform ease-out;
+      &:hover {
+        box-shadow: 0 0 8px rgba(255,255,0,.75);
+        transform: rotate(10deg);
+      }
+      img {
+        width: 100%;
+      }
+    }
+  }
+  .creditCtnr{
+    background-color: #EEE;
+    padding: @fcPadding;
+    .singleLanguageCtnr {
+      padding: 0;
+      margin: 0;
+    }
+
+    .buttonInlineCtnr {
+      padding-top: @fcPadding;
+      text-align: right;
+    }
+  }
+
+  .buttonCtnr {
+    padding: @fcPadding;
+    padding: 1em;
+    background-color: #DDD;
+
+  }
+}
