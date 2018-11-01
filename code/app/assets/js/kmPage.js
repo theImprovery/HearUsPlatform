@@ -43,7 +43,7 @@ function loadSingleFile(imageId) {
 }
 
 function createCard(data){
-    var imageLink = urlPrefix + "km/" + data.kmId + "/" + data.id + "." + data.suffix;
+    var imageLink = urlPrefix + data.kmId;
     var newFileCard = template.clone();
     newFileCard.data("fileId", data.id);
     newFileCard.find("img[data-role='image']").attr('src', imageLink);
@@ -95,8 +95,7 @@ function updateFileCredits(fileCard) {
 }
 
 function fileUploadComplete(json) {
-    Informationals.loader("Uploading image");
-    loadSingleFile(json.id);
+    loadSingleFile(json.record.id);
     hideFileEditor();
 }
 

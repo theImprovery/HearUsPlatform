@@ -43,8 +43,11 @@ DELETE  /bkof/KnessetMember/:id      controllers.KnessetMemberCtrl.deleteKM(id:L
 GET     /bkof/contactOptions/:id     controllers.KnessetMemberCtrl.getContactOptionForKm(id:Long)
 PUT     /bkof/contactOption/:id      controllers.KnessetMemberCtrl.updateContactOption(id:Long)
 
+# Serve Local Images
+GET     /images/mk/:id                controllers.KnessetMemberCtrl.getImage(id:Long)
+
 # Images
-POST    /api/mk/:id/addImage         controllers.FilesCtrl.apiAddFile(id:String)
+POST    /api/mk/:id/images         controllers.FilesCtrl.apiAddFile(id:String)
 PATCH   /api/image/:id/              controllers.FilesCtrl.apiUpdateCredit(id:Long)
 DELETE  /api/image/:id/              controllers.FilesCtrl.deleteFile(id:Long)
 GET     /api/image/km/:id            controllers.FilesCtrl.apiFilesForKm(id:Long)

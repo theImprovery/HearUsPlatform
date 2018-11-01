@@ -1,9 +1,11 @@
 package controllers
 
+import java.nio.file.{Files, Paths}
+
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions}
 import javax.inject.Inject
 import models.{ContactOption, KMImage, KnessetMember, Party}
-import dataaccess.{KnessetMemberDAO, Platform}
+import dataaccess.{ImagesDAO, KnessetMemberDAO, Platform}
 import play.api.{Configuration, Logger}
 import play.api.data.{Form, _}
 import play.api.data.Forms._
@@ -17,6 +19,7 @@ import scala.concurrent.Future
 
 
 class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
+                                  images: ImagesDAO,
                                   langs:Langs, messagesApi:MessagesApi, conf:Configuration) extends InjectedController{
 
   implicit private val ec = cc.executionContext
@@ -103,7 +106,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def updateContactOption(id:Long) = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
     req.body.validate[Seq[ContactOption]].fold(
-      errors => Future(BadRequest(Json.obj("status"->"error", "data"->JsError.toJson(errors)))),
+      errors => Future(BadRequest(Json.obj("status" -> "error", "data" -> JsError.toJson(errors)))),
       cos => {
         kms.addContactOption(cos).map(ans => Ok(Json.toJson(ans)))
       }
@@ -145,6 +148,18 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       deleted <- kms.deleteParty(id)
     } yield {
       Ok(views.html.knesset.parties(parties))
+    }
+  }
+  
+  def getImage(id:Long) = Action.async { implicit req =>
+    images.getFileForKM(id).map {
+      case None => NotFound("image not found")
+      case Some(image) => {
+        val path = Paths.get(conf.get[String]("hear_us.files.km.folder"))
+                        .resolve(image.kmId.toString)
+                        .resolve(image.id.toString + "." + image.suffix)
+        Ok(Files.readAllBytes(path)).as(image.mimeType)
+      }
     }
   }
 }

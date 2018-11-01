@@ -6,6 +6,7 @@ var FineUploaderHelper = (function(){
      * @return Options for fineUploader UI component
      */
     function createOptions(options) {
+        var call = beRoutes.controllers.FilesCtrl.apiAddFile(options.subjectId);
         var retVal = {autoUpload: false,
             thumbnails: {
                 placeholders: {
@@ -14,12 +15,22 @@ var FineUploaderHelper = (function(){
                 }
             },
             element: document.getElementById(options.elementId),
+            validation:{
+                itemLimit:1
+            },
             request: {
-                endpoint:beRoutes.controllers.FilesCtrl.apiAddFile(options.subjectId).url,
+                endpoint:call.url,
+                method: call.method,
+                forceMultipart:true,
                 customHeaders:{"Csrf-Token": document.getElementById("Playjax_csrfTokenValue").innerText}
             },
             callbacks: {
-                onComplete: options.onComplete
+                onComplete: options.onComplete,
+                onError: function(id, name, errorReason, xhr){
+                    console.error("Error loading file " + name + " (" + id + ")" +
+                                    ": " + errorReason );
+                    console.log( xhr );
+                }
             }
         };
 

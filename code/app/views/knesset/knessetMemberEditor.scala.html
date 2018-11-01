@@ -28,7 +28,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-9">
+    <div class="col">
       <ul class="nav nav-tabs justify-content-center" role="tablist">
         <li class="nav-item">
           <a class="nav-link active" data-toggle="pill" href="#kmDetails">Details</a>
@@ -111,7 +111,7 @@
           <div class="row">
             <div class="col">
               <div class="noData p-4" id="noImagePanel" style="display:none">
-                This knesset member has no image. You can <a href="javascript:showAddImage()">add</a>.
+                This knesset member has no image. You can <a href="javascript:showAddImage()">add one</a>.
               </div>
               <div class="noData" id="loadingImagePanel">
                 <i class="fa fa-spin fa-refresh"></i> loading image...
@@ -125,6 +125,7 @@
                   </div>
                   <div class="creditCtnr">
                     @helper.CSRF.formField
+                    @Messages("imageCredit"):<br>
                     <input type="text" data-role="credit">
                     <div class="buttonInlineCtnr">
                       <button class="btn btn-sm btn-outline-secondary" type="button" data-role="updateCredit"><i class="fa fa-save"></i> Update</button>
@@ -163,9 +164,9 @@
                         <option name="@platform.toString" value="@platform">@platform.toString</option>
                       }
                     </select>
-                    <label name="title"> <input type="text" name="title" placeholder=""> <span>Title</span> </label>
+                    <label name="title"> <input type="text" name="title" placeholder="" maxlength="256"> <span>Title</span> </label>
                     <label name="note"> <input type="text" name="note" placeholder=""> <span>Note</span> </label>
-                    <label name="details"> <input type="text" name="details" placeholder=""> <span>Details</span> </label>
+                    <label name="details"> <input type="text" name="details" placeholder="" maxlength="256"> <span>Details</span> </label>
                     <button type="button" class="btn btn-danger" onclick="deleteRow(this)"><i class="fa fa-minus"></i></button>
                   </li>
                 </ul>
@@ -177,11 +178,22 @@
           </div>
         </div>
       </div>
-      <div class="form-group row">
-        <div class="col-2">
+      <div class="row my-5">
+        <div class="col">
         @if(km("id").value.isDefined) {
           <button type="button" class="btn btn-danger" onclick="deleteKM(@km("id").value.getOrElse("-1"))"><i class="fa fa-trash-o"></i> Delete Knesset Member</button>
         }
+        </div>
+      </div>
+      <div class="row my-5">
+        <div class="col">
+          test form for bypassing fineUpload (to be removed).
+          <form action="@routes.FilesCtrl.apiAddFile(km("id").value.getOrElse("-1"))" method="POST" enctype="multipart/form-data">
+            <input type="file" name="qqfile">
+            <input type="text" name="qqfilename">
+            <button type="submit">Submit</button>
+            @helper.CSRF.formField
+          </form>
         </div>
       </div>
     </div>

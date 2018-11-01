@@ -4,9 +4,9 @@
 create TABLE contact_options (
   km_id       INTEGER,
   platform    VARCHAR(64),
-  title       VARCHAR(8),
+  title       VARCHAR(256),
   note        text,
-  details     VARCHAR(128),
+  details     VARCHAR(256),
   PRIMARY KEY (km_id, platform),
   FOREIGN KEY (km_id) REFERENCES knesset_members(id) ON DELETE CASCADE
 );

@@ -44,7 +44,7 @@ var UiUtils = (function () {
             }
             if ( options.data  ) { $emt.data(options.data); }
             if ( options.value ) { $emt.val(options.value); }
-            if ( options.id    ) { emt.id = options.id; console.log("setting id to " + options.id);}
+            if ( options.id    ) { emt.id = options.id; }
             if ( options.name  ) { emt.name=options.name; }
             if ( options.src   ) { emt.src=options.src; }
             if ( options.selected    ) { emt.selected=true; }
