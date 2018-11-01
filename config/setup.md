@@ -1,4 +1,4 @@
-# Geneva Initiative Setup
+# Server setup
 
 Use files in `resources` folder. Replace $passwords place-holders with real passwords.
 
@@ -12,7 +12,7 @@ Use files in `resources` folder. Replace $passwords place-holders with real pass
    * Configure PostgreSQL security
    * Create PostgreSQL database and user
 0. Install Java
-0. Deploy Play geneva-initiative app
+0. Deploy Play app
    * Install Play app service
 0. Install and configure IceBerg
    * Pull lastes version with Git
