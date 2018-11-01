@@ -1,0 +1,14 @@
+# /etc/systemd/system/hear-us-platform.play.service
+
+[Unit]
+Description=HearUsPlatform - a Play Framework Application
+After=syslog.target network.target
+
+[Service]
+ExecStart=/opt/mbarsinai/hear-us-platform/bin/hear-us-platform -Dconfig.file=/opt/mbarsinai/hear-us-platform/conf/server.conf -Dpidfile.path=/opt/mbarsinai/hear-us-platform/RUNNING.pid -Dplay.evolutions.db.default.autoApply=true
+SuccessExitStatus=143
+PIDFile=/opt/mbarsinai/hear-us-platform/RUNNING.pid
+User=play
+
+[Install]
+WantedBy=multi-user.target

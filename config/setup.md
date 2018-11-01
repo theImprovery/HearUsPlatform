@@ -8,6 +8,7 @@ Use files in `resources` folder. Replace $passwords place-holders with real pass
    * Configure HTTPd to serve as Play proxy
    * Enable HTTPS with [Let’s Encrypt](https://letsencrypt.org/).  
 0. Install and configure PostgreSQL
+   * Add PostgreSQL [YUM repository](https://yum.postgresql.org/howtoyum.php)
    * Install PostgreSQL
    * Configure PostgreSQL security
    * Create PostgreSQL database and user
