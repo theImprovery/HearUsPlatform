@@ -1,4 +1,4 @@
-# geneva-initiative
+# HearUsPlatform Server Configuration
 
 Click [here](http://hear-us.mbarsinai.com/) for the site. Click [here](setup.md) for installation and configuration steps.
 
