@@ -3,9 +3,15 @@ application.title=תשמעו אותנו
 
 navbar.title=תשמעו אותנו
 navbar.logout=התנתקות
-navbar.knesset=הכנסת
+navbar.knesset=כנסת ישראל
 navbar.knessetMembers=חברי כנסת
 navbar.parties=מפלגות
+navbar.logout=התנתקות
+navbar.myProfile=הפרופיל שלי
+navbar.users.title=משתמשים
+navbar.users.invite=שליחת הזמנה
+navbar.users.list=רשימה
+navbar.main=ראשי
 
 inviteEmail.title=Invitation to Open an Account in a PSPS Server
 inviteEmail.body=You have been invited to open an account on a PSPS server. To accept the invitation, please click the link below.\n{0}
@@ -55,14 +61,18 @@ contactPlatform.Fax=פקס
 
 # Common verbs
 add=הוספה
-logout=יציאה
-save=שמירה
 cancel=ביטול
-update=עידכון
 delete=מחיקה
-title=כותרת
-note=הערה
 details=פרטים
+loadingContactDetails=טוען פרטי קשר...
+loadingImage=טוען תמונה...
+logout=יציאה
+note=הערה
+save=שמירה
+title=כותרת
+update=עידכון
+username=שם משתמש
+users=משתמשים
 
 # Common nouns
 contactOptions=פרטי קשר
@@ -75,6 +85,4 @@ male=זכר
 name=שם
 party=מפלגה
 website=אתר אינטרנט
-loadingImage=טוען תמונה...
-loadingContactDetails=טוען פרטי קשר...
 
