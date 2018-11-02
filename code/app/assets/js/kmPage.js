@@ -23,12 +23,11 @@ function loadFiles(kmId) {
     }
     $.ajax(beRoutes.controllers.FilesCtrl.apiFilesForKm(kmId))
         .done( function (data) {
-
             $("#loadingImagePanel").remove();
             if ( !data ) {
                 $("#noImagePanel").slideDown();
             } else {
-                    createCard(data);
+                createCard(data);
             }
         });
 }

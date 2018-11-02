@@ -61,8 +61,8 @@ object Structure {
   val backOfficeSections:Seq[TopSiteSection[BackOfficeSections.Value]] = Seq(
     PageSection("BackEnd Home", BackOfficeSections.Home, routes.UserCtrl.userHome() ),
     MultiPageSection("navbar.knesset", BackOfficeSections.Knesset, Seq(
-      PageSectionItem("Parties", routes.KnessetMemberCtrl.showParties()),
-      PageSectionItem("Knesset Members", routes.KnessetMemberCtrl.showKms())
+      PageSectionItem("navbar.parties", routes.KnessetMemberCtrl.showParties()),
+      PageSectionItem("navbar.knessetMembers", routes.KnessetMemberCtrl.showKms())
     )),
     MultiPageSection("Users", BackOfficeSections.Users, Seq(
       PageSectionItem("Invite Users", routes.UserCtrl.showInviteUser()),

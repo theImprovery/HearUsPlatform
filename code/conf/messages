@@ -1,9 +1,11 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 application.title=תשמעו אותנו
+
 navbar.title=תשמעו אותנו
 navbar.logout=התנתקות
-
 navbar.knesset=הכנסת
+navbar.knessetMembers=חברי כנסת
+navbar.parties=מפלגות
 
 inviteEmail.title=Invitation to Open an Account in a PSPS Server
 inviteEmail.body=You have been invited to open an account on a PSPS server. To accept the invitation, please click the link below.\n{0}
@@ -30,12 +32,49 @@ error.username.exists=Username already taken
 error.invitation.doesNotExist=Invitation does not exist
 error.password=Passwords must match, and cannot be empty
 error.password.incorrect=Incorrect password
-knessetMember.update=Knesset Member updated successfully
 
 parties.title=מפלגות
+
+knessetMembers.empty=לא רשומים חברי כנסת במערכת
+knessetMember.deleted=חבר/ת הכנסת נמחק/ה בהצלחה
+knessetMember.new=חבר/ת כנסת חדש/ה
+knessetMember.update=חבר/ת הכנסת עודכנ/ה בהצלחה
+knessetMember.noImage=אין תמונה
+knessetMember.noContactDetails=לא רשומים פרטי קשר
+knessetMember.delete=מחיקת חבר/ת כנסת
 
 pager.title=Pager
 informationals.title=Informationals
 styledInputs.title=Styled Inputs
 
+contactPlatform.Email=אימייל
+contactPlatform.Phone=טלפון
+contactPlatform.Mail=דואר
+contactPlatform.Fax=פקס
+
+
+# Common verbs
+add=הוספה
+logout=יציאה
+save=שמירה
+cancel=ביטול
+update=עידכון
+delete=מחיקה
+title=כותרת
+note=הערה
+details=פרטים
+
+# Common nouns
+contactOptions=פרטי קשר
+female=נקבה
+gender=מגדר
+image=תמונה
 imageCredit=קרדיט תמונה
+knessetMembers=חברי כנסת
+male=זכר
+name=שם
+party=מפלגה
+website=אתר אינטרנט
+loadingImage=טוען תמונה...
+loadingContactDetails=טוען פרטי קשר...
+

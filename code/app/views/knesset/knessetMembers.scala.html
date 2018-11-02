@@ -1,41 +1,36 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 
-@(knessetMembers:Seq[KnessetMember])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(knessetMembers:Seq[KnessetMember], parties:Map[Long, Party])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @templates.backEndBase("Knesset Members", views.BackOfficeSections.Knesset, Html("")) {
+  @comps.pageTitleRow(Messages("knessetMembers")){
+    <a href="@routes.KnessetMemberCtrl.showNewKM()" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+  }
   <div class="row">
-    <div class="col">
-      <h1>
-        <div class="pull-right">
-          <a href="@routes.KnessetMemberCtrl.showNewKM()" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> Add</a>
-        </div>
-        Knesset Members
-      </h1>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
+    <div class="col-12">
       @if(knessetMembers.isEmpty) {
         <div class="noData">
-          At the moment, the system contains no knesset members.
+          @Messages("knessetMembers.empty")<br>
+          <a href="@routes.KnessetMemberCtrl.showNewKM()" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
         </div>
       } else {
         <div class="table-responsive">
-          <table>
+          <table class="table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Party</th>
+                <th>@Messages("name")</th>
+                <th>@Messages("party")</th>
               </tr>
             </thead>
             <tbody>
               @for( km <- knessetMembers ) {
                 <tr>
-                  <td><a href="@routes.KnessetMemberCtrl.showEditKM(km.id)">@km.name</a>
-                    @*<a class="btn btn-sm btn-default" href="@routes.UserCtrl.showEditUserPage(u.username)"><i class="fa fa-edit"></i>*@
-                      @*Edit</a>*@
+                  <td>
+                    <a href="@routes.KnessetMemberCtrl.showEditKM(km.id)">@km.name</a>
                   </td>
-                  <td data-role="kmParty-@km.partyId"></td>
+                  <td>
+                    @parties(km.partyId).name
+                  </td>
                 </tr>
               }
             </tbody>
