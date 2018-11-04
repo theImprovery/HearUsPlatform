@@ -87,7 +87,12 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.KnessetMemberCtrl.updateContactOption,
           routes.javascript.KnessetMemberCtrl.updateParty,
           routes.javascript.KnessetMemberCtrl.deleteParty,
-          routes.javascript.KnessetMemberCtrl.showKms
+          routes.javascript.KnessetMemberCtrl.showKms,
+          routes.javascript.KnessetMemberCtrl.showGroups,
+          routes.javascript.KnessetMemberCtrl.showEditGroup,
+          routes.javascript.KnessetMemberCtrl.showNewGroup,
+          routes.javascript.KnessetMemberCtrl.doEditGroup,
+          routes.javascript.KnessetMemberCtrl.deleteGroup
         )).as("text/javascript")
     }
   }

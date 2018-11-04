@@ -4,8 +4,8 @@ import java.nio.file.{Files, Paths}
 
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions}
 import javax.inject.Inject
-import models.{ContactOption, KMImage, KnessetMember, Party}
-import dataaccess.{ImagesDAO, KnessetMemberDAO, Platform}
+import models._
+import dataaccess.{ImagesDAO, KmGroupDAO, KnessetMemberDAO, Platform}
 import play.api.{Configuration, Logger}
 import play.api.data.{Form, _}
 import play.api.data.Forms._
@@ -17,9 +17,10 @@ import dataaccess.JSONFormats._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+case class GroupData(id:Long, name:String, kmsIds:String)
 
 class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
-                                  images: ImagesDAO,
+                                  images: ImagesDAO, groups: KmGroupDAO,
                                   langs:Langs, messagesApi:MessagesApi, conf:Configuration) extends InjectedController{
 
   implicit private val ec = cc.executionContext
@@ -36,6 +37,14 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       "webPage"->text,
       "partyId"->number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int])
     )(KnessetMember.apply)(KnessetMember.unapply)
+  )
+
+  val groupForm = Form(
+    mapping(
+      "id"->number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
+      "name"->nonEmptyText,
+      "kmsIds"->text
+    )(GroupData.apply)(GroupData.unapply)
   )
 
   def showParties = deadbolt.SubjectPresent()() { implicit req =>
@@ -150,8 +159,8 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def deleteParty(id:Long) = deadbolt.SubjectPresent()() { implicit req =>
     for{
-      parties <- kms.getAllParties
       deleted <- kms.deleteParty(id)
+      parties <- kms.getAllParties
     } yield {
       Ok(views.html.knesset.parties(parties))
     }
@@ -166,6 +175,61 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
                         .resolve(image.id.toString + "." + image.suffix)
         Ok(Files.readAllBytes(path)).as(image.mimeType)
       }
+    }
+  }
+
+  def showGroups = deadbolt.SubjectPresent()() { implicit req =>
+    for {
+      groupList <- groups.allGroupsDN
+    } yield {
+      Ok( views.html.knesset.groups(groupList))
+    }
+  }
+
+  def showNewGroup = deadbolt.SubjectPresent()() { implicit req =>
+    for {
+      knessetMembers <- kms.getAllKms
+    } yield {
+      Ok( views.html.knesset.groupEditor(groupForm, knessetMembers))
+    }
+  }
+
+  def showEditGroup(id:Long) = deadbolt.SubjectPresent()() { implicit req =>
+    for{
+      group <- groups.getGroupDN(id)
+      groupKms <- groups.getKmForGroup(id)
+      knessetMembers <- kms.getAllKms
+    } yield {
+      group.map( g => Ok( views.html.knesset.groupEditor(groupForm.fill(GroupData(g.id, g.name, groupKms.mkString(","))),
+        knessetMembers))).getOrElse( NotFound("Group with id " + id + "does not exist") )
+    }
+  }
+
+  def doEditGroup = deadbolt.SubjectPresent()() { implicit req =>
+    groupForm.bindFromRequest().fold(
+      formWithErrors => {
+        for {
+          groupList <- groups.allGroupsDN
+        } yield {
+          Logger.info( formWithErrors.errors.mkString("\n") )
+          BadRequest( views.html.knesset.groups(groupList))
+        }
+      },
+      data => {
+        val insGroup = if(data.kmsIds=="") KmGroups(data.id, data.name, Set[Long]()) else {
+          KmGroups(data.id, data.name, data.kmsIds.split(",",-1).map(id => id.toLong).toSet)
+        }
+        groups.addGroup(insGroup).map( group => Redirect(routes.KnessetMemberCtrl.showEditGroup(group.id)))
+      }
+    )
+  }
+
+  def deleteGroup(id:Long) = deadbolt.SubjectPresent()() { implicit req =>
+    for{
+      deleted <- groups.deleteGroup(id)
+      groups <- groups.allGroupsDN
+    } yield {
+      Ok(views.html.knesset.groups(groups))
     }
   }
 }
