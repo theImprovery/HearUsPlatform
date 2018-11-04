@@ -13,13 +13,25 @@ navbar.users.invite=שליחת הזמנה
 navbar.users.list=רשימה
 navbar.main=ראשי
 
+forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
+forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
+
 inviteEmail.title=Invitation to Open an Account in a PSPS Server
 inviteEmail.body=You have been invited to open an account on a PSPS server. To accept the invitation, please click the link below.\n{0}
 inviteEmail.confirmationMessage=Invitation email sent
 inviteEmail.confirmationDetails=To email address {0}
 
-forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
-forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
+login.title=התחברות למערכת
+login.loginButtonTitle=כניסה
+login.forgotPassword=שכחתם ססמא?
+login.error.badUsernameOrPassword=שם משתמש או ססמא שגויים
+login.logoutMessage=נותקת מהמערכת
+
+index.title.hear=תשמעו
+index.title.us=אותנו
+index.slogan=מבית איגוד האינטרנט הישראלי. ההשקה בקרוב. הם עוד ישמעו אותנו.
+
+forgotPassword.title=איפוס ססמא
 
 passwordReset.requestNotFound=Password reset request not found.
 passwordReset.requestExpired=Password reset request expired.
@@ -63,14 +75,14 @@ userHome.editCampaigns=עריכת קמפיינים
 
 parties.title=מפלגות
 
-knessetMembers.empty=לא רשומים חברי כנסת במערכת
-
 knessetMember.deleted=חבר/ת הכנסת נמחק/ה בהצלחה
 knessetMember.new=חבר/ת כנסת חדש/ה
 knessetMember.update=חבר/ת הכנסת עודכנ/ה בהצלחה
 knessetMember.noImage=אין תמונה
 knessetMember.noContactDetails=לא רשומים פרטי קשר
 knessetMember.delete=מחיקת חבר/ת כנסת
+
+knessetMembers.empty=לא רשומים חברי כנסת במערכת
 
 pager.title=Pager
 informationals.title=Informationals
@@ -81,7 +93,6 @@ contactPlatform.Phone=טלפון
 contactPlatform.Mail=דואר
 contactPlatform.Fax=פקס
 
-
 # Common verbs
 add=הוספה
 cancel=ביטול
@@ -90,8 +101,10 @@ details=פרטים
 loadingContactDetails=טוען פרטי קשר...
 loadingImage=טוען תמונה...
 logout=יציאה
+login=כניסה
 note=הערה
 save=שמירה
+send=שליחה
 title=כותרת
 update=עידכון
 sent_f=נשלחה

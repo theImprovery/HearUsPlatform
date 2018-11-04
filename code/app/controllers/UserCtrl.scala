@@ -110,7 +110,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
         users.authenticate(loginData.username.trim, loginData.password.trim)
           .map( _.map(u => Redirect(routes.UserCtrl.userHome).withNewSession.withSession(("userId",u.id.toString)))
             .getOrElse( {
-              BadRequest(views.html.users.login(loginForm.fill(loginData).withGlobalError("Bad username or password")))})
+              BadRequest(views.html.users.login(loginForm.fill(loginData).withGlobalError("login.error.badUsernameOrPassword")))})
           )
       }
     )
@@ -118,7 +118,8 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   def doLogout = Action { implicit req =>
     Redirect(routes.HomeCtrl.index()).withNewSession
-      .flashing(FlashKeys.MESSAGE->Informational(InformationalLevel.Success, "You have been logged out.", "").encoded)
+      .flashing(FlashKeys.MESSAGE->Informational(InformationalLevel.Success,
+                                                 messagesApi.preferred(req).messages("login.logoutMessage"), "").encoded)
   }
 
   def userHome = deadbolt.SubjectPresent()(){ implicit req =>
