@@ -1,9 +1,9 @@
 @(title:String, btnWidth:Int=3)(buttons:Html=Html(""))
 <div class="row pageTitle">
-  <div class="col-@(12-btnWidth)">
+  <div class="col-sm-@(12-btnWidth)">
     <h1>@title</h1>
   </div>
-  <div class="col-@btnWidth buttonCtnr">
+  <div class="col-sm-@btnWidth buttonCtnr">
     @buttons
   </div>
 </div>

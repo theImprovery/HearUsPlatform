@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.util.UUID
 
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions}
-import dataaccess.{InvitationDAO, PasswordResetRequestDAO, UsersDAO}
+import dataaccess.{InvitationDAO, KnessetMemberDAO, PasswordResetRequestDAO, UsersDAO}
 import javax.inject.Inject
 import models.{Invitation, PasswordResetRequest, User}
 import play.api.{Configuration, Logger, cache}
@@ -53,6 +53,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
                          cached: Cached, cc:ControllerComponents,
                          users: UsersDAO, invitations:InvitationDAO,
                          forgotPasswords:PasswordResetRequestDAO,
+                         knesset: KnessetMemberDAO,
                          mailerClient: MailerClient, langs:Langs, messagesApi:MessagesApi) extends InjectedController {
 
   implicit private val ec = cc.executionContext
@@ -122,8 +123,12 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   def userHome = deadbolt.SubjectPresent()(){ implicit req =>
     val user = req.subject.get.asInstanceOf[UserSubject].user
-    
-    Future(Ok( views.html.users.userHome(user) ))
+    for {
+      mkCount <- knesset.countKMs
+      ptCount <- knesset.countParties
+    } yield {
+      Ok( views.html.users.userHome(user, mkCount, ptCount) )
+    }
   }
 
   def apiAddUser = Action(parse.tolerantJson).async { req =>

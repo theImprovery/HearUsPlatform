@@ -39,9 +39,32 @@ error.invitation.doesNotExist=Invitation does not exist
 error.password=Passwords must match, and cannot be empty
 error.password.incorrect=Incorrect password
 
+users.inviteUser=הזמנת משתמש
+users.inviteUserFieldTitle=כתובת הדוא״ל של המשתמש/ת החדש/ה
+users.noPendingInvitations=אין הזמנות ממתינות
+users.pendingInvitations=הזמנות ממתינות
+
+userEditor.title=עריכת פרופיל
+userEditor.updateDetailsTab=פרטים
+userEditor.changePasswordTab=שינוי ססמא
+userEditor.emailHelpText=כתובת דוא״ל זו משמשת לאיפוס ססמאות ולמשלוח הודעות מהמערכת
+userEditor.newPassword=ססמא חדשה
+userEditor.newPasswordAgain=ססמא חדשה (שוב)
+userEditor.previousPassword=ססמא קודמת
+userEditor.updatePassword=עידכון ססמא
+userEditor.updateDetails=עידכון פרטים
+
+userHome.title=תשמעו אותנו: מסך הבית
+userHome.commonActions=פעולות נפוצות
+userHome.statistics=מצב המערכת
+userHome.editKMs=עריכת חברי כנסת
+userHome.editParties=עריכת מפלגות
+userHome.editCampaigns=עריכת קמפיינים
+
 parties.title=מפלגות
 
 knessetMembers.empty=לא רשומים חברי כנסת במערכת
+
 knessetMember.deleted=חבר/ת הכנסת נמחק/ה בהצלחה
 knessetMember.new=חבר/ת כנסת חדש/ה
 knessetMember.update=חבר/ת הכנסת עודכנ/ה בהצלחה
@@ -71,11 +94,16 @@ note=הערה
 save=שמירה
 title=כותרת
 update=עידכון
-username=שם משתמש
-users=משתמשים
+sent_f=נשלחה
 
 # Common nouns
+campaign=קמפיין
+campaigns=קמפיינים
+committee=וועדה
+committees=וועדות
 contactOptions=פרטי קשר
+email=דוא״ל
+emailAddress=כתובת דוא״ל
 female=נקבה
 gender=מגדר
 image=תמונה
@@ -83,6 +111,11 @@ imageCredit=קרדיט תמונה
 knessetMembers=חברי כנסת
 male=זכר
 name=שם
+parties=מפלגות
 party=מפלגה
+password=ססמא
+passwordAgain=ססמא (שוב)
 website=אתר אינטרנט
+username=שם משתמש
+users=משתמשים
 
