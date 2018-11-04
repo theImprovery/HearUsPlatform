@@ -82,7 +82,25 @@ class ImageTable(tag:Tag) extends Table[KMImage](tag, "images") {
   def * = (id, kmId, suffix, mimeType, date, credit) <> (KMImage.tupled, KMImage.unapply)
 }
 
+class GroupTable(tag:Tag) extends Table[KmGroupDN](tag, "groups") {
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def name = column[String]("name")
+
+  def * = (id, name) <> (KmGroupDN.tupled, KmGroupDN.unapply)
+}
+
+class KmGroupTable( tag:Tag ) extends Table[GroupIdKmId](tag, "km_group") {
+  def groupId = column[Long]("group_id", O.PrimaryKey)
+  def kmId    = column[Long]("km_id", O.PrimaryKey)
+
+  def * = (groupId, kmId) <> (GroupIdKmId.tupled, GroupIdKmId.unapply)
+
+  def groups    = foreignKey("group_fkey", groupId, TableClasses.groups)(_.id)
+  def kms = foreignKey("kms_fkey", kmId, TableClasses.knessetMembers)(_.id)
+}
+
 object TableClasses {
   val parties = TableQuery[PartyTable]
   val knessetMembers = TableQuery[KnessetMemberTable]
+  val groups = TableQuery[GroupTable]
 }

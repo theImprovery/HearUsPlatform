@@ -1,0 +1,75 @@
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import Helpers._
+
+@import dataaccess.Platform.Platform
+@import dataaccess.KnessetMemberDAO
+@(group:Form[GroupData], kms:Seq[KnessetMember])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@scripts = {
+  <script src="@routes.Assets.versioned("js/groupPage.js")"></script>
+  <script >
+    $(document).ready(function() {
+       var kms = $("#kmsIds").val().split(",");
+       kms.forEach(function (value) {
+           $("#km-"+value).prop("checked", true);
+       });
+    });
+  </script>
+}
+
+@templates.backEndBase(group("name").value.getOrElse("New Group"), views.BackOfficeSections.Knesset, Html(""), scripts) {
+  <div class="row">
+    <div class="col">
+      <h1>
+        @group("name").value.getOrElse("New Group")
+      </h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <form action="@routes.KnessetMemberCtrl.doEditGroup()" method="POST" id="editGroupForm">
+        @helper.CSRF.formField
+        <input name="id" type="hidden" id="id" value="@group("id").value.getOrElse("-1")">
+        <input name="kmsIds" type="hidden" id="kmsIds" value="@group("kmsIds").value.getOrElse("")">
+        <div class="form-group row @Helpers.fieldStatus(group("name"))">
+          <label for="name" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" id="name" name="name" value="@group("name").value.getOrElse("")">
+            @formErrors(group("name"))
+          </div>
+        </div>
+        @if(kms.isEmpty){
+          <div class="noData">
+            At the moment, the system contains no knesset members.
+          </div>
+        } else{
+          <div class="row">
+            <div class="col">
+              <h4>Knesset Members</h4>
+              @for(km <- kms) {
+                <input id="km-@km.id" type="checkbox" name="kmSelect" value="@km.name">
+                <label for="km-@km.id"> @km.name </label>
+              }
+              @*<select name="kmsSelection" id="kmsSelection" multiple="multiple">*@
+              @*@for(km <- kms){*@
+              @*<option value="@km.name" id="@km.id"></option>*@
+              @*}*@
+              @*</select>*@
+            </div>
+          </div>
+        }
+        <div class="col text-right">
+          <a href="@routes.KnessetMemberCtrl.showGroups()" class="btn btn-secondary">Cancel</a>
+          <button type="button" onclick="submitForm()" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="row my-5">
+    <div class="col">
+    @if(group("id").value.isDefined) {
+      <button type="button" class="btn btn-danger" onclick="deleteGroup(@group("id").value.getOrElse("-1"))"><i class="fa fa-trash-o"></i> Delete Group</button>
+    }
+    </div>
+  </div>
+}

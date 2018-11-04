@@ -42,6 +42,11 @@ POST    /bkof/KnessetMember          controllers.KnessetMemberCtrl.doEditKM()
 DELETE  /bkof/KnessetMember/:id      controllers.KnessetMemberCtrl.deleteKM(id:Long)
 GET     /bkof/contactOptions/:id     controllers.KnessetMemberCtrl.getContactOptionForKm(id:Long)
 PUT     /bkof/contactOption/:id      controllers.KnessetMemberCtrl.updateContactOption(id:Long)
+GET     /bkof/groups                 controllers.KnessetMemberCtrl.showGroups
+GET     /bkof/group                  controllers.KnessetMemberCtrl.showNewGroup
+GET     /bkof/group/:id              controllers.KnessetMemberCtrl.showEditGroup(id:Long)
+POST    /bkof/group                  controllers.KnessetMemberCtrl.doEditGroup
+DELETE  /bkof/group/:id              controllers.KnessetMemberCtrl.deleteGroup(id:Long)
 
 # Serve Local Images
 GET     /images/mk/:id                controllers.KnessetMemberCtrl.getImage(id:Long)
