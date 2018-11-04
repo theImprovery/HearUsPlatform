@@ -58,8 +58,10 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def showKms = deadbolt.SubjectPresent()() { implicit req =>
     for {
       knessetMembers <- kms.getAllKms
+      parties <- kms.getAllParties
     } yield {
-      Ok( views.html.knesset.knessetMembers(knessetMembers) )
+      val partyMap = parties.map(p=>p.id->p).toMap
+      Ok( views.html.knesset.knessetMembers(knessetMembers.sortBy(_.name), partyMap) )
     }
   }
 
@@ -88,9 +90,11 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       formWithErrors => {
         for {
           knessetMembers <- kms.getAllKms
+          parties <- kms.getAllParties
         } yield {
           Logger.info( formWithErrors.errors.mkString("\n") )
-          BadRequest( views.html.knesset.knessetMembers(knessetMembers) )
+          val partyMap = parties.map(p=>p.id->p).toMap
+          BadRequest( views.html.knesset.knessetMembers(knessetMembers, partyMap) )
         }
       },
       knessetMember => {
@@ -104,8 +108,10 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for{
       deleted <- kms.deleteKM(id)
       knessetMembers <- kms.getAllKms
+      parties <- kms.getAllParties
     } yield {
-      Ok(views.html.knesset.knessetMembers(knessetMembers))
+      val partyMap = parties.map(p=>p.id->p).toMap
+      Ok(views.html.knesset.knessetMembers(knessetMembers, partyMap)).flashing(FlashKeys.MESSAGE->messagesProvider.messages("knessetMember.deleted"))
     }
   }
 

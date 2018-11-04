@@ -7,20 +7,14 @@
 }
 
 @templates.backEndBase("parties", views.BackOfficeSections.Knesset, Html(""), head){
-  <div class="row">
-    <div class="col-md-12">
-      <div class="pull-right">
-        <a href="javascript:addRow()" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> Add</a>
-      </div>
-      <h1>@msgs.messages("parties.title")</h1>
-    </div>
-  </div>
+  @comps.pageTitleRow(Messages("parties.title")){
+    <button onclick="addRow()" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</button>
+  }
   <div class="row">
     <div class="col" id="partiesCtnr">
       @if(parties.isEmpty){
         @comps.noData{
-          No parties currently defined. You can <input type="button" class="addButton" onclick="addRow()" value="add one">.
-      }
+          No parties currently defined. You can <input type="button" class="addButton" onclick="addRow()" value="add one">.}
     }else{
         <ul id="partiesList" class="list-unstyled editableList">
           @for(party <- parties){
@@ -37,8 +31,5 @@
         </ul>
     }
     </div>
-  </div>
-  <div class="newParty hidden">
-    Test
   </div>
 }

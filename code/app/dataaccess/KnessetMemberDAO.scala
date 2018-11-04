@@ -16,17 +16,7 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   private val parties = TableQuery[PartyTable]
   private val contactOptions = TableQuery[ContactOptionTable]
 
-  private def insertKm ( km:KnessetMember ):Future[KnessetMember] = {
-    db.run( knessetMembers.returning(knessetMembers.map(_.id))
-      .into((user,newId)=>user.copy(id=newId)) += km.copy(id = -1) )
-  }
-
   def addKM( km:KnessetMember ):Future[KnessetMember] = {
-//    if( km.id == -1 ){
-//      insertKm(km)
-//    } else {
-//      db.run( knessetMembers.filter(_.id === km.id).update(km) ).map( _ => km )
-//    }
     db.run {
       (knessetMembers returning knessetMembers).insertOrUpdate(km)
     }.map( insertRes => insertRes.getOrElse(km) )
@@ -84,7 +74,9 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   def deleteContactOption( kmId: Long, platform:Platform.Value ):Future[Int] = {
     db.run(contactOptions.filter(co => ( co.kmId === kmId ) && ( co.platform === platform.toString )).delete)
   }
-
+  
+  def countKMs: Future[Int] = db.run(knessetMembers.size.result)
+  def countParties:Future[Int] = db.run(parties.size.result)
 }
 
 object Platform extends Enumeration {

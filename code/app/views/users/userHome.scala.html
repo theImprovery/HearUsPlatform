@@ -1,15 +1,41 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(u:User)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(u:User, mkCount:Int, ptCount:Int)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 
-@templates.backEndBase("User Home", views.BackOfficeSections.Home) {
-    <h1>User home</h1>
-    <div class="col-md-6">
-        <h3>Common Actions</h3>
-        <a href="@routes.UserCtrl.showEditUserPage(u.username)" class="btn btn-default btn-block">
-            Edit Profile
-        </a>
-        <a href="@routes.UserCtrl.showInviteUser()" class="btn btn-default btn-block">
-            Invite User
-        </a>
+@templates.backEndBase(Messages("userHome.title"), views.BackOfficeSections.Home) {
+    <div class="content">
+      <div class="row my-3">
+        <div class="col-md-6">
+          <h3>@Messages("userHome.commonActions")</h3>
+          <div class="buttonBox">
+            <a href="@routes.KnessetMemberCtrl.showKms()" class="btn btn-lg btn-primary">
+              @Messages("userHome.editKMs")
+            </a>
+            <a href="@routes.KnessetMemberCtrl.showParties()" class="btn btn-lg btn-primary">
+              @Messages("userHome.editParties")
+            </a>
+
+            <a href="javascript:alert('Coming soon')" class="btn btn-lg btn-success">
+              @Messages("userHome.editCampaigns")
+            </a>
+
+            <a href="@routes.UserCtrl.showEditUserPage(u.username)" class="btn btn-lg btn-secondary">
+                @Messages("userEditor.title")
+            </a>
+            <a href="@routes.UserCtrl.showInviteUser()" class="btn btn-lg btn-secondary">
+                @Messages("users.inviteUser")
+            </a>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h3>@Messages("userHome.statistics")</h3>
+          <ul>
+            <li>@Messages("knessetMembers"): @mkCount</li>
+            <li>@Messages("parties"): @ptCount</li>
+            <li>@Messages("committees"): <span class="badge badge-pill badge-secondary">n/a</span></li>
+            <li>@Messages("campaigns"): <span class="badge badge-pill badge-secondary">n/a</span></li>
+          </ul>
+        </div>
+      </div>
+
     </div>
 }

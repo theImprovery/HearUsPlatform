@@ -6,7 +6,7 @@
 
 @internalExtraHead = {
   <link rel="stylesheet" href="@routes.Assets.versioned("css/backend.min.css")">
-<meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="noindex, nofollow">
   @extraHead
 }
 
@@ -22,11 +22,11 @@
           @@@sub.identifier
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarUserDropdown">
-          <a class="dropdown-item" href="@routes.UserCtrl.showEditUserPage(sub.identifier)">My Profile</a>
+          <a class="dropdown-item" href="@routes.UserCtrl.showEditUserPage(sub.identifier)">@Messages("navbar.myProfile")</a>
           <div class="dropdown-divider"></div>
           <form class="dropdown-item" action="@routes.UserCtrl.doLogout()" method="POST">
             @helper.CSRF.formField
-          <button type="submit" class="btn btn-outline-danger"> Logout</button>
+          <button type="submit" class="btn btn-outline-danger"> @Messages("navbar.logout")</button>
           </form>
         </div>
       </li>
