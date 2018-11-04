@@ -18,13 +18,7 @@
 }
 
 @templates.backEndBase(group("name").value.getOrElse("New Group"), views.BackOfficeSections.Knesset, Html(""), scripts) {
-  <div class="row">
-    <div class="col">
-      <h1>
-        @group("name").value.getOrElse("New Group")
-      </h1>
-    </div>
-  </div>
+  @comps.pageTitleRow(group("name").value.getOrElse(Messages("groupEditor.title"))){ }
   <div class="row">
     <div class="col">
       <form action="@routes.KnessetMemberCtrl.doEditGroup()" method="POST" id="editGroupForm">
@@ -32,35 +26,34 @@
         <input name="id" type="hidden" id="id" value="@group("id").value.getOrElse("-1")">
         <input name="kmsIds" type="hidden" id="kmsIds" value="@group("kmsIds").value.getOrElse("")">
         <div class="form-group row @Helpers.fieldStatus(group("name"))">
-          <label for="name" class="col-sm-2 control-label">Name</label>
-          <div class="col-sm-6">
+          <label for="name" class="col-sm-2 control-label">@Messages("name")</label>
+          <div class="col-sm-10">
             <input type="text" class="form-control" id="name" name="name" value="@group("name").value.getOrElse("")">
             @formErrors(group("name"))
           </div>
         </div>
-        @if(kms.isEmpty){
-          <div class="noData">
-            At the moment, the system contains no knesset members.
-          </div>
-        } else{
-          <div class="row">
-            <div class="col">
-              <h4>Knesset Members</h4>
+        <div class="form-group row">
+          <label for="name" class="col-sm-2 control-label">@Messages("knessetMembers")</label>
+          <div class="col-sm-10">
+            @if(kms.isEmpty){
+              <div class="noData">
+                @Messages("groupEditor.empty")
+              </div>
+            } else{
+              <ul class="kmSelectList">
               @for(km <- kms) {
-                <input id="km-@km.id" type="checkbox" name="kmSelect" value="@km.name">
-                <label for="km-@km.id"> @km.name </label>
+                <li>
+                  <input id="km-@km.id" type="checkbox" name="kmSelect" value="@km.name">
+                  <label for="km-@km.id"> @km.name </label>
+                </li>
               }
-              @*<select name="kmsSelection" id="kmsSelection" multiple="multiple">*@
-              @*@for(km <- kms){*@
-              @*<option value="@km.name" id="@km.id"></option>*@
-              @*}*@
-              @*</select>*@
-            </div>
+              </ul>
+            }
           </div>
-        }
-        <div class="col text-right">
-          <a href="@routes.KnessetMemberCtrl.showGroups()" class="btn btn-secondary">Cancel</a>
-          <button type="button" onclick="submitForm()" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+        </div>
+        <div class="col text-left">
+          <a href="@routes.KnessetMemberCtrl.showGroups()" class="btn btn-secondary"><i class="fa fa-close"></i> @Messages("cancel")</a>
+          <button type="button" onclick="submitForm()" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("save")</button>
         </div>
       </form>
     </div>
@@ -68,7 +61,7 @@
   <div class="row my-5">
     <div class="col">
     @if(group("id").value.isDefined) {
-      <button type="button" class="btn btn-danger" onclick="deleteGroup(@group("id").value.getOrElse("-1"))"><i class="fa fa-trash-o"></i> Delete Group</button>
+      <button type="button" class="btn btn-danger" onclick="deleteGroup(@group("id").value.getOrElse("-1"))"><i class="fa fa-trash-o"></i> @Messages("groupEditor.delete")</button>
     }
     </div>
   </div>

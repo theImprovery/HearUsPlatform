@@ -6,6 +6,7 @@ navbar.logout=התנתקות
 navbar.knesset=כנסת ישראל
 navbar.knessetMembers=חברי כנסת
 navbar.parties=מפלגות
+navbar.groups=וועדות ולוביים
 navbar.logout=התנתקות
 navbar.myProfile=הפרופיל שלי
 navbar.users.title=משתמשים
@@ -50,6 +51,14 @@ error.username.exists=Username already taken
 error.invitation.doesNotExist=Invitation does not exist
 error.password=Passwords must match, and cannot be empty
 error.password.incorrect=Incorrect password
+
+groupEditor.title=עריכת קבוצה
+groupEditor.empty=אין כרגע חברי כנסת בקבוצה זו
+groupEditor.delete=מחק קבוצה
+
+groups.title=קבוצות ח״כים
+groups.subtitle=וועדות פרלמנטריות, לוביים שונים, קבוצות עניין, וכו׳
+groups.empty=אין כרגע קבוצות במערכת
 
 users.inviteUser=הזמנת משתמש
 users.inviteUserFieldTitle=כתובת הדוא״ל של המשתמש/ת החדש/ה

@@ -196,12 +196,15 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def showEditGroup(id:Long) = deadbolt.SubjectPresent()() { implicit req =>
     for{
-      group <- groups.getGroupDN(id)
+      groupOpt <- groups.getGroupDN(id)
       groupKms <- groups.getKmForGroup(id)
       knessetMembers <- kms.getAllKms
     } yield {
-      group.map( g => Ok( views.html.knesset.groupEditor(groupForm.fill(GroupData(g.id, g.name, groupKms.mkString(","))),
-        knessetMembers))).getOrElse( NotFound("Group with id " + id + "does not exist") )
+      groupOpt match {
+        case Some(g) => Ok( views.html.knesset.groupEditor(groupForm.fill(GroupData(g.id, g.name, groupKms.mkString(","))),
+                                                           knessetMembers.sortBy(_.name)))
+        case None => NotFound("Group with id " + id + "does not exist")
+      }
     }
   }
 

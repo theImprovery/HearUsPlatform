@@ -23,11 +23,11 @@ function getSelectedKms() {
 
 function deleteGroup(id) {
     swal({
-        title:"Are you sure you want to delete this group?",
+        title:"למחוק קבוצת חברי כנסת זו?",
         icon:"warning",
         buttons: {
-            cancel:true,
-            confirm:true
+            cancel:"ביטול",
+            confirm:"אישור"
         }
     }).then( function(willDelete){
         if(willDelete) {

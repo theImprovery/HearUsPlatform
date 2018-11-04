@@ -3,28 +3,22 @@
 @(groups:Seq[KmGroupDN])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @templates.backEndBase("Groups", views.BackOfficeSections.Knesset, Html("")) {
-  <div class="row">
-    <div class="col">
-      <h1>
-        <div class="pull-right">
-          <a href="@routes.KnessetMemberCtrl.showNewGroup()" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> Add</a>
-        </div>
-        Groups
-      </h1>
-    </div>
-  </div>
+  @comps.pageTitleRow(Messages("groups.title"), Messages("groups.subtitle")){
+    <a href="@routes.KnessetMemberCtrl.showNewGroup()" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+  }
+
   <div class="row">
     <div class="col-md-12">
     @if(groups.isEmpty) {
       <div class="noData">
-        At the moment, the system contains no groups.
+        @Messages("groups.empty")
       </div>
     } else {
       <div class="table-responsive">
         <table>
           <thead>
             <tr>
-              <th>Name</th>
+              <th>@Messages("name")</th>
             </tr>
           </thead>
           <tbody>

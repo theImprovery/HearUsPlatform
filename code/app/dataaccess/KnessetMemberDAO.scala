@@ -15,6 +15,11 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   private val knessetMembers = TableQuery[KnessetMemberTable]
   private val parties = TableQuery[PartyTable]
   private val contactOptions = TableQuery[ContactOptionTable]
+  
+//  object KmOrderBy {
+//    val Name = (f:KnessetMemberTable)=>f.name
+//    val Party = (f:KnessetMemberTable)=>f.party
+//  }
 
   def addKM( km:KnessetMember ):Future[KnessetMember] = {
     db.run {
@@ -29,7 +34,13 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   }
 
   def getAllKms:Future[Seq[KnessetMember]] = db.run( knessetMembers.result )
-
+  
+//  def getKmsPage( sortBy:pageSize:Int, pageNum:Int ):Future[Seq[KnessetMember]] = {
+//    db.run(
+//      knessetMembers.sortBy( _.name )
+//    )
+//  }
+  
   def deleteKM( id: Long ):Future[Unit] = {
     db.run{
       DBIO.seq(
