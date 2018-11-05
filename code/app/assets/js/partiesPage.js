@@ -77,7 +77,7 @@ function addRow(){
     if(!partiesList){
         partiesList = document.createElement('ul');
         partiesList.setAttribute('id', 'partiesList');
-        partiesList.addClass('editableList');
+        partiesList.classList.add('editableList');
         var div = document.getElementById('partiesCtnr');
         div.appendChild(partiesList);
 

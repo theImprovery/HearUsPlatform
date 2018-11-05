@@ -39,6 +39,7 @@ LessKeys.compress in Assets := true
 
 RjsKeys.modules += WebJs.JS.Object("esversion"->"6")
 
-pipelineStages := Seq(rjs, uglify, digest, gzip)
+//pipelineStages := Seq(rjs, uglify, digest, gzip)
+pipelineStages := Seq(digest, gzip)
 
 TwirlKeys.templateImports ++= Seq("views.Helpers")

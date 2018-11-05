@@ -17,8 +17,8 @@ navbar.main=ראשי
 forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
 forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
 
-inviteEmail.title=Invitation to Open an Account in HearUs
-inviteEmail.body=You have been invited to open an account on a HearUs, a new direct campaign platform. To sign up, click the link below.\n{0}
+inviteEmail.title=Invitation to Open an Account at HearUs
+inviteEmail.body=You have been invited to open an account at hear-us, a new direct campaign platform. To sign up, click the link below.\n{0}
 inviteEmail.confirmationMessage=הזמנת משתמש נשלחה
 inviteEmail.confirmationDetails=לכתובת דוא״ל {0}
 
