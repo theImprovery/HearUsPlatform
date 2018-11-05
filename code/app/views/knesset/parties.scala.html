@@ -14,7 +14,7 @@
     <div class="col" id="partiesCtnr">
       @if(parties.isEmpty){
         @comps.noData{
-          No parties currently defined. You can <input type="button" class="addButton" onclick="addRow()" value="add one">.}
+          @Messages("parties.empty") <input type="button" class="addButton" onclick="addRow()" value="@Messages("parties.addOne")">}
     }else{
         <ul id="partiesList" class="list-unstyled editableList">
           @for(party <- parties){
