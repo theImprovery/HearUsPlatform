@@ -26,7 +26,8 @@ login.title=התחברות למערכת
 login.loginButtonTitle=כניסה
 login.forgotPassword=שכחתם ססמא?
 login.error.badUsernameOrPassword=שם משתמש או ססמא שגויים
-login.logoutMessage=נותקת מהמערכת
+login.logoutMessage=נותקת מהמערכת. להתראות!
+login.pleaseLogIn=אי אפשר לגשת לדף זה בלי להזדהות קודם.
 
 index.title.hear=תשמעו
 index.title.us=אותנו
@@ -55,6 +56,7 @@ error.password.incorrect=Incorrect password
 groupEditor.title=עריכת קבוצה
 groupEditor.empty=אין כרגע חברי כנסת בקבוצה זו
 groupEditor.delete=מחק קבוצה
+groupEditor.savedSuccessfully=הקבוצה {0} נשמרה בהצלחה
 
 groups.title=קבוצות ח״כים
 groups.subtitle=וועדות פרלמנטריות, לוביים שונים, קבוצות עניין, וכו׳

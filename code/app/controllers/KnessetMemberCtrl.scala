@@ -263,7 +263,10 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         val insGroup = if(data.kmsIds=="") KmGroups(data.id, data.name, Set[Long]()) else {
           KmGroups(data.id, data.name, data.kmsIds.split(",",-1).map(id => id.toLong).toSet)
         }
-        groups.addGroup(insGroup).map( group => Redirect(routes.KnessetMemberCtrl.showEditGroup(group.id)))
+        groups.addGroup(insGroup).map{ group =>
+          val message = Informational(InformationalLevel.Success, Messages("groupEditor.savedSuccessfully", group.name))
+          Redirect(routes.KnessetMemberCtrl.showGroups()).flashing(FlashKeys.MESSAGE->message.encoded)
+        }
       }
     )
   }

@@ -107,11 +107,13 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     loginForm.bindFromRequest().fold(
       badForm   => Future(BadRequest(views.html.users.login(badForm))),
       loginData => {
-        users.authenticate(loginData.username.trim, loginData.password.trim)
-          .map( _.map(u => Redirect(routes.UserCtrl.userHome).withNewSession.withSession(("userId",u.id.toString)))
-            .getOrElse( {
-              BadRequest(views.html.users.login(loginForm.fill(loginData).withGlobalError("login.error.badUsernameOrPassword")))})
-          )
+        users.authenticate(loginData.username.trim, loginData.password.trim).map( {
+          case Some(user) => {
+            val redirectTo = request.session.get("targetUrl").getOrElse( routes.UserCtrl.userHome().url )
+            Redirect(redirectTo).withNewSession.removingFromSession("targetUrl").withSession(("userId",user.id.toString))
+          }
+          case None => BadRequest(views.html.users.login(loginForm.fill(loginData).withGlobalError("login.error.badUsernameOrPassword")))
+        })
       }
     )
   }
