@@ -3,7 +3,7 @@
 
 @import dataaccess.Platform.Platform
 @import dataaccess.KnessetMemberDAO
-@(km:Form[KnessetMember], prefix:String, parties:Map[Long,String], platforms: Seq[Platform])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(km:Form[KnessetMember], prefix:String, imageOpt:Option[KMImage],  parties:Map[Long,String], platforms: Seq[Platform])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 
 
 @head = {
@@ -41,29 +41,29 @@
             <input type="hidden" id="id" name="id" value="@km("id").value.getOrElse("-1")">
             <input type="hidden" id="partyId" name="partyId" value="@km("partyId").value.getOrElse("")">
             <div class="form-group row @Helpers.fieldStatus(km("name"))">
-              <label for="name" class="col-sm-2 control-label">@Messages("name")</label>
+              <label for="name" class="col-sm-2">@Messages("name")</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="name" name="name" value="@km("name").value.getOrElse("")">
                 @formErrors(km("name"))
               </div>
             </div>
             <div class="form-group row">
-              <label for="gender" class="col-sm-2 control-label">@Messages("gender")</label>
+              <label for="gender" class="col-sm-2">@Messages("gender")</label>
               <div class="col-sm-10">
-                <input class="hidden" type="radio" name="gender" value="Male" id="male" @if(km("gender").value!=Some("Female")){checked}>
+                <input class="hidden" type="radio" name="gender" value="Male" id="male" @if(!km("gender").value.contains("Female")){checked}>
                 <label for="male" class="buttonLike">@Messages("male")</label>
-                <input class="hidden" type="radio" name="gender" value="Female" id="female" @if(km("gender").value==Some("Female")){checked}>
+                <input class="hidden" type="radio" name="gender" value="Female" id="female" @if(km("gender").value.contains("Female")){checked}>
                 <label for="female" class="buttonLike">@Messages("female")</label>
               </div>
             </div>
             <div class="form-group row">
-              <label for="gender" class="col-sm-2 control-label">@Messages("website")</label>
+              <label for="gender" class="col-sm-2">@Messages("website")</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" name="webPage" id="webPage" value="@km("webPage").value.getOrElse("")">
               </div>
             </div>
             <div class="form-group row">
-              <label for="gender" class="col-sm-2 control-label">@Messages("party")</label>
+              <label for="gender" class="col-sm-2">@Messages("party")</label>
               <div class="col-sm-10">
                 <select name="parties" id="parties" class="form-control">
                   @for((partyId, partyName) <- parties.toSeq.sortBy(_._2)) {
@@ -82,6 +82,7 @@
             </div>
           </form>
         </div>
+
         <div class="tab-pane" id="imagePane">
           <div class="row">
             <div class="col">
@@ -90,13 +91,34 @@
               </h3>
             </div>
           </div>
-          <div class="row slideUpPanel" style="display:none" id="fileEditorPanel">
-            <div class="col">
-              <div id="uploader"></div>
-            </div>
-          </div>
+
+          @*<div class="row slideUpPanel" style="display:none" id="fileEditorPanel">*@
+            @*<div class="col">*@
+              @*<div id="uploader"></div>*@
+            @*</div>*@
+          @*</div>*@
           <div class="row">
-            <div class="col">
+            <div class="col-md-6">
+              <form action="@routes.KnessetMemberCtrl.doAddImage(km("id").value.get.toLong)" method="POST" enctype="multipart/form-data">
+                @helper.CSRF.formField
+                <div class="form-group row">
+                  <label class="col-sm-2 control-label" for="imageCredit">@Messages("knessetMemberEditor.imageCredit")</label>
+                  <div class="col-sm-10">
+                    <input type="text" value="@imageOpt.map(_.credit).getOrElse("")" name="imageCredit" class="form-control" id="imageCredit">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-2 control-label" for="imageFile">@Messages("knessetMemberEditor.imageFile")</label>
+                  <div class="col-sm-10">
+                    <input type="file" name="imageFile" id="imageFile" class="form-control">
+                  </div>
+                </div>
+                <div class="col text-left">
+                  <a href="@routes.KnessetMemberCtrl.showKms()" class="btn btn-secondary"><i class="fa fa-close"></i> @Messages("cancel")</a>
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("save")</button>
+                </div>
+              </form>
+              @*
               <div class="noData p-4" id="noImagePanel" style="display:none">
                 @Messages("knessetMember.noImage") <a href="javascript:showAddImage()">@Messages("add")</a>.
               </div>
@@ -121,9 +143,24 @@
                   </div>
                 </div>
               </div>
+                *@
+            </div>
+            <div class="col-md-6">
+              @if( imageOpt.isEmpty ){
+                <div class="noData">
+                  <i class="fa fa-5x fa-user-circle-o"></i>
+                  @Messages("אין תמונה")
+                </div>
+              }else{
+                <div class="text-center">
+                  <img style="max-height: 300px; max-width:300px" src="@prefix@imageOpt.get.filename" alt=""><br>
+                  @Messages("imageCredit"): @imageOpt.get.credit
+                </div>
+              }
             </div>
           </div>
         </div>
+
         <div class="tab-pane" id="contactOptions">
           <div class="row">
             <div class="col">

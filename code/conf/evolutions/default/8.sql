@@ -16,6 +16,6 @@ create TABLE km_group (
 );
 
 # --- !Downs
-DROP TABLE groups;
 DROP TABLE km_group;
+DROP TABLE groups;
 

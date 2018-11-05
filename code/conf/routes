@@ -49,12 +49,13 @@ POST    /bkof/group                  controllers.KnessetMemberCtrl.doEditGroup
 DELETE  /bkof/group/:id              controllers.KnessetMemberCtrl.deleteGroup(id:Long)
 
 # Serve Local Images
-GET     /images/mk/:id                controllers.KnessetMemberCtrl.getImage(id:Long)
+GET     /images/mks/:imageName       controllers.KnessetMemberCtrl.getImage(imageName)
+POST    /images/mks/:mkId            controllers.KnessetMemberCtrl.doAddImage(mkId:Long)
 
 # Images
 POST    /api/mk/:id/images           controllers.FilesCtrl.apiAddFile(id:String)
-PATCH   /api/image/:id/              controllers.FilesCtrl.apiUpdateCredit(id:Long)
-DELETE  /api/image/:id/              controllers.FilesCtrl.deleteFile(id:Long)
+#PATCH   /api/image/:id/              controllers.FilesCtrl.apiUpdateCredit(id:Long)
+#DELETE  /api/image/:id/              controllers.FilesCtrl.deleteFile(id:Long)
 GET     /api/image/km/:id            controllers.FilesCtrl.apiFilesForKm(id:Long)
 GET     /api/image/:id               controllers.FilesCtrl.apiGetImage(id:Long)
 

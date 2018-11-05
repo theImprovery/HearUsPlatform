@@ -1,6 +1,9 @@
 package controllers
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.attribute.PosixFilePermission._
+import java.nio.file.{CopyOption, Files, Paths, StandardCopyOption}
+import java.sql.Timestamp
+import java.util.Calendar
 
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions}
 import javax.inject.Inject
@@ -14,6 +17,7 @@ import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, ControllerComponents, InjectedController}
 import dataaccess.JSONFormats._
 
+import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -69,7 +73,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for {
       parties <- kms.getAllParties
     }yield {
-      Ok( views.html.knesset.knessetMemberEditor(knessetMemberForm, conf.get[String]("hear_us.files.url"),
+      Ok( views.html.knesset.knessetMemberEditor(knessetMemberForm, conf.get[String]("hear_us.files.url"), None,
                                                  parties.map(p => (p.id, p.name)).toMap, Platform.values.toSeq))
     }
   }
@@ -78,8 +82,10 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for{
       km <- kms.getKM(id)
       parties <- kms.getAllParties
+      imageOpt <- images.getImage(id)
     } yield {
-      km.map( m => Ok( views.html.knesset.knessetMemberEditor(knessetMemberForm.fill(m), conf.get[String]("hear_us.files.url"),
+      km.map( m => Ok( views.html.knesset.knessetMemberEditor(knessetMemberForm.fill(m),
+                                                              conf.get[String]("hearUs.files.mkImages.url"), imageOpt,
                                                               parties.map(p => (p.id, p.name)).toMap, Platform.values.toSeq)) )
         .getOrElse( NotFound("Knesset member with id " + id + "does not exist") )
     }
@@ -142,19 +148,6 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         kms.addParty(party).map(newP => Ok(Json.toJson(newP)))
       }
     )
-//    partyForm.bindFromRequest().fold(
-//      errors => {
-//        for {
-//          parties <- kms.getAllParties
-//        } yield {
-//          Logger.info( errors.errors.mkString("\n") )
-//          BadRequest( views.html.knesset.parties(parties))
-//        }
-//      },
-//      party => {
-//        kms.addParty(party).map(newP => Redirect(routes.KnessetMemberCtrl.showParties()))
-//      }
-//    )
   }
 
   def deleteParty(id:Long) = deadbolt.SubjectPresent()() { implicit req =>
@@ -166,16 +159,64 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
   
-  def getImage(id:Long) = Action.async { implicit req =>
-    images.getFileForKM(id).map {
-      case None => NotFound("image not found")
-      case Some(image) => {
-        val path = Paths.get(conf.get[String]("hear_us.files.km.folder"))
-                        .resolve(image.kmId.toString)
-                        .resolve(image.id.toString + "." + image.suffix)
-        Ok(Files.readAllBytes(path)).as(image.mimeType)
+  def doAddImage(kmId:Long) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData){ implicit req =>
+    val file = req.body.file("imageFile")
+    val imageCredit = req.body.dataParts.getOrElse("imageCredit", Seq[String]()).headOption.getOrElse("")
+    
+    if ( file.isEmpty || file.get.filename.isEmpty ) {
+      // no file, but we might be able to update the image credit.
+      images.getImage(kmId).flatMap( {
+        case Some(imageRec) => {
+          val updated = imageRec.copy(credit=imageCredit)
+          images.storeImage(updated).map( _ => {
+            val message = Informational(InformationalLevel.Success, Messages("knessetMemberEditor.imageCreditUpdated"))
+            Redirect(routes.KnessetMemberCtrl.showEditKM(kmId)).flashing(FlashKeys.MESSAGE->message.encoded)
+          })
+        }
+        case None => {
+          val message = Informational(InformationalLevel.Danger, Messages("knessetMemberEditor.imageFileMissing"))
+          Future(Redirect(routes.KnessetMemberCtrl.showEditKM(kmId)).flashing(FlashKeys.MESSAGE->message.encoded))
+        }
+      })
+      
+    } else {
+      // We have a file. Update all.
+      val filePart = file.get
+      val folderPath = Paths.get(conf.get[String]("hearUs.files.mkImages.folder"))
+      if ( ! Files.exists(folderPath) ) {
+        Files.createDirectories( folderPath )
+        Files.setPosixFilePermissions(folderPath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ) )
       }
+      val i = filePart.filename.lastIndexOf('.')
+      val suffix = if (i >= 0) filePart.filename.substring(i + 1) else ""
+      val filePathTemp = folderPath.resolve(kmId.toString + ".-temp-." + suffix)
+      val filePath = folderPath.resolve(kmId.toString + "." + suffix)
+      filePart.ref.moveTo( filePathTemp, replace=true )
+      Files.copy(filePathTemp, filePath, StandardCopyOption.REPLACE_EXISTING)
+      Files.delete(filePathTemp)
+      Files.setPosixFilePermissions(filePath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ) )
+      
+      val imageRec = KMImage(kmId,  suffix,
+        filePart.contentType.getOrElse(""),
+        new Timestamp(Calendar.getInstance().getTime.getTime),
+        imageCredit)
+      images.storeImage(imageRec).map(_ => {
+        val message = Informational(InformationalLevel.Success, Messages("knessetMemberEditor.imageFileUploaded"))
+        Redirect(routes.KnessetMemberCtrl.showEditKM(kmId)).flashing(FlashKeys.MESSAGE->message.encoded)
+      })
     }
+  }
+  
+  def getImage(imageName:String) = Action.async { implicit req =>
+    val kmId = imageName.split("\\.")(0)
+    
+    images.getImage(kmId.toInt).map({
+      case Some(img) => {
+        val path = Paths.get(conf.get[String]("hearUs.files.mkImages.folder")).resolve(imageName)
+        Ok(Files.readAllBytes(path)).as(img.mimeType)
+      }
+      case None => NotFound("Can't find image.")
+    })
   }
 
   def showGroups = deadbolt.SubjectPresent()() { implicit req =>

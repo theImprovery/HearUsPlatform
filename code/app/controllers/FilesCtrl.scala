@@ -24,7 +24,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
 
   def apiAddFile(subjectId: String) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData ){ req =>
     val uploadedFile = req.body.files.head
-    val filePath = Paths.get(config.get[String]("hear_us.files.km.folder")).resolve(subjectId)
+    val filePath = Paths.get(config.get[String]("hearUs.files.mkImages.folder"))
     if ( ! Files.exists(filePath) ) {
       Files.createDirectories( filePath )
       Files.setPosixFilePermissions(filePath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ) )
@@ -34,10 +34,13 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
     
     Logger.info( s"got file $filename with suffix $suffix")
     Logger.info( "Uploaded: " + uploadedFile.toString  + " -- " + uploadedFile.ref.toString )
-    
-    images.addFile( KMImage(0L, subjectId.toLong,  suffix, uploadedFile.contentType.getOrElse(""), new Timestamp(Calendar.getInstance().getTime.getTime), getFileName(filename)) )
+    val imageRec = KMImage(subjectId.toLong,  suffix,
+                            uploadedFile.contentType.getOrElse(""),
+                            new Timestamp(Calendar.getInstance().getTime.getTime),
+                            getFileName(filename))
+    images.storeImage( imageRec )
       .map(fileDbRecord => {
-        val localPath = filePath.resolve(fileDbRecord.id + "." + suffix)
+        val localPath = filePath.resolve(subjectId + "." + suffix)
         
         Logger.info("Moving file to " + localPath.toAbsolutePath.toString )
         val res = uploadedFile.ref.atomicMoveWithFallback(localPath)
@@ -49,38 +52,13 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
       })
 
   }
-
-  def deleteFile(fileId: Long) = deadbolt.SubjectPresent()() { req =>
-    Logger.info("Deleting file "  + fileId )
-    images.getFile(fileId).flatMap {
-      case None => Future(NotFound("file not found"))
-      case Some(file) => {
-        images.deleteFile(file).map(count => {
-          val filePath = Paths.get(config.get[String]("hear_us.files.km.folder")).resolve(file.kmId.toString).resolve(fileId.toString + "." + file.suffix)
-          if ( Files.exists(filePath) ) {
-            Files.delete(filePath)
-          }
-          Ok(Json.toJson(count))
-        })
-      }
-    }
-
-  }
-
-  //  def showUploadFile(id:Long) = Action { implicit req =>
-  //    Ok( views.html.backoffice.uploadSitesFiles())
-  //  }
-
+  
   def apiFilesForKm( kmId:Long ) = Action.async{ req =>
-    images.getFileForKM(kmId).map(image => Ok(Json.toJson(image)))
+    images.getImage(kmId).map(image => Ok(Json.toJson(image)))
   }
-
-  def apiUpdateCredit(id:Long) = deadbolt.SubjectPresent()(cc.parsers.tolerantText) { implicit req =>
-        images.updateCredit(id, req.body).map(count => Ok(Json.toJson(count)))
-  }
-
+  
   def apiGetImage(id:Long) = deadbolt.SubjectPresent()() { implicit req =>
-    images.getFile(id).map(image => Ok(Json.toJson(image)))
+    images.getImage(id).map(image => Ok(Json.toJson(image)))
   }
 
   private def getFileSuffix (fileName:String): String = {

@@ -90,6 +90,11 @@ knessetMember.update=חבר/ת הכנסת עודכנ/ה בהצלחה
 knessetMember.noImage=אין תמונה
 knessetMember.noContactDetails=לא רשומים פרטי קשר
 knessetMember.delete=מחיקת חבר/ת כנסת
+knessetMemberEditor.imageCredit=קרדיט תמונה
+knessetMemberEditor.imageFile=קובץ תמונה
+knessetMemberEditor.imageFileMissing=יש להעלות קובץ תמונה
+knessetMemberEditor.imageFileUploaded=קובץ תמונה עודכן בהצלחה
+knessetMemberEditor.imageCreditUpdated=קרדיט תמונה עודכן בהצלחה
 
 knessetMembers.empty=לא רשומים חברי כנסת במערכת
 

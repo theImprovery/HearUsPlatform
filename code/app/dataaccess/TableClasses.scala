@@ -71,15 +71,14 @@ class PartyTable(tag:Tag) extends Table[Party](tag, "parties") {
 }
 
 class ImageTable(tag:Tag) extends Table[KMImage](tag, "images") {
-  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def kmId = column[Long]("km_id")
+  def kmId = column[Long]("km_id", O.PrimaryKey)
   def suffix = column[String]("suffix")
   def mimeType = column[String]("mime_type")
   def date = column[Timestamp]("date")
   def credit = column[String]("credit")
 
-  def kmFK = foreignKey("image_knesset_member)fkey", kmId, TableClasses.knessetMembers)(_.id)
-  def * = (id, kmId, suffix, mimeType, date, credit) <> (KMImage.tupled, KMImage.unapply)
+  def kmFK = foreignKey("image_knesset_member_fkey", kmId, TableClasses.knessetMembers)(_.id)
+  def * = (kmId, suffix, mimeType, date, credit) <> (KMImage.tupled, KMImage.unapply)
 }
 
 class GroupTable(tag:Tag) extends Table[KmGroupDN](tag, "groups") {

@@ -14,38 +14,20 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
   import profile.api._
   private val images = TableQuery[ImageTable]
 
-  def addFile( i:KMImage ):Future[KMImage] = {
-    db.run( images.returning(images.map(_.id))
-      .into((file, newId) => file.copy(id=newId)) += i)
+  def storeImage(anImage:KMImage ):Future[KMImage] = {
+    db.run( images.insertOrUpdate(anImage) ).map( _ => anImage )
   }
-
-  def getFile( id:Long ):Future[Option[KMImage]] = {
-    db.run {
-      images.filter( _.id === id ).result
-    } map { _.headOption}
-  }
-
-  def getFileForKM( kmId:Long ):Future[Option[KMImage]] = {
+  
+  def getImage(kmId:Long ):Future[Option[KMImage]] = {
     db.run {
       images.filter( _.kmId === kmId ).result
     } map { _.headOption}
   }
 
-  def updateFile( i:KMImage ):Future[KMImage] = {
+  def deleteImage( kmId:Long):Future[Int] = {
     db.run {
-      images.filter(_.id === i.id).update(i)
-    } map { _=> i}
-  }
-
-  def deleteFile( i:KMImage ):Future[Int] = {
-    db.run {
-      images.filter(_.id === i.id).delete
+      images.filter(_.kmId === kmId).delete
     }
   }
-
-  def updateCredit( id:Long, credit:String ): Future[Int] = {
-    db.run {
-      images.filter( _.id === id).map( _.credit).update(credit)
-    }
-  }
+  
 }

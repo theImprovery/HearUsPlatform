@@ -60,6 +60,7 @@ function createCard(data){
     // than the filesystem on the server.
     var attempts = 0;
     var imageLoader = function(){
+        if ( true ) return; //todo remove
         attempts = attempts+1;
         fetch( imageLink ).then( function(response){
             if ( attempts > 10 ) return; // give up

@@ -2,8 +2,7 @@
 
 # --- !Ups
 create TABLE images (
-  id          serial PRIMARY KEY,
-  km_id       INTEGER,
+  km_id       INTEGER PRIMARY KEY,
   suffix      VARCHAR(64),
   mime_type   VARCHAR(64),
   date        TIMESTAMP,

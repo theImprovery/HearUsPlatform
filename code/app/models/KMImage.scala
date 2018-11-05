@@ -1,9 +1,10 @@
 package models
 import java.sql.Timestamp
 
-case class KMImage (id:Long,
-                    kmId:Long,
+case class KMImage (kmId:Long,
                     suffix:String,
                     mimeType:String,
                     date:Timestamp,
-                    credit:String)
+                    credit:String) {
+  def filename = s"$kmId.$suffix"
+}
