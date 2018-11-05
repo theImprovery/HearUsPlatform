@@ -106,6 +106,12 @@ contactPlatform.Email=אימייל
 contactPlatform.Phone=טלפון
 contactPlatform.Mail=דואר
 contactPlatform.Fax=פקס
+contactPlatform.Facebook=פייסבוק
+contactPlatform.Twitter=טוויטר
+contactPlatform.Instagram=אינסטגרם
+contactPlatform.Telegram=טלגרם
+contactPlatform.YouTube=יו-טיוב
+
 
 # Common verbs
 add=הוספה

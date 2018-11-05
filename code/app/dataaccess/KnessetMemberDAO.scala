@@ -92,5 +92,5 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
 
 object Platform extends Enumeration {
   type Platform = Value
-  val Phone, Email, Mail, Fax = Value
+  val Phone, Email, Mail, Fax, Facebook, Twitter, Instagram, Telegram, YouTube = Value
 }
