@@ -1,0 +1,14 @@
+@startuml
+
+actor "User" as user
+component "Apache HTTPd" as httpd
+artifact "Play app" as play
+database "PostgreSQL DB" as database
+artifact "IceBerg Backup utility" as iceberg
+
+user --> httpd
+httpd --> play
+play --> database
+database <.. iceberg
+
+@enduml

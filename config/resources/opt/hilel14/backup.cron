@@ -1,0 +1,2 @@
+# backup database every day at 1:00
+0 1 * * * /opt/hilel14/scripts/backup.sh
