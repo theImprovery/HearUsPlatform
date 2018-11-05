@@ -46,7 +46,14 @@ function cancelEdit(sender) {
     var $parent = $(sender.parentNode);
     var partyId = getPartyData($parent).id;
     setEditable( $parent, false );
-    setPartyData( $parent, prevPartyData[partyId] );
+    if ( prevPartyData[partyId] ) {
+        // restore old state
+        setPartyData( $parent, prevPartyData[partyId] );
+
+    } else {
+        // remove <li>, it's a new party that was never saved.
+        sender.parentNode.remove();
+    }
 }
 
 function deleteParty(id) {
