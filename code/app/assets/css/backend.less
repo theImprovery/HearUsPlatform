@@ -4,6 +4,8 @@ li a.partyWebPage {
   display: inline-block;
   min-width: 40ex;
   font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  direction: ltr;
+  text-align: left;
 }
 
 li div.partyName {
@@ -14,11 +16,13 @@ li div.partyName {
 ul.editableList {
   li {
     margin: .3em 0;
+    padding: .3em;
+    background-color: #FAFAFA;
   }
 }
 
 [contenteditable=true] {
-  background-color: #EEE;
+  background-color: #FAFAFA;
   box-shadow: 0 4px 4px rgba(0,0,0,.25) inset;
 }
 
