@@ -73,7 +73,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for {
       parties <- kms.getAllParties
     }yield {
-      Ok( views.html.knesset.knessetMemberEditor(knessetMemberForm, conf.get[String]("hear_us.files.url"), None,
+      Ok( views.html.knesset.knessetMemberEditor(knessetMemberForm, conf.get[String]("hearUs.files.mkImages.url"), None,
                                                  parties.map(p => (p.id, p.name)).toMap, Platform.values.toSeq))
     }
   }
