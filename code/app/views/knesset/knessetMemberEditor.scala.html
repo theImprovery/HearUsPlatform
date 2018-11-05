@@ -8,13 +8,9 @@
 
 @head = {
   <link rel="stylesheet" href="@routes.Assets.versioned("css/contactOption.min.css")">
-  @comps.upload.headUpload()
 }
 
 @scripts = {
-  <script src="@routes.HomeCtrl.backEndRoutes()?113"></script>
-  <script> var urlPrefix = "@prefix" </script>
-  @comps.upload.bottom(km("id").value.getOrElse("-1").toLong, "fileUploadComplete")
   <script src="@routes.Assets.versioned("js/kmPage.js")"></script>
 }
 

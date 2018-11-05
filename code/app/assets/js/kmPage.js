@@ -1,7 +1,7 @@
 var optionTemplate, platformList;
 $(document).ready( function() {
     var kmId = $("#id").val();
-    loadFiles(kmId);
+    // loadFiles(kmId);
     setupContactOptions(kmId);
 });
 
