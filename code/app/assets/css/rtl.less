@@ -1,5 +1,31 @@
 body {
-  font-family: 'Alef', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";;
+  font-family: 'Alef', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
   direction: rtl;
   text-align: right;
+}
+
+.dropdown-menu {
+  text-align:right;
+  left: auto;
+}
+
+.dropdown-toggle::after {
+  content: none;
+}
+
+.dropdown-toggle::before {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: .255em;
+  vertical-align: .255em;
+  content: "";
+  border-top: .3em solid;
+  border-right: .3em solid transparent;
+  border-bottom: 0;
+  border-left: .3em solid transparent;
+}
+
+.form-control {
+  unicode-bidi: plaintext;
 }
