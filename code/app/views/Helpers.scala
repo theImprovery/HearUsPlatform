@@ -49,7 +49,9 @@ object Helpers {
   
   def formErrors( field:Field )(implicit msgs:MessagesProvider ) = {
     if ( field.hasErrors ) {
-      Html(field.errors.flatMap( _.messages ).map( msgs.messages(_) ).mkString("<ul class=\"errors\"><li>","</li><li>","</li></ul>"))
+      Html(
+        field.errors.flatMap( e => e.format ).mkString("<ul class=\"errors\"><li>","</li><li>","</li></ul>")
+      )
     } else Html("")
   }
   
