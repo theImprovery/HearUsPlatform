@@ -10,7 +10,7 @@ import play.api.data.{Field, Form, FormError}
 import play.api.mvc.Request
 import play.api.mvc.Call
 import controllers.routes
-import play.api.i18n.MessagesProvider
+import play.api.i18n.{Messages, MessagesProvider}
 import play.twirl.api.Html
 import play.utils.UriEncoding
 
@@ -50,7 +50,7 @@ object Helpers {
   def formErrors( field:Field )(implicit msgs:MessagesProvider ) = {
     if ( field.hasErrors ) {
       Html(
-        field.errors.flatMap( e => e.format ).mkString("<ul class=\"errors\"><li>","</li><li>","</li></ul>")
+        field.errors.flatMap( e => e.messages ).map( Messages(_)).mkString("<ul class=\"errors\"><li>","</li><li>","</li></ul>")
       )
     } else Html("")
   }
@@ -60,6 +60,18 @@ object Helpers {
       Html(form.globalErrors.flatMap( _.messages ).map( msgs.messages(_) ).mkString("<ul class=\"errors\"><li>","</li><li>","</li></ul>"))
     } else Html("")
   }
-  
-  
+
+  object TableHelper {
+    def sortValue(isActive:Boolean, isAsc:Boolean):Option[String] = {
+      Some(
+        if ( isActive )
+          if ( isAsc ) "0" else "1"
+        else "1" )
+    }
+
+    def sortClass(isActive:Boolean, isAsc:Boolean):String = "fa-sort"+( if(isActive){if (isAsc) "-asc" else "-desc"} else "")
+  }
+
+
+
 }

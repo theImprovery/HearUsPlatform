@@ -12,3 +12,6 @@ case class ContactOption (kmId:Long,
                           title:String,
                           details:String,
                           note:String)
+
+case class KmsParties(km:KnessetMember,
+                      party:Party)

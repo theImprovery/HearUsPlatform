@@ -98,6 +98,25 @@ class KmGroupTable( tag:Tag ) extends Table[GroupIdKmId](tag, "km_group") {
   def kms = foreignKey("kms_fkey", kmId, TableClasses.knessetMembers)(_.id)
 }
 
+class KmsPartiesView( tag:Tag ) extends Table[KmsParties](tag, "kms_parties") {
+  def id = column[Long]("id")
+  def name = column[String]("name")
+  def gender = column[String]("gender")
+  def isActive = column[Boolean]("is_active")
+  def webPage = column[String]("web_page")
+  def partyId = column[Long]("party_id")
+  def partyName = column[String]("party_name")
+  def partyWebPage = column[String]("party_web_page")
+
+  def * = (id, name, gender, isActive, webPage, partyId, partyName, partyWebPage) <> (
+      { case (id, name, gender, isActive, webPage, partyId, partyName, partyWebPage) =>
+                    KmsParties(KnessetMember(id, name, gender, isActive, webPage, partyId), Party(partyId, partyName, partyWebPage))},
+      { kmp: KmsParties => Some(kmp.km.id, kmp.km.name, kmp.km.gender, kmp.km.isActive,
+                    kmp.km.webPage, kmp.km.partyId, kmp.party.name, kmp.party.webPage)}
+  )
+}
+
+
 object TableClasses {
   val parties = TableQuery[PartyTable]
   val knessetMembers = TableQuery[KnessetMemberTable]

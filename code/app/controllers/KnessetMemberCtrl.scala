@@ -8,7 +8,7 @@ import java.util.Calendar
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions}
 import javax.inject.Inject
 import models._
-import dataaccess.{ImagesDAO, KmGroupDAO, KnessetMemberDAO, Platform}
+import dataaccess._
 import play.api.{Configuration, Logger}
 import play.api.data.{Form, _}
 import play.api.data.Forms._
@@ -59,13 +59,17 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
 
-  def showKms = deadbolt.SubjectPresent()() { implicit req =>
+  def showKms(search:Option[String], asc:Option[String], sortByOpt:Option[String]) = deadbolt.SubjectPresent()() { implicit req =>
+    val effectiveSearch = search.map(_.trim).flatMap( v => if (v.isEmpty) None else Some(v) )
+    val sortBy:SortBy.Value = sortByOpt.flatMap( v => SortBy.values.find(_.toString==v) ).getOrElse(SortBy.KnessetMember)
+    val sqlSearch = search.map(s=>"%"+s.trim+"%")
+    val isAsc = asc.getOrElse("1")=="1"
     for {
-      knessetMembers <- kms.getAllKms
+      knessetMembers <- kms.getKms(sqlSearch, isAsc, sortBy)
       parties <- kms.getAllParties
     } yield {
       val partyMap = parties.map(p=>p.id->p).toMap
-      Ok( views.html.knesset.knessetMembers(knessetMembers.sortBy(_.name), partyMap) )
+      Ok( views.html.knesset.knessetMembers(knessetMembers, effectiveSearch, isAsc, sortBy) )
     }
   }
 
@@ -97,10 +101,13 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         for {
           knessetMembers <- kms.getAllKms
           parties <- kms.getAllParties
+          imageOpt <- images.getImage(formWithErrors.data("id").toLong)
         } yield {
           Logger.info( formWithErrors.errors.mkString("\n") )
           val partyMap = parties.map(p=>p.id->p).toMap
-          BadRequest( views.html.knesset.knessetMembers(knessetMembers, partyMap) )
+          BadRequest( views.html.knesset.knessetMemberEditor(formWithErrors,
+            conf.get[String]("hearUs.files.mkImages.url"), imageOpt,
+            parties.map(p => (p.id, p.name)).toMap, Platform.values.toSeq))
         }
       },
       knessetMember => {
@@ -113,11 +120,11 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def deleteKM(id:Long) = deadbolt.SubjectPresent()() { implicit req =>
     for{
       deleted <- kms.deleteKM(id)
-      knessetMembers <- kms.getAllKms
+      knessetMembers <- kms.getKms(None, true, SortBy.KnessetMember)
       parties <- kms.getAllParties
     } yield {
       val partyMap = parties.map(p=>p.id->p).toMap
-      Ok(views.html.knesset.knessetMembers(knessetMembers, partyMap)).flashing(FlashKeys.MESSAGE->messagesProvider.messages("knessetMember.deleted"))
+      Ok(views.html.knesset.knessetMembers(knessetMembers, None, true, SortBy.KnessetMember)).flashing(FlashKeys.MESSAGE->messagesProvider.messages("knessetMember.deleted"))
     }
   }
 
@@ -253,10 +260,10 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     groupForm.bindFromRequest().fold(
       formWithErrors => {
         for {
-          groupList <- groups.allGroupsDN
+          knessetMembers <- kms.getAllKms
         } yield {
           Logger.info( formWithErrors.errors.mkString("\n") )
-          BadRequest( views.html.knesset.groups(groupList))
+          BadRequest( views.html.knesset.groupEditor(formWithErrors, knessetMembers))
         }
       },
       data => {

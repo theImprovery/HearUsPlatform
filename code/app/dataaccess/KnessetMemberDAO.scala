@@ -1,7 +1,7 @@
 package dataaccess
 
 import javax.inject.Inject
-import models.{ContactOption, KnessetMember, Party}
+import models.{ContactOption, KmsParties, KnessetMember, Party}
 import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
@@ -15,6 +15,7 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   private val knessetMembers = TableQuery[KnessetMemberTable]
   private val parties = TableQuery[PartyTable]
   private val contactOptions = TableQuery[ContactOptionTable]
+  private val kmsPartiesView = TableQuery[KmsPartiesView]
   
 //  object KmOrderBy {
 //    val Name = (f:KnessetMemberTable)=>f.name
@@ -34,6 +35,25 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   }
 
   def getAllKms:Future[Seq[KnessetMember]] = db.run( knessetMembers.result )
+
+  def prepareView(searchStr: Option[String], sortBy: SortBy.Value, isAsc: Boolean) = {
+    val searchedView = searchStr match {
+      case None => kmsPartiesView
+      case Some(str) => kmsPartiesView.filter( row =>
+        Seq( row.name.like(str), row.webPage.like(str), row.partyName.like(str), row.partyWebPage.like(str)
+        ).reduceLeftOption(_||_).getOrElse(true:Rep[Boolean]) )
+    }
+    sortBy match {
+      case SortBy.Parties => searchedView.sortBy(r => order(r.partyName, isAsc))
+      case SortBy.KnessetMember => searchedView.sortBy(r => order(r.name, isAsc))
+    }
+  }
+
+  def getKms(searchStr:Option[String], isAsc:Boolean, sortBy:SortBy.Value):Future[Seq[KmsParties]] = {
+    db.run (
+      prepareView(searchStr, sortBy, isAsc).result
+    )
+  }
   
 //  def getKmsPage( sortBy:pageSize:Int, pageNum:Int ):Future[Seq[KnessetMember]] = {
 //    db.run(
@@ -88,9 +108,15 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   
   def countKMs: Future[Int] = db.run(knessetMembers.size.result)
   def countParties:Future[Int] = db.run(parties.size.result)
+  private def order( col:Rep[String], isAsc:Boolean ) = if ( isAsc ) col.asc else col.desc
 }
 
 object Platform extends Enumeration {
   type Platform = Value
   val Phone, Email, Mail, Fax, Facebook, Twitter, Instagram, Telegram, YouTube = Value
+}
+
+object SortBy extends Enumeration {
+  val Parties = Value("parties")
+  val KnessetMember = Value("knesset_member")
 }

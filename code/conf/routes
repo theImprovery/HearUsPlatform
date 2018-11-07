@@ -35,7 +35,7 @@ POST    /bkofc/changePassword        controllers.UserCtrl.doChangePassword
 GET     /bkof/parties                controllers.KnessetMemberCtrl.showParties
 PATCH   /bkof/party                  controllers.KnessetMemberCtrl.updateParty
 DELETE  /bkof/party/:id              controllers.KnessetMemberCtrl.deleteParty(id:Long)
-GET     /bkof/knessetMembers         controllers.KnessetMemberCtrl.showKms
+GET     /bkof/knessetMembers         controllers.KnessetMemberCtrl.showKms(search:Option[String], asc:Option[String], sortByOpt:Option[String])
 GET     /bkof/KnessetMember          controllers.KnessetMemberCtrl.showNewKM
 GET     /bkof/KnessetMember/:id      controllers.KnessetMemberCtrl.showEditKM(id:Long)
 POST    /bkof/KnessetMember          controllers.KnessetMemberCtrl.doEditKM()

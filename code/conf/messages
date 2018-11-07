@@ -152,3 +152,7 @@ website=אתר אינטרנט
 username=שם משתמש
 users=משתמשים
 
+error.required=שדה חובה
+search.empty=אין תוצאות
+search.text=הקלד טקסט לחיפוש
+search=חיפוש

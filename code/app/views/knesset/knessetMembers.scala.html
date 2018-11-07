@@ -1,35 +1,70 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import dataaccess.SortBy
 
-@(knessetMembers:Seq[KnessetMember], parties:Map[Long, Party])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@import views.Helpers.TableHelper
+@(knessetMembers:Seq[KmsParties], search:Option[String], isAsc:Boolean, sortBy:SortBy.Value)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@tableHead(sb:SortBy.Value, isAsc:Boolean, text:String) = {
+  @defining( sortBy==sb ){ active =>
+    <th@if(active){ class="table-active"}>
+  <a href="@routes.KnessetMemberCtrl.showKms(search, TableHelper.sortValue(active, isAsc), Some(sb.toString))">
+    <i class="fa @TableHelper.sortClass(active, isAsc)"></i> @text
+  </a>
+  </th>
+}}
 
 @templates.backEndBase("Knesset Members", views.BackOfficeSections.Knesset, Html("")) {
   @comps.pageTitleRow(Messages("knessetMembers")){
     <a href="@routes.KnessetMemberCtrl.showNewKM()" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
   }
   <div class="row">
+    <div class="col d-flex justify-content-end">
+      <form class="form-inline" method="GET" action="@routes.KnessetMemberCtrl.showKms(None,None,None).fragment">
+        <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <i class="fa fa-search"></i>
+            </div>
+          </div>
+          <input type="text" class="form-control form-control-sm" id="search" name="search" placeholder="@Messages("search.text")" value="@search.getOrElse("")">
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-outline-secondary">@Messages("search")</button>
+          </div>
+        </div>
+        <input type="hidden" name="asc"  value="@if(isAsc){1}else{0}">
+        <input type="hidden" name="sortBy" value="@sortBy.toString">
+        <input type="hidden" name="page" value="1">
+      </form>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-12">
       @if(knessetMembers.isEmpty) {
-        <div class="noData">
-          @Messages("knessetMembers.empty")<br>
-          <a href="@routes.KnessetMemberCtrl.showNewKM()" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
-        </div>
+          <div class="noData">
+            @if(search.isEmpty){
+              @Messages("knessetMembers.empty")<br>
+              <a href="@routes.KnessetMemberCtrl.showNewKM()" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+            } else {
+              @Messages("search.empty")
+            }
+          </div>
       } else {
         <div class="table-responsive">
           <table class="table">
             <thead>
               <tr>
-                <th>@Messages("name")</th>
-                <th>@Messages("party")</th>
+                @tableHead(SortBy.KnessetMember, isAsc, Messages("name"))
+                @tableHead(SortBy.Parties, isAsc, Messages("party"))
               </tr>
             </thead>
             <tbody>
               @for( km <- knessetMembers ) {
                 <tr>
                   <td>
-                    <a href="@routes.KnessetMemberCtrl.showEditKM(km.id)">@km.name</a>
+                    <a href="@routes.KnessetMemberCtrl.showEditKM(km.km.id)">@km.km.name</a>
                   </td>
                   <td>
-                    @parties(km.partyId).name
+                    @km.party.name
                   </td>
                 </tr>
               }
