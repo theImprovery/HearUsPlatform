@@ -46,9 +46,10 @@ class KnessetMemberTable(tag:Tag) extends Table[KnessetMember](tag,"knesset_memb
   def isActive = column[Boolean]("is_active")
   def webPage = column[String]("web_page")
   def partyId = column[Long]("party_id")
+  def knessetKey = column[Long]("knesset_key")
 
   def patryFK = foreignKey("knesset_member_party_fkey", partyId, TableClasses.parties)(_.id)
-  def * = (id, name, gender, isActive, webPage, partyId) <> (KnessetMember.tupled, KnessetMember.unapply)
+  def * = (id, name, gender, isActive, webPage, partyId, knessetKey) <> (KnessetMember.tupled, KnessetMember.unapply)
 }
 
 class ContactOptionTable(tag:Tag) extends Table[ContactOption](tag, "contact_options"){
@@ -66,8 +67,9 @@ class PartyTable(tag:Tag) extends Table[Party](tag, "parties") {
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name")
   def webPage = column[String]("web_page")
-  
-  def * = (id, name, webPage) <> (Party.tupled, Party.unapply)
+  def isActive = column[Boolean]("is_active")
+
+  def * = (id, name, webPage, isActive) <> (Party.tupled, Party.unapply)
 }
 
 class ImageTable(tag:Tag) extends Table[KMImage](tag, "images") {
@@ -84,8 +86,9 @@ class ImageTable(tag:Tag) extends Table[KMImage](tag, "images") {
 class GroupTable(tag:Tag) extends Table[KmGroupDN](tag, "groups") {
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name")
+  def knessetKey = column[Long]("knesset_key")
 
-  def * = (id, name) <> (KmGroupDN.tupled, KmGroupDN.unapply)
+  def * = (id, name, knessetKey) <> (KmGroupDN.tupled, KmGroupDN.unapply)
 }
 
 class KmGroupTable( tag:Tag ) extends Table[GroupIdKmId](tag, "km_group") {
@@ -105,14 +108,16 @@ class KmsPartiesView( tag:Tag ) extends Table[KmsParties](tag, "kms_parties") {
   def isActive = column[Boolean]("is_active")
   def webPage = column[String]("web_page")
   def partyId = column[Long]("party_id")
+  def knessetKey = column[Long]("knesset_key")
   def partyName = column[String]("party_name")
   def partyWebPage = column[String]("party_web_page")
+  def partyIsActive = column[Boolean]("party_is_active")
 
-  def * = (id, name, gender, isActive, webPage, partyId, partyName, partyWebPage) <> (
-      { case (id, name, gender, isActive, webPage, partyId, partyName, partyWebPage) =>
-                    KmsParties(KnessetMember(id, name, gender, isActive, webPage, partyId), Party(partyId, partyName, partyWebPage))},
+  def * = (id, name, gender, isActive, webPage, partyId, knessetKey, partyName, partyWebPage, partyIsActive) <> (
+      { case (id, name, gender, isActive, webPage, partyId, knessetKey, partyName, partyWebPage, partyIsActive) =>
+                    KmsParties(KnessetMember(id, name, gender, isActive, webPage, partyId, knessetKey), Party(partyId, partyName, partyWebPage, partyIsActive))},
       { kmp: KmsParties => Some(kmp.km.id, kmp.km.name, kmp.km.gender, kmp.km.isActive,
-                    kmp.km.webPage, kmp.km.partyId, kmp.party.name, kmp.party.webPage)}
+                    kmp.km.webPage, kmp.km.partyId, kmp.km.knessetKey, kmp.party.name, kmp.party.webPage, kmp.party.isActive)}
   )
 }
 

@@ -17,7 +17,7 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
   private val kmsGroups = TableQuery[KmGroupTable]
 
   def addGroup( group:KmGroups ):Future[KmGroups] = {
-    val groupRow = KmGroupDN(group.id, group.name)
+    val groupRow = KmGroupDN(group.id, group.name, group.knessetKey)
     if( group.id != 0 || group.id != -1 ) {
       Await.result(db.run {
         //delete stores group's kms
@@ -39,6 +39,11 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
     }
   }
 
+  def updateGroups( newGroups:Seq[KmGroups] ):Future[Seq[KmGroups]] = {
+    db.run( DBIO.seq(kmsGroups.delete, groups.delete))
+    Future.sequence(newGroups.map(gro => addGroup(gro)))
+  }
+
   def getGroup( id:Long ):Future[Option[KmGroups]] = {
     val groupAndKms = for {
       (group, km) <- groups.filter(_.id === id) joinLeft kmsGroups on ( _.id === _.groupId )
@@ -47,7 +52,7 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
       groupAndKms.result
     } map { resSeq => {
       val tupl = resSeq.headOption
-      tupl.map(_._1).map( gr => KmGroups(gr.id, gr.name, resSeq.map(_._2).map(_.get).map(_.kmId).toSet))
+      tupl.map(_._1).map( gr => KmGroups(gr.id, gr.name, gr.knessetKey, resSeq.map(_._2).map(_.get).map(_.kmId).toSet))
     }}
   }
 
@@ -75,7 +80,7 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
       val rowsByGroup = grSeq.map( p => (p._1, p._2.get.kmId)).groupBy(_._1)
       rowsByGroup.map( g => {
         val gr:KmGroupDN = g._1
-        KmGroups(gr.id, gr.name, g._2.map(_._2).toSet)
+        KmGroups(gr.id, gr.name, gr.knessetKey, g._2.map(_._2).toSet)
       })
       }.toSeq
     }
@@ -90,6 +95,8 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
       }
     }
   }
+
+  def countGroups():Future[Int] = db.run(groups.size.result)
 
   private def idsToSet( ids:Iterable[Long] ):Set[KnessetMember] = {
     val res = Future.sequence(ids.map(knessetMembers.getKM).toSet)

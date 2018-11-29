@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.util.UUID
 
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions}
-import dataaccess.{InvitationDAO, KnessetMemberDAO, PasswordResetRequestDAO, UsersDAO}
+import dataaccess._
 import javax.inject.Inject
 import models.{Invitation, PasswordResetRequest, User}
 import play.api.{Configuration, Logger, cache}
@@ -54,6 +54,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
                          users: UsersDAO, invitations:InvitationDAO,
                          forgotPasswords:PasswordResetRequestDAO,
                          knesset: KnessetMemberDAO,
+                         committees: KmGroupDAO,
                          mailerClient: MailerClient, langs:Langs, messagesApi:MessagesApi) extends InjectedController {
 
   implicit private val ec = cc.executionContext
@@ -129,8 +130,9 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     for {
       mkCount <- knesset.countKMs
       ptCount <- knesset.countParties
+      comCount <- committees.countGroups
     } yield {
-      Ok( views.html.users.userHome(user, mkCount, ptCount) )
+      Ok( views.html.users.userHome(user, mkCount, ptCount, comCount) )
     }
   }
 

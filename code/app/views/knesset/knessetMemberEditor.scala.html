@@ -36,6 +36,7 @@
             @helper.CSRF.formField
             <input type="hidden" id="id" name="id" value="@km("id").value.getOrElse("-1")">
             <input type="hidden" id="partyId" name="partyId" value="@km("partyId").value.getOrElse("")">
+            <input type="hidden" id="knessetKey" name="knessetKey" value="@km("knessetKey").value.getOrElse("-1")">
             <div class="form-group row @Helpers.fieldStatus(km("name"))">
               <label for="name" class="col-sm-2">@Messages("name")</label>
               <div class="col-sm-10">

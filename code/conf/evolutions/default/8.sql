@@ -2,7 +2,7 @@
 
 # --- !Ups
 create TABLE groups (
-  id          serial PRIMARY KEY,
+  id         serial PRIMARY KEY,
   name       VARCHAR(256)
 );
 

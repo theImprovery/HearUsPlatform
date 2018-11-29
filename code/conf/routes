@@ -47,6 +47,8 @@ GET     /bkof/group                  controllers.KnessetMemberCtrl.showNewGroup
 GET     /bkof/group/:id              controllers.KnessetMemberCtrl.showEditGroup(id:Long)
 POST    /bkof/group                  controllers.KnessetMemberCtrl.doEditGroup
 DELETE  /bkof/group/:id              controllers.KnessetMemberCtrl.deleteGroup(id:Long)
+POST    /bkofc/api/km/update         controllers.ParseCtrl.apiKms
+POST    /bkofc/api/committee/update  controllers.ParseCtrl.apiUpdateCommittees
 
 # Serve Local Images
 GET     /images/mks/:imageName       controllers.KnessetMemberCtrl.getImage(imageName)

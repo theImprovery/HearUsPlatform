@@ -86,6 +86,38 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
 
   def deleteParty( id: Long ):Future[Int] = db.run(parties.filter( _.id === id ).delete)
 
+  def updateParties(currentParties:Seq[Party] ) = {
+    val markAsNotActive = parties.filter(party => !party.name.inSet(currentParties.map(_.name))).map(_.isActive).update(false)
+    val markAsActive = parties.filter(party => party.name.inSet(currentParties.map(_.name))).map(_.isActive).update(true)
+    val insertNewParties = for {
+      existingPartyNames <- parties.map( _.name ).result
+      addParties         <- parties ++= currentParties.filter( p => !existingPartyNames.contains(p.name) )
+    } yield addParties
+    db.run( DBIO.seq(markAsNotActive, markAsActive, insertNewParties).transactionally )
+  }
+
+  def updateKms(currentKms:Seq[KnessetMember]) = {
+    val markAsNotActive = knessetMembers.filter(km => !km.knessetKey.inSet(currentKms.map(_.knessetKey))).map(_.isActive).update(false)
+    val markAsActive = knessetMembers.filter(km => km.knessetKey.inSet(currentKms.map(_.knessetKey))).map(_.isActive).update(true)
+    val insertNewKms = for {
+      existingKmsKeys <- knessetMembers.map( _.knessetKey ).result
+      addKms          <- knessetMembers ++= currentKms.filter( k => !existingKmsKeys.contains(k.knessetKey) )
+    } yield addKms
+    db.run( DBIO.seq(markAsNotActive, markAsActive, insertNewKms).transactionally )
+  }
+
+  def getAllActiveParties():Future[Seq[Party]] = {
+    db.run{
+      parties.filter( _.isActive ).result
+    }
+  }
+
+  def getAllActiveKms():Future[Seq[KnessetMember]] = {
+    db.run{
+      knessetMembers.filter( _.isActive ).result
+    }
+  }
+
   def addContactOption( co: ContactOption ):Future[ContactOption] = {
     db.run{
       (contactOptions returning contactOptions).insertOrUpdate(co)

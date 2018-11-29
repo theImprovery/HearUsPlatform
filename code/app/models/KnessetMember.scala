@@ -5,7 +5,8 @@ case class KnessetMember (id:Long,
                           gender:String,
                           isActive:Boolean,
                           webPage:String,
-                          partyId:Long)
+                          partyId:Long,
+                          knessetKey:Long)
 
 case class ContactOption (kmId:Long,
                           platform:String,

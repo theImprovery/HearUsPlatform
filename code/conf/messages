@@ -111,6 +111,8 @@ contactPlatform.Twitter=טוויטר
 contactPlatform.Instagram=אינסטגרם
 contactPlatform.Telegram=טלגרם
 contactPlatform.YouTube=יו-טיוב
+platform.email.title=מייל לשכה
+platform.email.note=מקור: אתר הכנסת
 
 
 # Common verbs
@@ -156,3 +158,6 @@ error.required=שדה חובה
 search.empty=אין תוצאות
 search.text=הקלד טקסט לחיפוש
 search=חיפוש
+
+km.api.update=שאב מידע
+committee.api.update=עדכן ועדות

@@ -24,6 +24,7 @@
       <form action="@routes.KnessetMemberCtrl.doEditGroup()" method="POST" id="editGroupForm">
         @helper.CSRF.formField
         <input name="id" type="hidden" id="id" value="@group("id").value.getOrElse("-1")">
+        <input name="knessetKey" type="hidden" id="knessetKey" value="@group("knessetKey").value.getOrElse("-1")">
         <input name="kmsIds" type="hidden" id="kmsIds" value="@group("kmsIds").value.getOrElse("")">
         <div class="form-group row @Helpers.fieldStatus(group("name"))">
           <label for="name" class="col-sm-2 control-label">@Messages("name")</label>

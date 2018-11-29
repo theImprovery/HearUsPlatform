@@ -1,7 +1,11 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(u:User, mkCount:Int, ptCount:Int)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(u:User, mkCount:Int, ptCount:Int, comCount:Int)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 
-@templates.backEndBase(Messages("userHome.title"), views.BackOfficeSections.Home) {
+@scripts = {
+  <script src="@routes.Assets.versioned("js/userHome.js")"></script>
+}
+
+@templates.backEndBase(Messages("userHome.title"), views.BackOfficeSections.Home, Html(""), scripts) {
     <div class="content">
       <div class="row my-3">
         <div class="col-md-6">
@@ -24,6 +28,12 @@
             <a href="@routes.UserCtrl.showInviteUser()" class="btn btn-lg btn-secondary">
                 @Messages("users.inviteUser")
             </a>
+            <button type="button" onclick="updateKmsAndPartes()" class="btn btn-sm btn-danger">
+              @Messages("km.api.update")
+            </button>
+            <button type="button" onclick="updateCommittees()" class="btn btn-sm btn-danger">
+            @Messages("committee.api.update")
+            </button>
           </div>
         </div>
         <div class="col-md-6">
@@ -31,7 +41,7 @@
           <ul>
             <li>@Messages("knessetMembers"): @mkCount</li>
             <li>@Messages("parties"): @ptCount</li>
-            <li>@Messages("committees"): <span class="badge badge-pill badge-secondary">n/a</span></li>
+            <li>@Messages("committees"): @comCount</li>
             <li>@Messages("campaigns"): <span class="badge badge-pill badge-secondary">n/a</span></li>
           </ul>
         </div>
