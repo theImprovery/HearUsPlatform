@@ -22,7 +22,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
 
   implicit private val ec: ExecutionContext = cc.executionContext
 
-  def apiAddFile(subjectId: String) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData ){ req =>
+  def apiAddFile(subjectId: String, subjectType:String) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData ){ req =>
     val uploadedFile = req.body.files.head
     val filePath = Paths.get(config.get[String]("hearUs.files.mkImages.folder"))
     if ( ! Files.exists(filePath) ) {
@@ -34,7 +34,11 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
     
     Logger.info( s"got file $filename with suffix $suffix")
     Logger.info( "Uploaded: " + uploadedFile.toString  + " -- " + uploadedFile.ref.toString )
-    val imageRec = KMImage(subjectId.toLong,  suffix,
+    val related = (subjectType) match {
+      case "kms" => (Some(subjectId.toLong), None)
+      case "camps" => (None, Some(subjectId.toLong))
+    }
+    val imageRec = KMImage(-1L, related._1, related._2, suffix,
                             uploadedFile.contentType.getOrElse(""),
                             new Timestamp(Calendar.getInstance().getTime.getTime),
                             getFileName(filename))

@@ -94,7 +94,8 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.KnessetMemberCtrl.doEditGroup,
           routes.javascript.KnessetMemberCtrl.deleteGroup,
           routes.javascript.ParseCtrl.apiKms,
-          routes.javascript.ParseCtrl.apiUpdateCommittees
+          routes.javascript.ParseCtrl.apiUpdateCommittees,
+          routes.javascript.CampaignCtrl.editCampaign
         )).as("text/javascript")
     }
   }

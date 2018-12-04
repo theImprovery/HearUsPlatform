@@ -6,7 +6,7 @@ var FineUploaderHelper = (function(){
      * @return Options for fineUploader UI component
      */
     function createOptions(options) {
-        var call = beRoutes.controllers.FilesCtrl.apiAddFile(options.subjectId);
+        var call = beRoutes.controllers.FilesCtrl.apiAddFile(options.subjectId, options.subjectType);
         var retVal = {autoUpload: false,
             thumbnails: {
                 placeholders: {

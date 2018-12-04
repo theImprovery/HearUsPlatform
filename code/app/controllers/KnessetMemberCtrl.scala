@@ -207,7 +207,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       Files.delete(filePathTemp)
       Files.setPosixFilePermissions(filePath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
 
-      val imageRec = KMImage(kmId, suffix,
+      val imageRec = KMImage(-1L, Some(kmId), None, suffix,
         filePart.contentType.getOrElse(""),
         new Timestamp(Calendar.getInstance().getTime.getTime),
         imageCredit)

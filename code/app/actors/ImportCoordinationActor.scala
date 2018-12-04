@@ -344,8 +344,6 @@ class ImportCommitteesActor @Inject()(ws:WSClient, cc:ControllerComponents, knes
       val comWithPersonsImmutable = ptp.map( p => ( p._1, members(p._1, ptp))).toMap
       var comWithPersons:scala.collection.mutable.Map[String, mutable.Set[String]] = collection.mutable.Map(comWithPersonsImmutable.toSeq: _*)
       committees.foreach( com => if( !comWithPersons.contains(com.knessetKey.toString)) comWithPersons += (com.knessetKey.toString -> mutable.Set()) )
-      Logger.info("groups \n" + committees.size)
-      Logger.info("comWithPersons \n" +comWithPersons.size)
       val updatedGroups = committees.map(group => {
         val setOfKms = comWithPersons(group.knessetKey.toString).map(p => knessetKeyToKmID(p.toLong) )
         KmGroups(group.id, group.name, group.knessetKey, setOfKms.toSet)

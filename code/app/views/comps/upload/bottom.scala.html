@@ -1,10 +1,11 @@
-@(subjectId: Long, callbackName:String)
+@(subjectId: Long, callbackName:String, subjectType: Long)
 <script language="Javascript">
         var uploader;
         $(document).ready( function(){
           uploader = FineUploaderHelper.create({
             elementId: "uploader",
             subjectId: @subjectId,
+            subjectType: @subjectType,
             onComplete: function(id, name, json, xhr) {
               uploader.cancel(id);
               @{callbackName}(json);
