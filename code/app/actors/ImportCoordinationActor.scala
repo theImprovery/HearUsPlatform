@@ -10,11 +10,11 @@ import play.api.mvc.ControllerComponents
 import akka.util.Timeout
 import dataaccess.{KmGroupDAO, KnessetMemberDAO}
 import models.{ContactOption, KmGroups, KnessetMember, Party}
-import play.api.Logger
 import play.api.i18n._
 
 import scala.collection.mutable
 import scala.concurrent.duration._
+
 import scala.xml.NodeSeq
 
 object ImportCoordinationActor {
@@ -33,7 +33,7 @@ object ImportCoordinationActor {
 }
 
 class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, knessetMembers: KnessetMemberDAO,
-                                        langs:Langs, messagesApi:MessagesApi ) extends Actor {
+                                        langs:Langs, messagesApi:MessagesApi) extends Actor {
   implicit val timeout = Timeout(6 seconds)
   private var kmsCount = 0
   private var partiesCount = 0
@@ -161,7 +161,7 @@ object ImportSinglePageActor {
 
 class ImportSinglePageActor extends Actor {
 
-//  override def preStart(): Unit = Logger.info("supervised actor started ")
+//  override def preStart(): Unit = Logger.info("supervised actor started " + self.path)
 //  override def postStop(): Unit = Logger.info("supervised actor stopped " + self.path)
   implicit val timeout = Timeout(6 seconds)
   override def receive: Receive = {
@@ -176,7 +176,7 @@ class ImportSinglePageActor extends Actor {
           if(getNext(links).isDefined){
             sender ! loadKmNextPage(getNext(links).get)
           }
-          val currentKms = (xml \ "entry" \ "content" \ "properties").filter( node => (node \ "IsCurrent" text) == "true" )
+          val currentKms = xml \ "entry" \ "content" \ "properties"
           val mappedKms = currentKms.map( node => {
             val name = (node \ "FirstName" text) + " " + (node \ "LastName" text)
             val gender = if( (node \ "GenderID").text == "251") "Male" else "Female"

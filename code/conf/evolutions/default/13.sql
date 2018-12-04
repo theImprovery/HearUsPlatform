@@ -30,7 +30,7 @@ create TABLE canned_messages (
 );
 
 create TABLE social_media (
-  id        INTEGER PRIMARY KEY,
+  id        serial PRIMARY KEY,
   cam_id    INTEGER,
   name      VARCHAR(64),
   service   VARCHAR(64),
@@ -47,7 +47,7 @@ create TABLE km_positions (
 );
 
 create TABLE km_actions (
-  id        INTEGER PRIMARY KEY,
+  id        serial PRIMARY KEY,
   cam_id    INTEGER,
   km_id     INTEGER,
   type      VARCHAR(16),

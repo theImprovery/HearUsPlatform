@@ -32,23 +32,23 @@ GET     /bkofc/newUserInvitation/:id controllers.UserCtrl.showNewUserInvitation(
 POST    /bkofc/newUserInvitation/    controllers.UserCtrl.doNewUserInvitation
 POST    /bkofc/changePassword        controllers.UserCtrl.doChangePassword
 
-GET     /bkof/parties                controllers.KnessetMemberCtrl.showParties
-PATCH   /bkof/party                  controllers.KnessetMemberCtrl.updateParty
-DELETE  /bkof/party/:id              controllers.KnessetMemberCtrl.deleteParty(id:Long)
-GET     /bkof/knessetMembers         controllers.KnessetMemberCtrl.showKms(search:Option[String], asc:Option[String], sortByOpt:Option[String])
-GET     /bkof/KnessetMember          controllers.KnessetMemberCtrl.showNewKM
-GET     /bkof/KnessetMember/:id      controllers.KnessetMemberCtrl.showEditKM(id:Long)
-POST    /bkof/KnessetMember          controllers.KnessetMemberCtrl.doEditKM()
-DELETE  /bkof/KnessetMember/:id      controllers.KnessetMemberCtrl.deleteKM(id:Long)
-GET     /bkof/contactOptions/:id     controllers.KnessetMemberCtrl.getContactOptionForKm(id:Long)
-PUT     /bkof/contactOption/:id      controllers.KnessetMemberCtrl.updateContactOption(id:Long)
-GET     /bkof/groups                 controllers.KnessetMemberCtrl.showGroups
-GET     /bkof/group                  controllers.KnessetMemberCtrl.showNewGroup
-GET     /bkof/group/:id              controllers.KnessetMemberCtrl.showEditGroup(id:Long)
-POST    /bkof/group                  controllers.KnessetMemberCtrl.doEditGroup
-DELETE  /bkof/group/:id              controllers.KnessetMemberCtrl.deleteGroup(id:Long)
-POST    /bkofc/api/km/update         controllers.ParseCtrl.apiKms
-POST    /bkofc/api/committee/update  controllers.ParseCtrl.apiUpdateCommittees
+GET     /bkofc/parties                controllers.KnessetMemberCtrl.showParties
+PATCH   /bkofc/party                  controllers.KnessetMemberCtrl.updateParty
+DELETE  /bkofc/party/:id              controllers.KnessetMemberCtrl.deleteParty(id:Long)
+GET     /bkofc/knessetMembers         controllers.KnessetMemberCtrl.showKms(search:Option[String], asc:Option[String], sortByOpt:Option[String])
+GET     /bkofc/KnessetMember          controllers.KnessetMemberCtrl.showNewKM
+GET     /bkofc/KnessetMember/:id      controllers.KnessetMemberCtrl.showEditKM(id:Long)
+POST    /bkofc/KnessetMember          controllers.KnessetMemberCtrl.doEditKM()
+DELETE  /bkofc/KnessetMember/:id      controllers.KnessetMemberCtrl.deleteKM(id:Long)
+GET     /bkofc/contactOptions/:id     controllers.KnessetMemberCtrl.getContactOptionForKm(id:Long)
+PUT     /bkofc/contactOption/:id      controllers.KnessetMemberCtrl.updateContactOption(id:Long)
+GET     /bkofc/groups                 controllers.KnessetMemberCtrl.showGroups
+GET     /bkofc/group                  controllers.KnessetMemberCtrl.showNewGroup
+GET     /bkofc/group/:id              controllers.KnessetMemberCtrl.showEditGroup(id:Long)
+POST    /bkofc/group                  controllers.KnessetMemberCtrl.doEditGroup
+DELETE  /bkofc/group/:id              controllers.KnessetMemberCtrl.deleteGroup(id:Long)
+POST    /bkofc/api/km/update          controllers.ParseCtrl.apiKms
+POST    /bkofc/api/committee/update   controllers.ParseCtrl.apiUpdateCommittees
 
 GET     /bkofc/camps/:camId             controllers.CampaignCtrl.editCampaign(camId:Long)
 

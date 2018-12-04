@@ -6,7 +6,7 @@ import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.DeadboltActions
 import dataaccess.{ImagesDAO, KmGroupDAO, KnessetMemberDAO}
 import javax.inject.{Inject, Named}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.i18n._
 import play.api.libs.ws.WSClient
 import akka.pattern.ask
@@ -26,19 +26,21 @@ class ParseCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms
   }
 
   def apiKms = deadbolt.SubjectPresent()() { implicit req =>
-    implicit val timeout = Timeout(6 seconds)
-    importActor ? importAll("http://localhost:8080/projects/HearUsPlatform/code/public/xmls/km.xml",
-      "http://localhost:8080/projects/HearUsPlatform/code/public/xmls/factions.xml",
-      "http://localhost:8080/projects/HearUsPlatform/code/public/xmls/knessetDates.xml",
-      "http://localhost:8080/projects/HearUsPlatform/code/public/xmls/ptp.xml")
+    implicit val timeout = Timeout(60 seconds)
+    importActor ? importAll(
+      conf.get[String]("xml.km"),
+      conf.get[String]("xml.factions"),
+      conf.get[String]("xml.knessetDates"),
+      conf.get[String]("xml.ptpParties"))
     Future(Ok("updated"))
   }
 
   def apiUpdateCommittees = deadbolt.SubjectPresent()() { implicit req =>
-    implicit val timeout = Timeout(6 seconds)
-    committeeActor ? importCommittees("http://localhost:8080/projects/HearUsPlatform/code/public/xmls/committee.xml",
-      "http://localhost:8080/projects/HearUsPlatform/code/public/xmls/ptpCom.xml",
-      "http://localhost:8080/projects/HearUsPlatform/code/public/xmls/knessetDates.xml")
+    implicit val timeout = Timeout(60  seconds)
+    committeeActor ? importCommittees(
+      conf.get[String]("xml.committees"),
+      conf.get[String]("xml.ptpCommittees"),
+      conf.get[String]("xml.knessetDates"))
     Future(Ok("update"))
   }
 

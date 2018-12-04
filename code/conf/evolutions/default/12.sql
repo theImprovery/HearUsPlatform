@@ -2,7 +2,7 @@
 
 # --- !Ups
 create TABLE campaigns (
-  id            INTEGER PRIMARY KEY,
+  id            serial PRIMARY KEY,
   title         VARCHAR(64),
   subtitle      text,
   website       VARCHAR(128),

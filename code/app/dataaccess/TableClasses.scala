@@ -218,6 +218,16 @@ class KmActionTable( tag:Tag ) extends Table[KmAction](tag, "km_actions") {
   def * = (id, camId, kmId, actionType, date, title, details, link) <> (KmAction.tupled, KmAction.unapply)
 }
 
+class sytemEventTable( tag:Tag ) extends Table[SystemEvent](tag, "system_events") {
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def userId = column[Long]("user_id")
+  def date = column[Timestamp]("date")
+  def message = column[String]("message")
+  def details = column[String]("details")
+
+  def * = (id, userId, date, message, details) <> (SystemEvent.tupled, SystemEvent.unapply)
+}
+
 object TableClasses {
   val parties = TableQuery[PartyTable]
   val knessetMembers = TableQuery[KnessetMemberTable]
