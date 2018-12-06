@@ -8,7 +8,8 @@ function getPartyData( $li ) {
     return {
         id: Number($li.find("[name=id]").val()),
         name: $li.find(".partyName")[0].innerText,
-        webPage: $li.find(".partyWebPage")[0].innerText
+        webPage: $li.find(".partyWebPage")[0].innerText,
+        isActive: Boolean($li.find("[name=isActive]").val())
     };
 }
 
@@ -91,6 +92,7 @@ function addRow(){
         $(".card.noData").slideUp();
     }
     var idHidden = createElementWithAttr("input", {"type":"hidden", "name":"id"});
+    var isActive = createElementWithAttr("input", {"type":"hidden", "name":"isActive", "value":"true"});
     var partyName = createElementWithAttr("div", {"class":"partyName"});
     var webLink = createElementWithAttr("a", {"href":"", "class":"partyWebPage", "target":"_blank"});
     var cancelIcon = createElementWithAttr("i", {"class": "fa fa-close"});
@@ -113,7 +115,7 @@ function addRow(){
         {"type":"button", "name":"deleteBtn", "class":"btn btn-sm btn-danger hidden"});
     deleteButton.appendChild(deleteIcon);
 
-    var liElements = [idHidden, partyName, webLink, editButton, cancelEditButton, saveButton, deleteButton];
+    var liElements = [idHidden, isActive, partyName, webLink, editButton, cancelEditButton, saveButton, deleteButton];
     var li = document.createElement("li");
     for (var i = 0; i < liElements.length; i++) {
         li.appendChild(liElements[i]);

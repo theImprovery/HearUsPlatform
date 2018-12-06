@@ -20,6 +20,7 @@
           @for(party <- parties){
             <li>
                 <input type="hidden" name="id" value="@party.id">
+                <input type="hidden" name="isActive" value="@party.isActive">
                 <div class="partyName">@party.name</div>
                 <a class="partyWebPage" href="@party.webPage" target="_blank">@party.webPage</a>
                 <button type="button" name="editBtn" onclick="editParty(this);" class="btn btn-sm btn-default"><i class="fa fa-edit"></i></button>
