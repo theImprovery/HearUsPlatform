@@ -57,7 +57,7 @@ package campaigns {
   class MKPosition {
     mk
     position
-    campgaign
+    campaign
   }
 
   class MKAction {
@@ -81,8 +81,9 @@ package users {
 }
 
 User "0..*" -- "*..0" Campaign: participates
-MKPosition "1" -- "1" KnessetMember
-MKAction "1" -- "1" KnessetMember
+MKPosition "1" -- "*..0" KnessetMember
+MKAction "0..*" --* "1" KnessetMember
+MKAction "0..*" --> "1" Position
 
 Campaign *- "*" MKAction
 Campaign *- "*" MKPosition

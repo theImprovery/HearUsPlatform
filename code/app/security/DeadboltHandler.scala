@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class UserSubject(user:User) extends Subject
 {
   override def identifier: String = user.username
-  override def roles = List[Role]()
+  override def roles = Nil
   override def permissions = Nil
 }
 

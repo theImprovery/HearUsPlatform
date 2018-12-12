@@ -1,16 +1,25 @@
 // Styles that are only useful in the application back-end.
 
-li a.partyWebPage {
+@partyListRowHeight: 26px;
+
+.pseudoInput {
   display: inline-block;
+  border: 1px solid #ddd;
+  height: @partyListRowHeight;
+  vertical-align: text-bottom;
   min-width: 40ex;
+}
+
+li a.partyWebPage {
+  .pseudoInput;
   font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   direction: ltr;
   text-align: left;
+
 }
 
 li div.partyName {
-  display: inline-block;
-  min-width: 40ex;
+  .pseudoInput;
 }
 
 ul.editableList {

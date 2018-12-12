@@ -1,0 +1,39 @@
+= Hear Us worklog
+
+== TODO
+
+1. מערכת הרשאות
+    * User types: site admin, campaigner
+1. split system to support views for each user type
+1. 
+
+
+== Use Cases
+
+=== Manage Campaigns
+****
+Nirshman
+****
+* create campaign
+* delete campaign
+* un-publish campaign
+
+=== Manage Single Campaign
+****
+Campaigner
+****
+* add user
+* edit campaign data
+* publish
+
+
+=== Create campaign
+
+==== Prereqs
+* future campaign manager has a user
+
+==== flow
+1. Nirshman creates campaign and selects manager
+1. manager can see new campaign in their dashboard
+
+

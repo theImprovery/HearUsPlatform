@@ -1,0 +1,32 @@
+@startuml
+' skinparam handwritten true
+ left to right direction
+ actor nirshman #IndianRed
+ actor campaigner #AliceBlue
+ actor crowd
+
+rectangle hearUs {
+    usecase MKS as "maintain\nKnesset\nstate"
+    usecase CreateC as "create campaign"
+    usecase manageCampagin as "manage campaign"
+    usecase login
+    usecase choose as "Choose Campaigns"
+    usecase viewC as "view campaign"
+
+    nirshman -- MKS
+    nirshman -- CreateC 
+    nirshman -- login
+
+    manageCampagin -- campaigner
+    choose -- campaigner
+    login -- campaigner
+    
+    choose .> login : includes
+    CreateC .> login 
+    manageCampagin .> login 
+    MKS .> login 
+
+    crowd -- viewC
+}
+
+@enduml

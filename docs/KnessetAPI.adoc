@@ -1,0 +1,27 @@
+= Knesset API
+
+== Filters
+OData has filters based on XML content. It's added like this: `http://server/endpoint-url?$filter=Field op param`.
+
+[NOTE]
+The `field op param` part has to be URL-encoded. So add `%20` for spaces: `field%20op%20param`.
+
+All factions of the 20th Knesset::
+    `curl 'http://knesset.gov.il/Odata/ParliamentInfo.svc/KNS_Faction()?$filter=KnessetNum%20eq%2020'`
+
+Current People in the Knesset::
+    `http://knesset.gov.il/Odata/ParliamentInfo.svc/KNS_Person?$filter=IsCurrent`
+
+[WARNING]
+This includes MKs **AND** other people too. Filter on `PersonToPosition` to know what that person is doing there.
+
+
+[plantuml]     
+....
+class KnessetPerson
+class Role 
+class PersonToPosition
+
+PersonToPosition "0..*" o--> "0..*" Role
+PersonToPosition "0..*" o--> "0..*" KnessetPerson
+....
