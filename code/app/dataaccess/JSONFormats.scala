@@ -3,7 +3,7 @@ package dataaccess
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
-import models.{ContactOption, KMImage, Party}
+import models._
 import play.api.libs.json._
 
 object JSONFormats {
@@ -27,7 +27,26 @@ object JSONFormats {
     }
   }
 
+  implicit val positionFormat:Format[Position.Value ] = new Format[Position.Value ] {
+    val writeFmt = Writes.enumNameWrites[Position.type]
+    val readFmt = Reads.enumNameReads(Position)
+    override def writes(o: Position.Value): JsValue = writeFmt.writes(o)
+    override def reads(json: JsValue): JsResult[Position.Value] = readFmt.reads(json)
+  }
+
+  implicit val platformFormat:Format[Platform.Value ] = new Format[Platform.Value ] {
+    val writeFmt = Writes.enumNameWrites[Platform.type]
+    val readFmt = Reads.enumNameReads(Platform)
+    override def writes(o: Platform.Value): JsValue = writeFmt.writes(o)
+    override def reads(json: JsValue): JsResult[Platform.Value] = readFmt.reads(json)
+  }
+
   implicit val fileFormat:Format[KMImage] = Json.format[KMImage]
   implicit val contactOptionFormat:Format[ContactOption] = Json.format[ContactOption]
   implicit val partyFormat:Format[Party] = Json.format[Party]
+  implicit val campaignFormat:Format[Campaign] = Json.format[Campaign]
+  implicit val lblFormat:Format[LabelText] = Json.format[LabelText]
+  implicit val msgFormat:Format[CannedMessage] = Json.format[CannedMessage]
+  implicit val smFormat:Format[SocialMedia] = Json.format[SocialMedia]
+  implicit val kmPositionFormat:Format[KmPosition] = Json.format[KmPosition]
 }

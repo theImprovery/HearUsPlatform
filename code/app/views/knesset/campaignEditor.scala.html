@@ -1,0 +1,331 @@
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+
+@import dataaccess.Platform.Platform
+@import models.Position.Position
+@(campaign:Campaign, positions:Seq[Position], platforms:Seq[Platform], imageOpt:Option[KMImage], prefix:String,
+        kms:Seq[KnessetMember], kmPosition:Map[Long, String], actions:Seq[KmAction],
+        parties:Map[Long, String])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@head = {
+  <link rel="stylesheet" href="@routes.Assets.versioned("css/labelDisplay.min.css")">
+}
+
+@scripts = {
+  <script src="@routes.Assets.versioned("js/campaignEditorPage.js")"></script>
+
+  <div class="modal fade" id="actionModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">@Messages("campaigns.editAction")</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editActionForm" method="POST" action="@routes.CampaignCtrl.updateAction()">
+            <input type="hidden" id="camId" name="camId" value="@campaign.id">
+            <select name="smPlatform" id="smPlatform" class="form-control" style="display:inline; width:auto">
+            @for(pl <- platforms){
+              <option name="sm-@pl.toString" value="@pl">@Messages(pl.toString)</option>
+            }
+            </select>
+            <label name="smTitle">
+              <input type="text" class="form-control" name="smTitle" placeholder="" maxlength="256"> <span>@Messages("title")</span> </label>
+            <label name="smLink">
+              <input type="text" class="form-control" name="smLink" placeholder="" maxlength="256"> <span>@Messages("link")</span> </label>
+            <input type="date" name="date" id="date">
+            <div class="col-sm-10">
+              <textarea type="text" style="direction:ltr" class="form-control" name="details" id="details"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="submitForm()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@templates.backEndBase(campaign.title, views.BackOfficeSections.Knesset, head, scripts) {
+  @comps.pageTitleRow(campaign.title) { }
+  <div class="row">
+    <div class="col">
+      <input type="hidden" name="id" id="id" value="@campaign.id">
+      <ul class="nav nav-tabs justify-content-center" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-toggle="pill" href="#details">@Messages("details")</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="pill" href="#settings">@Messages("settings")</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="pill" href="#media">@Messages("media")</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="pill" href="#positions">@Messages("positions")</a>
+        </li>
+      </ul>
+
+      <div class="tab-content pt-2">
+        <div class="tab-pane active" id="details">
+          <div>
+            <input type="hidden" name="themeData" id="themeData" value=" ">
+            <div class="form-group row">
+              <label for="title" class="col-sm-2">@Messages("title")</label>
+              <div class="col-sm-10">
+                <input type="text" style="direction:ltr" class="form-control" name="title" id="title" value="@campaign.title">
+              </div>
+            </div> <!-- title -->
+            <div class="form-group row">
+              <label for="subtitle" class="col-sm-2">@Messages("subtitle")</label>
+              <div class="col-sm-10">
+                <textarea type="text" style="direction:ltr" class="form-control" name="subtitle" id="subtitle">@campaign.subtitle</textarea>
+              </div>
+            </div> <!-- subtitle -->
+            <div class="form-group row">
+              <label for="website" class="col-sm-2">@Messages("website")</label>
+              <div class="col-sm-10">
+                <input type="text" style="direction:ltr" class="form-control" name="website" id="website" value="@campaign.website">
+              </div>
+            </div> <!-- website -->
+            <div class="form-group row">
+              <label for="contactEmail" class="col-sm-2">@Messages("campaign.contactEmail")</label>
+              <div class="col-sm-10">
+                <input type="text" style="direction:ltr" class="form-control" name="contactEmail" id="contactEmail" value="@campaign.contactEmail">
+              </div>
+            </div> <!-- contactEmail -->
+          </div>
+          <div class="row">
+            <div class="col-4">
+              <div class="text-right">
+                <button onclick="patchDetails()" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> @Messages("updateDetails")</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="settings">
+          <div id="labels">
+            <div class="row">
+              <div class="col">
+                <h3>@Messages("labels")</h3>
+              </div>
+              <div class="col text-left">
+                <button onclick="updateLabels(@campaign.id)" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> @Messages("campaigns.updateLabels")</button>
+              </div>
+            </div>
+
+            <div class="row labels">
+              <div class="col">
+                <div class="noData p-4" id="noLabels" style="display:none">
+                  @Messages("campaigns.noLabels")
+                </div>
+                <div class="noData" id="loadingLabels">
+                  <i class="fa fa-spin fa-refresh"></i> @Messages("loadingLabels")
+                </div>
+                <div class="labelsCtnr">
+                  <ul id="labelList" style="list-style-type:none">
+                    <li id="labelTemplate">
+                      <select name="lPosition" id="lPosition" class="form-control" style="display:inline; width:auto">
+                      @for(pos <- positions){
+                        <option name="l-@pos.toString" value="@pos">@Messages(pos.toString)</option>
+                      }
+                      </select>
+                      <input class="hidden" type="radio" name="lGender" value="Male" id="l-Male">
+                      <label for="l-Male" class="buttonLike">@Messages("male")</label>
+                      <input class="hidden" type="radio" name="lGender" value="Female" id="l-Female">
+                      <label for="l-Female" class="buttonLike">@Messages("female")</label>
+                      <label name="label">
+                        <input type="text" class="form-control" name="label" placeholder="" maxlength="256"> <span>@Messages("label")</span> </label>
+                      <button type="button" class="btn btn-danger" style="vertical-align: baseline" onclick="deleteRow(this)"><i class="fa fa-close"></i></button>
+                    </li>
+                  </ul>
+                  <div>
+                    <button type="button" class="btn btn-outline-success" onclick="addLabel()"><i class="fa fa-plus"></i> @Messages("add")</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="messages">
+            <div>
+              <hr>
+            </div>
+            <div class="row">
+              <div class="col">
+                <h3>@Messages("messages")</h3>
+              </div>
+              <div class="col text-left">
+                <button onclick="updateMessages(@campaign.id)" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> @Messages("campaigns.updateMessages")</button>
+              </div>
+            </div>
+            <div class="row messages">
+              <div class="col">
+                <div class="noData p-4" id="noMessages" style="display:none">
+                  @Messages("campaigns.noMessages")
+                </div>
+                <div class="noData" id="loadingMessages">
+                  <i class="fa fa-spin fa-refresh"></i> @Messages("loadingMessages")
+                </div>
+                <div class="messagesCtnr">
+                  <ul id="messagesList" style="list-style-type:none">
+                    <li id="messageTemplate">
+                      <select name="mPlatform" id="mPlatform" class="form-control" style="display:inline; width:auto">
+                        @for(pl <- platforms){
+                          <option name="m-@pl.toString" value="@pl">@Messages(pl.toString)</option>
+                        }
+                      </select>
+                      <select name="mPosition" id="mPosition" class="form-control" style="display:inline; width:auto">
+                        @for(pos <- positions){
+                          <option name="m-@pos.toString" value="@pos">@Messages(pos.toString)</option>
+                        }
+                      </select>
+                      <input class="hidden" type="radio" name="mGender" value="Male" id="m-Male">
+                      <label for="m-Male" class="buttonLike">@Messages("male")</label>
+                      <input class="hidden" type="radio" name="mGender" value="Female" id="m-Female">
+                      <label for="m-Female" class="buttonLike">@Messages("female")</label>
+                      <label name="message">
+                        <input type="text" class="form-control" name="message" placeholder="" maxlength="256"> <span>@Messages("message")</span> </label>
+                      <button type="button" class="btn btn-danger" style="vertical-align: baseline" onclick="deleteRow(this)"><i class="fa fa-close"></i></button>
+                    </li>
+                  </ul>
+                  <div>
+                    <button type="button" class="btn btn-outline-success" onclick="addMessage()"><i class="fa fa-plus"></i> @Messages("add")</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="socialMedia">
+            <div>
+              <hr>
+            </div>
+            <div class="row">
+              <div class="col">
+                <h3>@Messages("socialMedia")</h3>
+              </div>
+              <div class="col text-left">
+                <button onclick="updateSm(@campaign.id)" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> @Messages("campaigns.updateSocialMedia")</button>
+              </div>
+            </div>
+            <div class="row sm">
+              <div class="col">
+                <div class="noData p-4" id="noSm" style="display: none">
+                  @Messages("campaigns.noSm")
+                </div>
+                <div class="noData" id="loadingSm">
+                  <i class="fa fa-spin fa-refresh"></i> @Messages("loadingSm")
+                </div>
+                <div class="smCtnr">
+                  <ul id="smList" style="list-style-type:none">
+                    <li id="smTemplate">
+                      <input type="hidden" name="smId" value="-1">
+                      <label name="smName">
+                        <input type="text" class="form-control" name="smName" placeholder="" maxlength="256"> <span>@Messages("name")</span> </label>
+                      <label name="smService">
+                        <input type="text" class="form-control" name="smService" placeholder="" maxlength="256"> <span>@Messages("service")</span> </label>
+                      <button type="button" class="btn btn-danger" style="vertical-align: baseline" onclick="deleteRow(this)"><i class="fa fa-close"></i></button>
+                    </li>
+                  </ul>
+                  <div>
+                    <button type="button" class="btn btn-outline-success" onclick="addSm()"><i class="fa fa-plus"></i> @Messages("add")</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="background">
+            <div>
+              <hr>
+            </div>
+            <div class="row">
+              <div class="col">
+                <h3>
+                @Messages("background")
+                </h3>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <form action="@routes.FilesCtrl.doAddImage(campaign.id, "camps")" method="POST" enctype="multipart/form-data">
+                  @helper.CSRF.formField
+                  <div class="form-group row">
+                    <label class="col-sm-2 control-label" for="imageCredit">@Messages("knessetMemberEditor.imageCredit")</label>
+                    <div class="col-sm-10">
+                      <input type="text" value="@imageOpt.map(_.credit).getOrElse("")" name="imageCredit" class="form-control" id="imageCredit">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 control-label" for="imageFile">@Messages("knessetMemberEditor.imageFile")</label>
+                    <div class="col-sm-10">
+                      <input type="file" name="imageFile" id="imageFile" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col text-left">
+                    <a href="@routes.CampaignCtrl.showCampaigns()" class="btn btn-secondary"><i class="fa fa-close"></i> @Messages("back")</a>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("save")</button>
+                  </div>
+                </form>
+              </div>
+              <div class="col-md-6">
+              @if( imageOpt.isEmpty ){
+                <div class="noData">
+                  <i class="fa fa-5x fa-user-circle-o"></i>
+                  @Messages("אין תמונה")
+                </div>
+              }else{
+                <div class="text-center">
+                  <img style="max-height: 300px; max-width:300px" src="@prefix@imageOpt.get.filename" alt=""><br>
+                  @Messages("imageCredit"): @imageOpt.get.credit
+                </div>
+              }
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="positions">
+          <div>
+            <label for="searchStr">@Messages("search")</label>
+            <input type="text" placeholder="search" id="searchStr" onkeyup="filterKmsList(this.value)">
+            <ul id="kmsPositionList" style="list-style-type:none">
+              @for(km <- kms) {
+                <li data-km-name="@km.name.replaceAll("\"", "\\\\\"")" data-party-name="@parties(km.partyId).replaceAll("\"", "\\\\\"")">
+                  <label for="name" class="col-sm-2">@km.name</label>
+                  @for(pos <- positions) {
+                    <input class="hidden" type="radio" name="@km.id-position"
+                        value="@pos" id="@km.id-@pos.toString" onchange="changePosition(this)"
+                        @if(kmPosition.isDefinedAt(km.id) && (kmPosition(km.id) == pos.toString)){checked}>
+                    <label for="@km.id-@pos.toString" class="buttonLike">@Messages(pos.toString)</label>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+        <div class="tab-pane" id="media">
+          <div>
+            @if(actions.isEmpty){
+              <div class="noData p-4" id="noActions">
+              @Messages("campaigns.noActions")
+              </div>
+            } else {
+
+            }
+            <button class="btn btn-outline-success" onclick="showCleanDialog()"><i class="fa fa-plus-plus"></i> @Messages("add")</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <hr>
+        </div>
+      </div>
+      <div>
+        <a href="@routes.CampaignCtrl.showCampaigns()" class="btn btn-secondary"><i class="fa fa-undo"></i> @Messages("back")</a>
+        <button type="button" class="btn btn-danger" onclick="deleteCampaign(@campaign.id)"><i class="fa fa-trash-o"></i> @Messages("campaign.delete")</button>
+      </div>
+    </div>
+  </div>
+}

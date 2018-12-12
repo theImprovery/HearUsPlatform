@@ -18,9 +18,24 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
     db.run( images.insertOrUpdate(anImage) ).map( _ => anImage )
   }
   
-  def getImage(kmId:Long ):Future[Option[KMImage]] = {
+  def getImageForKm(kmId:Long ):Future[Option[KMImage]] = {
     db.run {
       images.filter( _.kmId === kmId ).result
+    } map { _.headOption}
+  }
+
+  def getImageForCamps(camId:Long ):Future[Option[KMImage]] = {
+    db.run {
+      images.filter( _.camId === camId ).result
+    } map { _.headOption}
+  }
+
+  def getImage( id:Long, subjectType:String ):Future[Option[KMImage]] = {
+    db.run {
+      subjectType match {
+        case "kms" => images.filter( _.kmId === id ).result
+        case "camps" => images.filter( _.camId === id ).result
+      }
     } map { _.headOption}
   }
 

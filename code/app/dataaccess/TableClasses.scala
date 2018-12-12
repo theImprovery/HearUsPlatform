@@ -151,7 +151,7 @@ class CampaignTable( tag:Tag ) extends Table[Campaign](tag, "campaigns") {
 
 class LabelTextTable( tag:Tag ) extends Table[LabelText](tag, "label_texts") {
   import Mappers.positionMapper
-  def camId = column[Long]("id", O.PrimaryKey)
+  def camId = column[Long]("cam_id", O.PrimaryKey)
   def position = column[Position.Value]("position", O.PrimaryKey)
   def gender = column[String]("gender", O.PrimaryKey)
   def text = column[String]("text")

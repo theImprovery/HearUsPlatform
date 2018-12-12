@@ -7,7 +7,7 @@
 
 
 @head = {
-  <link rel="stylesheet" href="@routes.Assets.versioned("css/contactOption.min.css")">
+  <link rel="stylesheet" href="@routes.Assets.versioned("css/labelDisplay.min.css")">
 }
 
 @scripts = {
@@ -96,7 +96,7 @@
           @*</div>*@
           <div class="row">
             <div class="col-md-6">
-              <form action="@routes.KnessetMemberCtrl.doAddImage(km("id").value.getOrElse("0").toLong)" method="POST" enctype="multipart/form-data">
+              <form action="@routes.FilesCtrl.doAddImage(km("id").value.getOrElse("0").toLong, "kms")" method="POST" enctype="multipart/form-data">
                 @helper.CSRF.formField
                 <div class="form-group row">
                   <label class="col-sm-2 control-label" for="imageCredit">@Messages("knessetMemberEditor.imageCredit")</label>

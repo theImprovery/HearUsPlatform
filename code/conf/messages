@@ -13,6 +13,7 @@ navbar.users.title=משתמשים
 navbar.users.invite=שליחת הזמנה
 navbar.users.list=רשימה
 navbar.main=ראשי
+navbar.campaigns=קמפיינים
 
 forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
 forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
@@ -88,6 +89,9 @@ parties.title=מפלגות
 parties.empty=לא רשומות מפלגות כרגע.
 parties.addOne=אפשר להוסיף אחת.
 
+campaigns.title=קמפיינים
+campaigns.empty=אין כרגע קמפיינים במערכת
+
 knessetMember.deleted=חבר/ת הכנסת נמחק/ה בהצלחה
 knessetMember.new=חבר/ת כנסת חדש/ה
 knessetMember.update=חבר/ת הכנסת עודכנ/ה בהצלחה
@@ -118,8 +122,11 @@ platform.email.note=מקור: אתר הכנסת
 # Common verbs
 add=הוספה
 cancel=ביטול
+back=חזור
 delete=מחיקה
 details=פרטים
+settings=הגדרות
+positions=עמדות
 loadingContactDetails=טוען פרטי קשר...
 loadingImage=טוען תמונה...
 logout=יציאה
@@ -128,8 +135,11 @@ note=הערה
 save=שמירה
 send=שליחה
 title=כותרת
+subtitle=פירוט
 update=עידכון
 sent_f=נשלחה
+media=מדיה
+updateDetails=עדכון פרטים
 
 # Common nouns
 campaign=קמפיין
@@ -161,3 +171,20 @@ search=חיפוש
 
 km.api.update=שאב מידע
 committee.api.update=עדכן ועדות
+
+campaign.delete=מחיקת קמפיין
+campaigns.deleted=הקמפיין נמחק בהצלחה
+campaign.contactEmail=דוא"ל (מנהל הקמפיין)
+campaigns.noLabels=לא הוכנסו תוויות
+loadingLabels=טוען תוויות
+Against=נגד
+For=בעד
+Neutral=נייטרלי
+Undecided=לא החליט/ה
+label=תווית
+labels=תוויות
+messages=הודעות
+campaigns.updateLabels=עדכון תוויות
+campaigns.updateMessages=עדכן הודעות
+campaigns.noMessages=לא הוכנסו הודעות
+background=רקע

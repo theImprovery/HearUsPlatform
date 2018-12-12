@@ -90,7 +90,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for {
       km <- kms.getKM(id)
       parties <- kms.getAllParties
-      imageOpt <- images.getImage(id)
+      imageOpt <- images.getImageForKm(id)
     } yield {
       km.map(m => Ok(views.html.knesset.knessetMemberEditor(knessetMemberForm.fill(m),
         conf.get[String]("hearUs.files.mkImages.url"), imageOpt,
@@ -105,7 +105,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         for {
           knessetMembers <- kms.getAllKms
           parties <- kms.getAllParties
-          imageOpt <- images.getImage(formWithErrors.data("id").toLong)
+          imageOpt <- images.getImageForKm(formWithErrors.data("id").toLong)
         } yield {
           Logger.info(formWithErrors.errors.mkString("\n"))
           val partyMap = parties.map(p => p.id -> p).toMap
@@ -170,13 +170,13 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
 
-  def doAddImage(kmId: Long) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData) { implicit req =>
+  def doAddImage(kmId: Long, subjectType:String) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData) { implicit req =>
     val file = req.body.file("imageFile")
     val imageCredit = req.body.dataParts.getOrElse("imageCredit", Seq[String]()).headOption.getOrElse("")
 
     if (file.isEmpty || file.get.filename.isEmpty) {
       // no file, but we might be able to update the image credit.
-      images.getImage(kmId).flatMap({
+      images.getImageForKm(kmId).flatMap({
         case Some(imageRec) => {
           val updated = imageRec.copy(credit = imageCredit)
           images.storeImage(updated).map(_ => {
@@ -221,7 +221,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def getImage(imageName: String) = Action.async { implicit req =>
     val kmId = imageName.split("\\.")(0)
 
-    images.getImage(kmId.toInt).map({
+    images.getImageForKm(kmId.toInt).map({
       case Some(img) => {
         val path = Paths.get(conf.get[String]("hearUs.files.mkImages.folder")).resolve(imageName)
         Ok(Files.readAllBytes(path)).as(img.mimeType)

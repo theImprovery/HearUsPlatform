@@ -95,7 +95,18 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.KnessetMemberCtrl.deleteGroup,
           routes.javascript.ParseCtrl.apiKms,
           routes.javascript.ParseCtrl.apiUpdateCommittees,
-          routes.javascript.CampaignCtrl.editCampaign
+          routes.javascript.CampaignCtrl.showCampaigns,
+          routes.javascript.CampaignCtrl.editCampaign,
+          routes.javascript.CampaignCtrl.createCampaign,
+          routes.javascript.CampaignCtrl.updateDetails,
+          routes.javascript.CampaignCtrl.deleteCampaign,
+          routes.javascript.CampaignCtrl.getLabelText,
+          routes.javascript.CampaignCtrl.updateLabels,
+          routes.javascript.CampaignCtrl.getMessages,
+          routes.javascript.CampaignCtrl.updateMessages,
+          routes.javascript.CampaignCtrl.updatePosition,
+          routes.javascript.CampaignCtrl.getSocialMedia,
+          routes.javascript.CampaignCtrl.updateSocialMedia
         )).as("text/javascript")
     }
   }

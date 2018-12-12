@@ -1,1 +1,40 @@
-@(camps:Seq[Campaign])
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+
+@(campaigns:Seq[Campaign])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+
+
+  @templates.backEndBase("Campaigns", views.BackOfficeSections.Knesset, Html("")) {
+    @comps.pageTitleRow(Messages("campaigns.title")){
+      <form action="@routes.CampaignCtrl.createCampaign()" method="POST">
+        @helper.CSRF.formField
+        <button type="submit" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> @Messages("add")</button>
+      </form>
+    }
+
+    <div class="row">
+      <div class="col-md-12">
+      @if(campaigns.isEmpty) {
+        <div class="noData">
+        @Messages("campaigns.empty")
+        </div>
+      } else {
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>@Messages("name")</th>
+              </tr>
+            </thead>
+            <tbody>
+            @for( campaign <- campaigns ) {
+              <tr>
+                <td><a href="@routes.CampaignCtrl.editCampaign(campaign.id)">@campaign.title</a></td>
+              </tr>
+            }
+            </tbody>
+          </table>
+        </div>
+      }
+      </div>
+    </div>
+  }

@@ -63,7 +63,8 @@ object Structure {
     MultiPageSection("navbar.knesset", BackOfficeSections.Knesset, Seq(
       PageSectionItem("navbar.parties", routes.KnessetMemberCtrl.showParties()),
       PageSectionItem("navbar.knessetMembers", routes.KnessetMemberCtrl.showKms(None, None, None)),
-      PageSectionItem("navbar.groups", routes.KnessetMemberCtrl.showGroups())
+      PageSectionItem("navbar.groups", routes.KnessetMemberCtrl.showGroups()),
+      PageSectionItem("navbar.campaigns", routes.CampaignCtrl.showCampaigns())
     )),
     MultiPageSection("navbar.users.title", BackOfficeSections.Users, Seq(
       PageSectionItem("navbar.users.invite", routes.UserCtrl.showInviteUser()),

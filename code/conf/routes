@@ -50,11 +50,24 @@ DELETE  /bkofc/group/:id              controllers.KnessetMemberCtrl.deleteGroup(
 POST    /bkofc/api/km/update          controllers.ParseCtrl.apiKms
 POST    /bkofc/api/committee/update   controllers.ParseCtrl.apiUpdateCommittees
 
-GET     /bkofc/camps/:camId             controllers.CampaignCtrl.editCampaign(camId:Long)
+GET     /bkofc/camps/:camId           controllers.CampaignCtrl.editCampaign(camId:Long)
+POST    /bkofc/camps/new              controllers.CampaignCtrl.createCampaign
+GET     /bkofc/camps                  controllers.CampaignCtrl.showCampaigns
+PATCH   /bkofc/camps/details/         controllers.CampaignCtrl.updateDetails
+DELETE  /bkofc/camps/:id              controllers.CampaignCtrl.deleteCampaign(id:Long)
+GET     /bkofc/camps/lbls/:id         controllers.CampaignCtrl.getLabelText(id:Long)
+PATCH   /bkofc/camps/labels/          controllers.CampaignCtrl.updateLabels
+GET     /bkofc/camps/msgs/:id         controllers.CampaignCtrl.getMessages(id:Long)
+PATCH   /bkofc/camps/msgs/            controllers.CampaignCtrl.updateMessages
+GET     /bkofc/camps/sm/:id           controllers.CampaignCtrl.getSocialMedia(id:Long)
+PATCH   /bkofc/camps/sm/              controllers.CampaignCtrl.updateSocialMedia
+PATCH   /bkofc/camps/position         controllers.CampaignCtrl.updatePosition
+POST    /bkofc/camps/actions          controllers.CampaignCtrl.updateAction
+
 
 # Serve Local Images
-GET     /images/mks/:imageName       controllers.KnessetMemberCtrl.getImage(imageName)
-POST    /images/mks/:mkId            controllers.KnessetMemberCtrl.doAddImage(mkId:Long)
+#POST    /images/:subjectType/:mkId            controllers.KnessetMemberCtrl.doAddImage(mkId:Long, subjectType:String)
+POST    /images/:subjectType/:mkId            controllers.FilesCtrl.doAddImage(mkId:Long, subjectType:String)
 
 # Images
 POST    /api/mk/:id/images           controllers.FilesCtrl.apiAddFile(id:String, subjectType:String)
