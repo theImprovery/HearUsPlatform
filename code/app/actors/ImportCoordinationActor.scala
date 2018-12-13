@@ -34,7 +34,7 @@ object ImportCoordinationActor {
 
 class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, knessetMembers: KnessetMemberDAO,
                                         langs:Langs, messagesApi:MessagesApi) extends Actor {
-  implicit val timeout = Timeout(6 seconds)
+  implicit val timeout = Timeout(20 seconds)
   private var kmsCount = 0
   private var partiesCount = 0
   private var ptfCount = 0
@@ -48,7 +48,6 @@ class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, kn
   override def receive: Receive = {
     case importAll(kmsFirstPage:String, partiesFirstPage:String, numPage:String, ptpPage:String) => {
       implicit val ec = cc.executionContext
-      Logger.info("Import all KMs started")
       ws.url(numPage)
         .withFollowRedirects(true)
         .get()
