@@ -1,7 +1,7 @@
 package security
 
 import be.objectify.deadbolt.scala.AuthenticatedRequest
-import be.objectify.deadbolt.scala.models.{Role, Subject}
+import be.objectify.deadbolt.scala.models.{Permission, Role, Subject}
 import controllers.{FlashKeys, Informational, InformationalLevel, routes}
 import dataaccess.UsersDAO
 import models.User
@@ -11,18 +11,15 @@ import play.api.mvc.{Request, Result, Results}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+case class HearUsRole(name:String) extends Role
 
-case class UserSubject(user:User) extends Subject
-{
+case class HearUsSubject(user:User) extends Subject {
   override def identifier: String = user.username
-  override def roles = Nil
-  override def permissions = Nil
+  override def roles:List[HearUsRole] = user.roles.map( r => HearUsRole(r.toString) ).toList
+  override def permissions:List[Permission] = Nil
 }
 
 
-/**
-  * Created by michael on 12/3/17.
-  */
 class DeadboltHandler(users:UsersDAO, langs:Langs, messagesApi:MessagesApi) extends be.objectify.deadbolt.scala.DeadboltHandler {
   
   implicit val messagesProvider: MessagesProvider = {
@@ -34,8 +31,9 @@ class DeadboltHandler(users:UsersDAO, langs:Langs, messagesApi:MessagesApi) exte
   override def getDynamicResourceHandler[A](request: Request[A]) = Future(None)
 
   override def getSubject[A](request: AuthenticatedRequest[A]):Future[Option[Subject]] = {
-    request.session.get("userId").map( sId => users.get(sId.toLong).map(_.map(u=>UserSubject(u))) )
-      .getOrElse( Future(None) )
+    request.session.get("userId")
+           .map( sId => users.get(sId.toLong).map(_.map(u=>HearUsSubject(u))) )
+           .getOrElse( Future(None) )
   }
 
   /**

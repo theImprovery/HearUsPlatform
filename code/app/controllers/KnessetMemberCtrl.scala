@@ -5,8 +5,7 @@ import java.nio.file.{CopyOption, Files, Paths, StandardCopyOption}
 import java.sql.Timestamp
 import java.util.Calendar
 
-
-import be.objectify.deadbolt.scala.DeadboltActions
+import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
 import javax.inject.Inject
 import models._
 import dataaccess._
@@ -77,7 +76,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
 
-  def showNewKM() = deadbolt.SubjectPresent()() { implicit req =>
+  def showNewKM() = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     for {
       parties <- kms.getAllParties
     } yield {

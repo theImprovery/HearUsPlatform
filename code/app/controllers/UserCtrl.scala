@@ -6,7 +6,7 @@ import java.util.UUID
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions}
 import dataaccess._
 import javax.inject.Inject
-import models.{Invitation, PasswordResetRequest, User}
+import models.{Invitation, PasswordResetRequest, User, UserRole}
 import play.api.{Configuration, Logger, cache}
 import play.api.cache.Cached
 import play.api.data._
@@ -15,7 +15,7 @@ import play.api.i18n._
 import play.api.libs.json.{JsObject, JsString}
 import play.api.libs.mailer.{Email, MailerClient}
 import play.api.mvc.{Action, ControllerComponents, InjectedController}
-import security.UserSubject
+import security.HearUsSubject
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -126,7 +126,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   }
 
   def userHome = deadbolt.SubjectPresent()(){ implicit req =>
-    val user = req.subject.get.asInstanceOf[UserSubject].user
+    val user = req.subject.get.asInstanceOf[HearUsSubject].user
     for {
       mkCount <- knesset.countKMs
       ptCount <- knesset.countParties
@@ -142,7 +142,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       val username = payload("username").as[JsString].value
       val password = payload("password").as[JsString].value
       val email = payload("email").as[JsString].value
-      val user = User(0, username, "", email, users.hashPassword(password))
+      val user = User(0, username, "", email, Set(UserRole.Admin), users.hashPassword(password))
 
       users.addUser(user).map(u => Ok("Added user " + u.username))
 
@@ -153,7 +153,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
 
   def showEditUserPage( userId:String ) = deadbolt.SubjectPresent()(){ implicit req =>
-    val user = req.subject.get.asInstanceOf[UserSubject].user
+    val user = req.subject.get.asInstanceOf[HearUsSubject].user
     if ( userId ==  user.username ) {
       users.get(userId).map({
         case None => notFound(userId)
@@ -168,7 +168,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   }
 
   def doSaveUser(userId:String) = deadbolt.SubjectPresent()(){ implicit req =>
-    val user = req.subject.get.asInstanceOf[UserSubject].user
+    val user = req.subject.get.asInstanceOf[HearUsSubject].user
     if ( userId == user.username ) {
       userForm.bindFromRequest().fold(
         fwe => Future(BadRequest(views.html.users.userEditor(fwe, routes.UserCtrl.doSaveUser(userId), isNew = false, false))),
@@ -203,7 +203,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
         } yield {
           if ( canCreateUser ) {
-            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""),
+            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""), Set(),
               users.hashPassword(fData.pass1.get))
             users.addUser(user).map( _ => Redirect(routes.UserCtrl.showUserList()) )
 
@@ -243,7 +243,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
           canCreateUser  = uuidExists && !usernameExists && !emailExists && passwordOK
         } yield {
           if (canCreateUser){
-            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""),
+            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""), Set(),
               users.hashPassword(fData.pass1.get))
             invitations.delete(fData.uuid.get)
             users.addUser(user).map(_ => Redirect(routes.UserCtrl.userHome()).withNewSession.withSession(("userId",user.id.toString)))
@@ -269,7 +269,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   }
 
   def showUserList = deadbolt.SubjectPresent()(){ implicit req =>
-    val user = req.subject.get.asInstanceOf[UserSubject].user
+    val user = req.subject.get.asInstanceOf[HearUsSubject].user
     users.allUsers.map( users => Ok(views.html.users.userList(users, user)) )
   }
   
@@ -360,14 +360,14 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   }
 
   def showInviteUser = deadbolt.SubjectPresent()(){ implicit req =>
-    val user = req.subject.get.asInstanceOf[UserSubject].user
+    val user = req.subject.get.asInstanceOf[HearUsSubject].user
     for {
       invitations <- invitations.all
     } yield Ok(views.html.users.inviteUser(invitations))
   }
 
   def doInviteUser = deadbolt.SubjectPresent()(){ implicit req =>
-    val user = req.subject.get.asInstanceOf[UserSubject].user
+    val user = req.subject.get.asInstanceOf[HearUsSubject].user
     emailForm.bindFromRequest().fold(
       formWithErrors => {
         Logger.info( formWithErrors.errors.mkString("\n") )
@@ -420,7 +420,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   }
   
   def doChangePassword = deadbolt.SubjectPresent()(){ implicit req =>
-    val user = req.subject.get.asInstanceOf[UserSubject].user
+    val user = req.subject.get.asInstanceOf[HearUsSubject].user
     changePassForm.bindFromRequest().fold(
       fwi => {
         Future(BadRequest(views.html.users.userEditor(userForm, routes.UserCtrl.doSaveNewUser, isNew = false, false)))

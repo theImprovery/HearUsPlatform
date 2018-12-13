@@ -38,10 +38,6 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
     Ok(Json.obj("message"->s"Hello, $name."))
   }
   
-  def pager( currentPage:Int ) = Action{ implicit req =>
-    Ok( views.html.pagerSample(generateDataPage(currentPage, 10), PaginationInfo(currentPage, 23)) )
-  }
-  
   def informationals = Action{ implicit req =>
     Ok( views.html.informationalsSample() )
   }
@@ -64,7 +60,7 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
   }
   
   /**
-    * Routes for the front-end.
+    * Routes for the back-end.
     * @return
     */
   def backEndRoutes = cached("ACT_backEndRoutes") {
@@ -112,18 +108,5 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
   }
   
   def notImplYet = TODO
-  
-  val prefixes   = Seq("","pro","post","pseudo","pre","deep","auto","anti","multi","single","parallel","concurrent")
-  val adjectives = Seq("cyber","related","sym/tech","general","dental","argumental","side-channel-ly","persistent")
-  val nouns      = Seq("blockchain", "neural network", "css", "browser", "jelly","utopia","shared workspace","lunch","machine learning")
-  
-  def generateDataPage( pageNum:Int, perPage:Int):Seq[(Int, String)] = {
-    val startNum = (pageNum-1)*perPage
-    scala.collection.immutable.Range.inclusive(1,perPage).map( i => {
-      val itemNum = startNum+i
-      val item = Seq(prefixes(itemNum%prefixes.size), adjectives(itemNum%adjectives.size), nouns(itemNum%nouns.size)).mkString(" ")
-      (itemNum, item)
-    })
-  }
   
 }

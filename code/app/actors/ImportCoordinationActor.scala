@@ -10,11 +10,11 @@ import play.api.mvc.ControllerComponents
 import akka.util.Timeout
 import dataaccess.{KmGroupDAO, KnessetMemberDAO}
 import models.{ContactOption, KmGroups, KnessetMember, Party}
+import play.api.Logger
 import play.api.i18n._
 
 import scala.collection.mutable
 import scala.concurrent.duration._
-
 import scala.xml.NodeSeq
 
 object ImportCoordinationActor {
@@ -48,6 +48,7 @@ class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, kn
   override def receive: Receive = {
     case importAll(kmsFirstPage:String, partiesFirstPage:String, numPage:String, ptpPage:String) => {
       implicit val ec = cc.executionContext
+      Logger.info("Import all KMs started")
       ws.url(numPage)
         .withFollowRedirects(true)
         .get()

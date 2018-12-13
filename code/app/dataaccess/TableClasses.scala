@@ -20,17 +20,22 @@ object Mappers {
     (a:ActionType.Value) => a.toString,
     (s:String) => ActionType.withName(s)
   )
+  implicit val roleSeqMappers = MappedColumnType.base[Set[UserRole.Value], Int](
+    (a:Set[UserRole.Value]) => a.map(r => Math.pow(2,r.id).toInt ).sum,
+    (i:Int) => UserRole.values.map(r => (r, (i>>r.id) & 1) ).filter(_._2==1).map(_._1)
+  )
 }
 
 class UserTable(tag:Tag) extends Table[User](tag,"users") {
-
+  import Mappers.roleSeqMappers
   def id                = column[Long]("id",O.PrimaryKey, O.AutoInc)
   def username          = column[String]("username")
   def name              = column[String]("name")
   def email             = column[String]("email")
+  def userRoles         = column[Set[UserRole.Value]]("roles")
   def encryptedPassword = column[String]("encrypted_password")
 
-  def * = (id, username, name, email, encryptedPassword) <> (User.tupled, User.unapply)
+  def * = (id, username, name, email, userRoles, encryptedPassword) <> (User.tupled, User.unapply)
 
 }
 
