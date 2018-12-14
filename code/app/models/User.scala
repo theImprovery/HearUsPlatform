@@ -11,3 +11,4 @@ case class User(id:Long,
                 email:String,
                 roles:Set[UserRole.Value],
                 encryptedPassword:String)
+

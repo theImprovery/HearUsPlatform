@@ -3,21 +3,27 @@
  left to right direction
  actor nirshman #IndianRed
  actor campaigner #AliceBlue
- actor crowd
+ actor viewer
 
 rectangle hearUs {
     usecase MKS as "maintain\nKnesset\nstate"
     usecase CreateC as "create campaign"
-    usecase manageCampagin as "manage campaign"
+    usecase manageCampaign as "manage campaign\ngo live"
+    usecase updateCampaign as "update KM\nstatus per campaign"
     usecase login
     usecase choose as "Choose Campaigns"
     usecase viewC as "view campaign"
+    usercase inviteUser as "Invite User"
+    usercase inviteEmail as "Invite\nby email"
 
     nirshman -- MKS
     nirshman -- CreateC 
     nirshman -- login
 
-    manageCampagin -- campaigner
+    manageCampaign -- campaigner
+    updateCampaign -- campaigner
+    inviteUser     -- campaigner
+    inviteEmail    -- campaigner
     choose -- campaigner
     login -- campaigner
     
@@ -26,7 +32,7 @@ rectangle hearUs {
     manageCampagin .> login 
     MKS .> login 
 
-    crowd -- viewC
+    viewer -- viewC
 }
 
 @enduml

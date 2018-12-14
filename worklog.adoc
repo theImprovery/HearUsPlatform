@@ -1,12 +1,14 @@
 = Hear Us worklog
 
-== TODO
+== TODO - Michael
 
-1. מערכת הרשאות
-    * User types: site admin, campaigner
-1. split system to support views for each user type
-1. 
-
+1. [x] connect campaigns and users.
+1. [ ] Make a campaigner controller
+1. [ ] Allow users to select campaign (or auto-select if there's only one)
+1. [ ] edit screens
+1. [ ] goLive
+1. [ ] Edit KM positions
+1. [ ] Edit KM Actions
 
 == Use Cases
 

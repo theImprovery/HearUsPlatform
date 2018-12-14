@@ -6,13 +6,16 @@ import java.time.{Instant, LocalDate, LocalDateTime}
 import java.time.format.DateTimeFormatter
 import java.util.TimeZone
 
+import be.objectify.deadbolt.scala.AuthenticatedRequest
 import play.api.data.{Field, Form, FormError}
 import play.api.mvc.Request
 import play.api.mvc.Call
 import controllers.routes
+import models.UserRole
 import play.api.i18n.{Messages, MessagesProvider}
 import play.twirl.api.Html
 import play.utils.UriEncoding
+import security.HearUsSubject
 
 /**
   * Information required to show a pager component.
@@ -59,6 +62,13 @@ object Helpers {
     if ( form.hasGlobalErrors ) {
       Html(form.globalErrors.flatMap( _.messages ).map( msgs.messages(_) ).mkString("<ul class=\"errors\"><li>","</li><li>","</li></ul>"))
     } else Html("")
+  }
+  
+  val roleMap = Map(UserRole.Admin->Structure.adminSiteSections, UserRole.Campaigner->Structure.campaignManagerItems)
+  
+  def navbarForUser( req:AuthenticatedRequest[_] )={
+    req.subject.map( u=> u.asInstanceOf[HearUsSubject].user.roles.toSeq.sorted.flatMap(roleMap) )
+      .getOrElse( Structure.publicItems )
   }
 
   object TableHelper {

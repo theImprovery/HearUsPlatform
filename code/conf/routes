@@ -65,6 +65,8 @@ PATCH   /bkofc/camps/position         controllers.CampaignCtrl.updatePosition
 POST    /bkofc/camps/actions          controllers.CampaignCtrl.updateAction
 
 
+GET     /campaignMgmt/                controllers.CampaignMgrCtrl.index
+
 # Serve Local Images
 #POST    /images/:subjectType/:mkId            controllers.KnessetMemberCtrl.doAddImage(mkId:Long, subjectType:String)
 POST    /images/:subjectType/:mkId            controllers.FilesCtrl.doAddImage(mkId:Long, subjectType:String)
