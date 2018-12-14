@@ -60,7 +60,7 @@ object Structure {
       PageSectionItem("navbar.campaigns.list", routes.HomeCtrl.notImplYet() ),
       PageSectionItem("navbar.campaigns.new", routes.HomeCtrl.notImplYet() )
     )),
-    MultiPageSection("navbar.users.title", BackOfficeSections.ManageSystemCampaigns, Seq(
+    MultiPageSection("navbar.users.title", BackOfficeSections.Users, Seq(
       PageSectionItem("navbar.users.invite", routes.UserCtrl.showInviteUser()),
       PageSectionItem("navbar.users.list", routes.UserCtrl.showUserList())
     ))
@@ -72,7 +72,7 @@ object Structure {
       PageSectionItem("navbar.campaigner.campaignSettings.users", routes.HomeCtrl.notImplYet()),
       PageSectionItem("navbar.campaigner.campaignSettings.goLive", routes.HomeCtrl.notImplYet())
     )),
-    MultiPageSection("navbar.campaigner.campaignSettings", BackOfficeSections.MyCampaigns, Seq(
+    MultiPageSection("navbar.campaigner.campaignSettings", BackOfficeSections.CampaignSettings, Seq(
       PageSectionItem("navbar.campaigner.campaignSettings.texts", routes.HomeCtrl.notImplYet()),
       PageSectionItem("navbar.campaigner.campaignSettings.webPage", routes.HomeCtrl.notImplYet())
     )),
