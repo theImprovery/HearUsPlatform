@@ -45,8 +45,14 @@ class DeadboltHandler(users:UsersDAO, langs:Langs, messagesApi:MessagesApi) exte
   override def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result] = {
     Future {
       val message = Informational(InformationalLevel.Warning, Messages("login.pleaseLogIn"))
-      Results.Redirect(routes.UserCtrl.showLogin()).withSession(
-        request.session + ("targetUrl" -> request.path)).flashing((FlashKeys.MESSAGE,message.encoded))
+      if ( request.headers.get("Accept").filter(h=> h.contains("html")).isDefined ) {
+        // This is a "address bar" call.
+        Results.Redirect(routes.UserCtrl.showLogin()).withSession(
+          request.session + ("targetUrl" -> request.path)).flashing((FlashKeys.MESSAGE,message.encoded))
+      } else {
+        // This is an API call
+        Results.Unauthorized
+      }
     }
   }
 
