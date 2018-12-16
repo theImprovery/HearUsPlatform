@@ -3,16 +3,17 @@ package controllers
 import java.sql.Timestamp
 import java.util.UUID
 
-import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions}
+import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
 import dataaccess._
 import javax.inject.Inject
+
 import models.{Invitation, PasswordResetRequest, User, UserRole}
 import play.api.{Configuration, Logger, cache}
 import play.api.cache.Cached
 import play.api.data._
 import play.api.data.Forms._
 import play.api.i18n._
-import play.api.libs.json.{JsObject, JsString}
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.mailer.{Email, MailerClient}
 import play.api.mvc.{Action, ControllerComponents, InjectedController}
 import security.HearUsSubject
@@ -98,7 +99,8 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     "password2" -> text
     )(ChangePassFormData.apply)(ChangePassFormData.unapply)
   )
-  
+
+
   
   def showLogin = Action { implicit req =>
     Ok( views.html.users.login(loginForm) )
@@ -177,7 +179,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
             userOpt <- users.get(userId)
             _ <- userOpt.map( user => users.updateUser(fData.update(user)) ).getOrElse(Future(()))
           } yield {
-            userOpt.map(_ => Redirect(routes.UserCtrl.showUserList))
+            userOpt.map(_ => Redirect(routes.UserCtrl.showUserList(None)))
               .getOrElse(notFound(userId))
           }
         }
@@ -203,9 +205,9 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
         } yield {
           if ( canCreateUser ) {
-            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""), Set(),
+            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""), Set(UserRole.Campaigner),
               users.hashPassword(fData.pass1.get))
-            users.addUser(user).map( _ => Redirect(routes.UserCtrl.showUserList()) )
+            users.addUser(user).map( _ => Redirect(routes.UserCtrl.showUserList(None)) )
 
           } else {
             var form = userForm.fill(fData)
@@ -243,7 +245,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
           canCreateUser  = uuidExists && !usernameExists && !emailExists && passwordOK
         } yield {
           if (canCreateUser){
-            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""), Set(),
+            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""), Set(UserRole.Campaigner),
               users.hashPassword(fData.pass1.get))
             invitations.delete(fData.uuid.get)
             users.addUser(user).map(_ => Redirect(routes.UserCtrl.userHome()).withNewSession.withSession(("userId",user.id.toString)))
@@ -268,9 +270,11 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   }
 
-  def showUserList = deadbolt.SubjectPresent()(){ implicit req =>
+  def showUserList(search:Option[String]) = deadbolt.SubjectPresent()(){ implicit req =>
+    val effectiveSearch = search.map(_.trim).flatMap(v => if (v.isEmpty) None else Some(v))
+    val sqlSearch = search.map(s => "%" + s.trim + "%")
     val user = req.subject.get.asInstanceOf[HearUsSubject].user
-    users.allUsers.map( users => Ok(views.html.users.userList(users, user)) )
+    users.allUsers(sqlSearch).map( users => Ok(views.html.users.userList(users, user, effectiveSearch)) )
   }
   
   private def notFound(userId:String) = NotFound("User with username '%s' does not exist.".format(userId))
@@ -479,4 +483,12 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       }
     )
   }
+
+  def updateRole() = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson) { implicit req =>
+    val json = req.body.as[JsObject]
+    val roles = if(json("isAdmin").asOpt[Boolean].getOrElse(true)) { Set(UserRole.Admin, UserRole.Campaigner) }
+            else { Set(UserRole.Campaigner) }
+    users.updateRole(json("id").asOpt[Long].getOrElse(-1L), roles).map(ans => Ok("updated"))
+  }
+
 }

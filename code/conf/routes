@@ -17,7 +17,7 @@ GET     /bkofc/                      controllers.UserCtrl.userHome
 GET     /bkofc/login                 controllers.UserCtrl.showLogin
 POST    /bkofc/login                 controllers.UserCtrl.doLogin
 POST    /bkofc/logout                controllers.UserCtrl.doLogout
-GET     /bkofc/users/                controllers.UserCtrl.showUserList
+GET     /bkofc/users/                controllers.UserCtrl.showUserList(search:Option[String])
 GET     /bkofc/users/new             controllers.UserCtrl.showNewUserPage
 POST    /bkofc/users/                controllers.UserCtrl.doSaveNewUser
 GET     /bkofc/users/:id/edit        controllers.UserCtrl.showEditUserPage(id)
@@ -31,6 +31,7 @@ POST    /bkofc/inviteUser/           controllers.UserCtrl.doInviteUser
 GET     /bkofc/newUserInvitation/:id controllers.UserCtrl.showNewUserInvitation(id)
 POST    /bkofc/newUserInvitation/    controllers.UserCtrl.doNewUserInvitation
 POST    /bkofc/changePassword        controllers.UserCtrl.doChangePassword
+PATCH   /bkofc/changeRole            controllers.UserCtrl.updateRole
 
 GET     /bkofc/parties                controllers.KnessetMemberCtrl.showParties
 PATCH   /bkofc/party                  controllers.KnessetMemberCtrl.updateParty
