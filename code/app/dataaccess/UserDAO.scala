@@ -1,11 +1,14 @@
 package dataaccess
 
+import dataaccess.SortBy.Value
 import javax.inject.Inject
-import models.User
+
+import models.{User, UserRole}
 import org.mindrot.jbcrypt.BCrypt
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
+
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -39,10 +42,10 @@ class UsersDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider,
     }
   }
 
-  def allUsers:Future[Seq[User]] = {
-    db.run {
-      Users.sortBy( _.name ).result
-    }
+  def allUsers(searchStr:Option[String]):Future[Seq[User]] = {
+    db.run (
+      prepareTable(searchStr).result
+    )
   }
 
   def getUserByEmail(email:String):Future[Option[User]] = {
@@ -61,6 +64,15 @@ class UsersDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider,
     update(u.copy(encryptedPassword = BCrypt.hashpw(newPass, BCrypt.gensalt())))
   }
 
+  def updateRole(u:User, newRoles:Set[UserRole.Value] ):Future[User] = {
+    update(u.copy(roles = newRoles))
+  }
+
+  def updateRole(id:Long, newRoles:Set[UserRole.Value] ):Future[Int] = {
+    import Mappers.roleSeqMappers
+    db.run( Users.filter( _.id === id ).map( _.userRoles ).update( newRoles ) )
+  }
+
   def get(username:String):Future[Option[User]] = db.run( Users.filter( _.username === username).result ).map( _.headOption )
 
   def get(userId:Long):Future[Option[User]] = db.run( Users.filter( _.id === userId).result ).map( _.headOption )
@@ -74,4 +86,12 @@ class UsersDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider,
   // verifyPass
   def verifyPassword( u:User, plaintext:String ):Boolean = BCrypt.checkpw(plaintext, u.encryptedPassword)
 
+  def prepareTable(searchStr: Option[String]) = {
+    searchStr match {
+      case None => Users
+      case Some(str) => Users.filter( row =>
+        Seq( row.name.like(str), row.username.like(str), row.email.like(str)
+        ).reduceLeftOption(_||_).getOrElse(true:Rep[Boolean]) )
+    }
+  }
 }

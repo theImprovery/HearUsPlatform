@@ -58,7 +58,7 @@ object Structure {
     )),
     MultiPageSection("navbar.users.title", BackOfficeSections.Campaigns, Seq(
       PageSectionItem("navbar.users.invite", routes.UserCtrl.showInviteUser()),
-      PageSectionItem("navbar.users.list", routes.UserCtrl.showUserList())
+      PageSectionItem("navbar.users.list", routes.UserCtrl.showUserList(None))
     ))
   )
   

@@ -1,16 +1,45 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(users:Seq[User], curUser:User)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
-@templates.backEndBase("Users", views.BackOfficeSections.Users) {
+@import views.Helpers.TableHelper
+@import dataaccess.SortBy
+
+@(users:Seq[User], curUser:User, search:Option[String])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@bottom = {
+  <script src="@routes.Assets.versioned("js/userListPage.js")"></script>
+}
+
+@templates.backEndBase("Users", views.BackOfficeSections.Users, Html(""), bottom) {
   @comps.pageTitleRow(Messages("users")){
     <a href="@routes.UserCtrl.showNewUserPage" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
     <a href="@routes.UserCtrl.showInviteUser" class="btn btn-large btn-default"><i class="fa fa-send"></i> @Messages("users.inviteUser")</a>
   }
+  <div class="row">
+    <div class="col d-flex justify-content-end">
+      <form class="form-inline" method="GET" action="@routes.UserCtrl.showUserList(None).fragment">
+        <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <i class="fa fa-search"></i>
+            </div>
+          </div>
+          <input type="text" class="form-control form-control-sm" id="search" name="search" placeholder="@Messages("search.text")" value="@search.getOrElse("")">
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-outline-secondary">@Messages("search")</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
     <div class="row">
         <div class="col-md-12">
         @if(users.isEmpty) {
-            <div class="noData">
-                At the moment, the system contains no users.
-            </div>
+          <div class="noData">
+            @if(search.isEmpty){
+              At the moment, the system contains no users.
+            } else {
+              @Messages("search.empty")
+            }
+          </div>
         } else {
           <div class="table-responsive">
             <table class="table table-striped">
@@ -19,6 +48,7 @@
                         <th>@Messages("name")</th>
                         <th>@Messages("username")</th>
                         <th>@Messages("email")</th>
+                        <th>Admin</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,6 +65,13 @@
                         <td>@if((u.email != null) & (u.email.trim.nonEmpty)){
                             <a href="mailto:@u.email">@u.email</a>
                         }</td>
+                        <td>
+                          @if(curUser.roles.contains(UserRole.Admin)) {
+                            <input type="checkbox" id="isAdmin" onchange="updateRole(this, @u.id)" @if(u.roles.contains(UserRole.Admin)) {checked} @if( u.username == curUser.username ) {disabled}>
+                          } else {
+                            <input type="checkbox" id="isAdmin" onchange="updateRole(this, @u.id)" @if(u.roles.contains(UserRole.Admin)) {checked} disabled>
+                          }
+                        </td>
                     </tr>
                 }
                 </tbody>
