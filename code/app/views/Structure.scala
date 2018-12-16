@@ -28,10 +28,14 @@ object PublicSections extends Enumeration {
 }
 
 object BackOfficeSections extends Enumeration {
-  val Home = Value("Home")
-  val Users = Value("Users")
-  val Knesset = Value("Knesset")
-  val Campaigns = Value("Campaigns")
+  val Home             = Value("Home")
+  val Users            = Value("Users")
+  val Knesset          = Value("Knesset")
+  val ManageSystemCampaigns = Value("Campaigns")
+  val MyCampaigns      = Value("MyCampaigns")
+  val CampaignSettings = Value("CampaignSettings")
+  val CampaignKnessetStatus   = Value("CampaignStatus")
+  val CampaignAdmin    = Value("CampaignAdmin")
 }
 
 
@@ -52,14 +56,27 @@ object Structure {
       PageSectionItem("navbar.knessetMembers", routes.KnessetMemberCtrl.showKms(None, None, None)),
       PageSectionItem("navbar.groups", routes.KnessetMemberCtrl.showGroups())
     )),
-    MultiPageSection("navbar.campaigns", BackOfficeSections.Campaigns, Seq(
+    MultiPageSection("navbar.campaigns", BackOfficeSections.ManageSystemCampaigns, Seq(
       PageSectionItem("navbar.campaigns.list", routes.HomeCtrl.notImplYet() ),
       PageSectionItem("navbar.campaigns.new", routes.HomeCtrl.notImplYet() )
     )),
-    MultiPageSection("navbar.users.title", BackOfficeSections.Campaigns, Seq(
+    MultiPageSection("navbar.users.title", BackOfficeSections.Users, Seq(
       PageSectionItem("navbar.users.invite", routes.UserCtrl.showInviteUser()),
       PageSectionItem("navbar.users.list", routes.UserCtrl.showUserList(None))
     ))
+  )
+  
+  val campaignManagerItems:Seq[TopSiteSection[BackOfficeSections.Value]] = Seq(
+    PageSection("navbar.campaigner.myCampaigns", BackOfficeSections.MyCampaigns, routes.CampaignMgrCtrl.index()),
+    MultiPageSection("navbar.campaigner.campaignAdmin", BackOfficeSections.CampaignAdmin, Seq(
+      PageSectionItem("navbar.campaigner.campaignSettings.users", routes.HomeCtrl.notImplYet()),
+      PageSectionItem("navbar.campaigner.campaignSettings.goLive", routes.HomeCtrl.notImplYet())
+    )),
+    MultiPageSection("navbar.campaigner.campaignSettings", BackOfficeSections.CampaignSettings, Seq(
+      PageSectionItem("navbar.campaigner.campaignSettings.texts", routes.HomeCtrl.notImplYet()),
+      PageSectionItem("navbar.campaigner.campaignSettings.webPage", routes.HomeCtrl.notImplYet())
+    )),
+    PageSection("navbar.campaigner.campaignKnessetStatus", BackOfficeSections.CampaignKnessetStatus, routes.HomeCtrl.notImplYet())
   )
   
 }

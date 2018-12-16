@@ -34,4 +34,4 @@
   }
 
 }
-@bsNavbar(title, views.Structure.adminSiteSections, currentSection, internalExtraHead, internalExtraBottom, Some(logoutButton))(content)
+@bsNavbar(title, Helpers.navbarForUser(request), currentSection, internalExtraHead, internalExtraBottom, Some(logoutButton))(content)

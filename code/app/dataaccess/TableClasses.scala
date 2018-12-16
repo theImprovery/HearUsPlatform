@@ -26,6 +26,8 @@ object Mappers {
   )
 }
 
+case class UserCampaign(userId:Long, campaignId:Long)
+
 class UserTable(tag:Tag) extends Table[User](tag,"users") {
   import Mappers.roleSeqMappers
   def id                = column[Long]("id",O.PrimaryKey, O.AutoInc)
@@ -36,7 +38,16 @@ class UserTable(tag:Tag) extends Table[User](tag,"users") {
   def encryptedPassword = column[String]("encrypted_password")
 
   def * = (id, username, name, email, userRoles, encryptedPassword) <> (User.tupled, User.unapply)
+}
 
+class UserCampaignTable(tag:Tag) extends Table[UserCampaign](tag,"user_campaign") {
+  def userId     = column[Long]("user_id", O.PrimaryKey                                       )
+  def campaignId = column[Long]("campaign_id", O.PrimaryKey)
+  
+  def * = (userId, campaignId) <> (UserCampaign.tupled, UserCampaign.unapply)
+  
+  def userFK = foreignKey("user_campaign_user_id_fkey", userId, TableClasses.knessetMembers)(_.id)
+  def campaignFK = foreignKey("user_campaign_campaign_id_fkey", userId, TableClasses.campaigns)(_.id)
 }
 
 class InvitationTable(tag:Tag) extends Table[Invitation](tag, "invitations") {
@@ -44,8 +55,6 @@ class InvitationTable(tag:Tag) extends Table[Invitation](tag, "invitations") {
   def date  = column[Timestamp]("date")
   def uuid  = column[String]("uuid")
   def sender  = column[String]("sender",O.PrimaryKey)
-
-//  def pk = primaryKey("invitation_pkey", (email, sender))
 
   def * = (email, date, uuid, sender) <> (Invitation.tupled, Invitation.unapply)
 }

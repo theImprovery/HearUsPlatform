@@ -1,0 +1,20 @@
+@import views.BackOfficeSections
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+
+@(campaigns:Seq[Campaign])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+
+
+@templates.backEndBase("campaignMgmt.index.title", BackOfficeSections.MyCampaigns) {
+
+  <div class="row">
+    <div class="col">
+      <ul>
+        @for( c <- campaigns ){
+          <li>
+            <strong>@c.title</strong> @if(c.subtitle.trim.nonEmpty){@c.subtitle}
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+}

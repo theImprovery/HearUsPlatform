@@ -138,7 +138,7 @@ class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, kn
           val partyId = partyNameToID(personToFaction(km.knessetKey.toString))
           KnessetMember(km.id, km.name, km.gender, km.isActive, km.webPage, partyId, km.knessetKey)
         })
-        updatedKm      <- knessetMembers.updateKms(mappedKms.toSeq)
+        updatedKm  <- knessetMembers.updateKms(mappedKms.toSeq)
         currentKms <- knessetMembers.getAllActiveKms()
     } yield {
       val knessetKeyToPerson = currentKms.map( ck => ( ck.knessetKey, ck.id )).toMap

@@ -17,6 +17,15 @@ navbar.campaigns=קמפיינים
 navbar.campaigns.new=קמפיין חדש
 navbar.campaigns.list=רשימה
 
+navbar.campaigner.myCampaigns=הקמפיינים שלי
+navbar.campaigner.campaignSettings=עריכה
+navbar.campaigner.campaignSettings.texts=טקסטים
+navbar.campaigner.campaignSettings.webPage=אתר
+navbar.campaigner.campaignKnessetStatus=מצב הכנסת
+navbar.campaigner.campaignAdmin=ניהול
+navbar.campaigner.campaignSettings.users=משתמשים
+navbar.campaigner.campaignSettings.goLive=פרסום
+
 forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
 forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
 
