@@ -23,7 +23,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <form id="editActionForm" method="POST" action="@routes.CampaignCtrl.updateAction()">
+          <form id="editActionForm" method="POST" action="@routes.CampaignAdminCtrl.updateAction()">
             <input type="hidden" id="camId" name="camId" value="@campaign.id">
             <select name="smPlatform" id="smPlatform" class="form-control" style="display:inline; width:auto">
             @for(pl <- platforms){
@@ -264,7 +264,7 @@
                     </div>
                   </div>
                   <div class="col text-left">
-                    <a href="@routes.CampaignCtrl.showCampaigns()" class="btn btn-secondary"><i class="fa fa-close"></i> @Messages("back")</a>
+                    <a href="@routes.CampaignAdminCtrl.showCampaigns()" class="btn btn-secondary"><i class="fa fa-close"></i> @Messages("back")</a>
                     <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("save")</button>
                   </div>
                 </form>
@@ -323,7 +323,7 @@
         </div>
       </div>
       <div>
-        <a href="@routes.CampaignCtrl.showCampaigns()" class="btn btn-secondary"><i class="fa fa-undo"></i> @Messages("back")</a>
+        <a href="@routes.CampaignAdminCtrl.showCampaigns()" class="btn btn-secondary"><i class="fa fa-undo"></i> @Messages("back")</a>
         <button type="button" class="btn btn-danger" onclick="deleteCampaign(@campaign.id)"><i class="fa fa-trash-o"></i> @Messages("campaign.delete")</button>
       </div>
     </div>

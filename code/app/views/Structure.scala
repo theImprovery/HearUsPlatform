@@ -57,8 +57,8 @@ object Structure {
       PageSectionItem("navbar.groups", routes.KnessetMemberCtrl.showGroups())
     )),
     MultiPageSection("navbar.campaigns", BackOfficeSections.ManageSystemCampaigns, Seq(
-      PageSectionItem("navbar.campaigns.list", routes.HomeCtrl.notImplYet() ),
-      PageSectionItem("navbar.campaigns.new", routes.HomeCtrl.notImplYet() )
+      PageSectionItem("navbar.campaigns.list", routes.CampaignAdminCtrl.showCampaigns() ),
+      PageSectionItem("navbar.campaigns.new", routes.CampaignAdminCtrl.createCampaign() )
     )),
     MultiPageSection("navbar.users.title", BackOfficeSections.Users, Seq(
       PageSectionItem("navbar.users.invite", routes.UserCtrl.showInviteUser()),

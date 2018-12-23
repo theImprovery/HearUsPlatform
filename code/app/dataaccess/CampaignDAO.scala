@@ -1,6 +1,9 @@
 package dataaccess
 
 import javax.inject.Inject
+
+import com.fasterxml.jackson.databind.ser.std.StdArraySerializers.BooleanArraySerializer
+import com.sun.org.apache.xpath.internal.functions.FuncTrue
 import models._
 import play.api.Configuration
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -19,6 +22,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   private val socialMedia = TableQuery[SocialMediaTable]
   private val positions = TableQuery[KmPositionTable]
   private val actions = TableQuery[KmActionTable]
+  private val usersCampaigns = TableQuery[UserCampaignTable]
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
 
@@ -93,6 +97,30 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
 
   def getActions( camId:Long ):Future[Seq[KmAction]] = {
     db.run( actions.filter( _.camId === camId ).result)
+  }
+
+  def isAllowToEdit( userId:Long, campaignId: Long ):Future[Boolean] = {
+    db.run(
+      usersCampaigns.filter(row => (row.userId === userId) && (row.campaignId === campaignId) ).result
+    ) map ( _.nonEmpty)
+  }
+
+  def addUserCampaignRel( rel:UserCampaign ):Future[UserCampaign] = {
+    db.run{
+      (usersCampaigns returning usersCampaigns).insertOrUpdate(rel)
+    }.map( insertRes => insertRes.getOrElse(rel) )
+  }
+
+  def campaignNameExists( name:String ):Future[Boolean] = {
+    db.run{
+      campaigns.map( _.title ).filter( _.toLowerCase === name.toLowerCase() ).exists.result
+    }
+  }
+
+  def updatePublish( campId:Long, isPublish:Boolean ):Future[Int] = {
+    db.run(
+      campaigns.filter( _.id === campId ).map( _.isPublish ).update(isPublish)
+    )
   }
 
 }

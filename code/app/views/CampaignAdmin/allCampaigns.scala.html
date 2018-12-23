@@ -1,0 +1,39 @@
+@import views.BackOfficeSections
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@(campaigns:Seq[Campaign])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@head = {
+  <link rel="stylesheet" href="@routes.Assets.versioned("css/toggleSwitch.min.css")">
+}
+
+@bottom = {
+  <script src="@routes.Assets.versioned("js/campaignsAdmin.js")"></script>
+}
+
+@templates.backEndBase("campaigns", BackOfficeSections.ManageSystemCampaigns, head, bottom) {
+  @comps.pageTitleRow(Messages("campaigns.title")){
+
+  }
+  <div class="row">
+    <div class="col">
+      <ul>
+      @for( c <- campaigns ){
+        <li>
+          <div class="row">
+            <div class="col-md-2">
+              <strong>@c.title</strong> @if(c.subtitle.trim.nonEmpty){@c.subtitle}
+            </div>
+            <div class="col-md-2 bottom">
+              <label class="switch">
+                <input type="checkbox" onchange="updatePublish(this, @c.id)" @if(c.isPublish) {checked}>
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+        </li>
+      }
+      </ul>
+    </div>
+  </div>
+}

@@ -159,8 +159,9 @@ class CampaignTable( tag:Tag ) extends Table[Campaign](tag, "campaigns") {
   def website = column[String]("website")
   def themeData = column[String]("theme_data")
   def contactEmail = column[String]("contact_email")
+  def isPublish = column[Boolean]("is_publish")
 
-  def * = (id, title, subtitle, website, themeData, contactEmail) <> (Campaign.tupled, Campaign.unapply)
+  def * = (id, title, subtitle, website, themeData, contactEmail, isPublish) <> (Campaign.tupled, Campaign.unapply)
 }
 
 class LabelTextTable( tag:Tag ) extends Table[LabelText](tag, "label_texts") {

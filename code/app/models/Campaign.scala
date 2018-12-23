@@ -8,7 +8,8 @@ case class Campaign( id:Long,
                      subtitle: String,
                      website: String,
                      themeData: String,
-                     contactEmail: String )
+                     contactEmail: String,
+                     isPublish: Boolean)
 
 case class LabelText( camId: Long,
                       position: Position.Value,

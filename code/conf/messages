@@ -7,7 +7,6 @@ navbar.knesset=כנסת ישראל
 navbar.knessetMembers=חברי כנסת
 navbar.parties=מפלגות
 navbar.groups=וועדות ולוביים
-navbar.logout=התנתקות
 navbar.myProfile=הפרופיל שלי
 navbar.users.title=משתמשים
 navbar.users.invite=שליחת הזמנה
@@ -151,6 +150,7 @@ update=עידכון
 sent_f=נשלחה
 media=מדיה
 updateDetails=עדכון פרטים
+campaigner=מנהל קמפיין
 
 # Common nouns
 campaign=קמפיין
@@ -200,3 +200,6 @@ campaigns.updateLabels=עדכון תוויות
 campaigns.updateMessages=עדכן הודעות
 campaigns.noMessages=לא הוכנסו הודעות
 background=רקע
+
+newCampaigner.noCampainger=נא לבחור מנהל קמפיין
+error.campaignName.exists=השם תפוס

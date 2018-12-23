@@ -92,19 +92,22 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.KnessetMemberCtrl.deleteGroup,
           routes.javascript.ParseCtrl.apiKms,
           routes.javascript.ParseCtrl.apiUpdateCommittees,
-          routes.javascript.CampaignCtrl.showCampaigns,
-          routes.javascript.CampaignCtrl.editCampaign,
-          routes.javascript.CampaignCtrl.createCampaign,
-          routes.javascript.CampaignCtrl.updateDetails,
-          routes.javascript.CampaignCtrl.deleteCampaign,
-          routes.javascript.CampaignCtrl.getLabelText,
-          routes.javascript.CampaignCtrl.updateLabels,
-          routes.javascript.CampaignCtrl.getMessages,
-          routes.javascript.CampaignCtrl.updateMessages,
-          routes.javascript.CampaignCtrl.updatePosition,
-          routes.javascript.CampaignCtrl.getSocialMedia,
-          routes.javascript.CampaignCtrl.updateSocialMedia
-        )).as("text/javascript")
+          routes.javascript.CampaignAdminCtrl.showCampaigns,
+          routes.javascript.CampaignAdminCtrl.createCampaign,
+          routes.javascript.CampaignAdminCtrl.updateDetails,
+          routes.javascript.CampaignAdminCtrl.deleteCampaign,
+          routes.javascript.CampaignAdminCtrl.getLabelText,
+          routes.javascript.CampaignAdminCtrl.updateLabels,
+          routes.javascript.CampaignAdminCtrl.getMessages,
+          routes.javascript.CampaignAdminCtrl.updateMessages,
+          routes.javascript.CampaignAdminCtrl.updatePosition,
+          routes.javascript.CampaignAdminCtrl.getSocialMedia,
+          routes.javascript.CampaignAdminCtrl.updateSocialMedia,
+          routes.javascript.CampaignAdminCtrl.getCampaigners,
+          routes.javascript.CampaignAdminCtrl.saveCampaign,
+          routes.javascript.CampaignAdminCtrl.updatePublish,
+          routes.javascript.CampaignMgrCtrl.editCampaign
+      )).as("text/javascript")
     }
   }
   

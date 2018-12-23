@@ -3,14 +3,16 @@ package controllers
 import actors.ImportCommitteesActor.importCommittees
 import actors.ImportCoordinationActor.{getKnessetNum, importAll}
 import akka.actor.ActorRef
-import be.objectify.deadbolt.scala.DeadboltActions
+import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
 import dataaccess.{ImagesDAO, KmGroupDAO, KnessetMemberDAO}
 import javax.inject.{Inject, Named}
+
 import play.api.{Configuration, Logger}
 import play.api.i18n._
 import play.api.libs.ws.WSClient
 import akka.pattern.ask
 import akka.util.Timeout
+import models.UserRole
 import play.api.mvc.{ControllerComponents, InjectedController}
 
 import scala.concurrent.duration._
@@ -25,7 +27,7 @@ class ParseCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms
     MessagesImpl(langs.availables.head, messagesApi)
   }
 
-  def apiKms = deadbolt.SubjectPresent()() { implicit req =>
+  def apiKms = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     implicit val timeout = Timeout(60 seconds)
     importActor ? importAll(
       conf.get[String]("xml.km"),
@@ -35,7 +37,7 @@ class ParseCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms
     Future(Ok("updated"))
   }
 
-  def apiUpdateCommittees = deadbolt.SubjectPresent()() { implicit req =>
+  def apiUpdateCommittees = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     implicit val timeout = Timeout(60  seconds)
     committeeActor ? importCommittees(
       conf.get[String]("xml.committees"),

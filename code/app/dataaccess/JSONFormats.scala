@@ -41,6 +41,13 @@ object JSONFormats {
     override def reads(json: JsValue): JsResult[Platform.Value] = readFmt.reads(json)
   }
 
+  implicit val rolesFormat:Format[UserRole.Value ] = new Format[UserRole.Value ] {
+    val writeFmt = Writes.enumNameWrites[UserRole.type]
+    val readFmt = Reads.enumNameReads(UserRole)
+    override def writes(o: UserRole.Value): JsValue = writeFmt.writes(o)
+    override def reads(json: JsValue): JsResult[UserRole.Value] = readFmt.reads(json)
+  }
+
   implicit val fileFormat:Format[KMImage] = Json.format[KMImage]
   implicit val contactOptionFormat:Format[ContactOption] = Json.format[ContactOption]
   implicit val partyFormat:Format[Party] = Json.format[Party]
@@ -49,4 +56,5 @@ object JSONFormats {
   implicit val msgFormat:Format[CannedMessage] = Json.format[CannedMessage]
   implicit val smFormat:Format[SocialMedia] = Json.format[SocialMedia]
   implicit val kmPositionFormat:Format[KmPosition] = Json.format[KmPosition]
+  implicit val userFormat:Format[User] = Json.format[User]
 }

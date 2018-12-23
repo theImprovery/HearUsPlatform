@@ -84,7 +84,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
     val file = req.body.file("imageFile")
     val imageCredit = req.body.dataParts.getOrElse("imageCredit", Seq[String]()).headOption.getOrElse("")
     val goTo = subjectType match {
-      case "camps" => routes.CampaignCtrl.editCampaign(id)
+      case "camps" => routes.CampaignMgrCtrl.editCampaign(id)
       case "kms" => routes.KnessetMemberCtrl.showEditKM(id)
     }
     if (file.isEmpty || file.get.filename.isEmpty) {

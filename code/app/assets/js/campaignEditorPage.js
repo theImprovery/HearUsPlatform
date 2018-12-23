@@ -6,7 +6,7 @@ function patchDetails() {
     var msgDiv = Informationals.showBackgroundProcess("Updating..");
     new Playjax(beRoutes)
         .using(function (c) {
-            return c.CampaignCtrl.updateDetails();
+            return c.CampaignAdminCtrl.updateDetails();
         })
         .fetch(data)
         .then( function (res) {
@@ -31,10 +31,10 @@ function deleteCampaign(id) {
         if(willDelete) {
             new Playjax(beRoutes)
                 .using(function(c){
-                    return c.CampaignCtrl.deleteCampaign(id);}).fetch()
+                    return c.CampaignAdminCtrl.deleteCampaign(id);}).fetch()
                 .then( function(res){
                     if (res.ok) {
-                        window.location = beRoutes.controllers.CampaignCtrl.showCampaigns().url;
+                        window.location = beRoutes.controllers.CampaignAdminCtrl.showCampaigns().url;
                     } else {
                         Informationals.makeDanger("Deletion of campaign "+ id +" failed", "See server log for details", 1500).show();
                     }
@@ -62,7 +62,7 @@ function labelHandler(camId) {
     labelTemplate = document.getElementById("labelTemplate");
     $(labelTemplate).removeAttr("id");
     labelTemplate.remove();
-    $.ajax(beRoutes.controllers.CampaignCtrl.getLabelText(camId))
+    $.ajax(beRoutes.controllers.CampaignAdminCtrl.getLabelText(camId))
         .done( function (data) {
             $("#loadingLabels").remove();
             if ( data.length === 0 ) {
@@ -98,7 +98,7 @@ function updateLabels(id) {
     });
     new Playjax(beRoutes)
         .using(function (c) {
-            return c.CampaignCtrl.updateLabels();
+            return c.CampaignAdminCtrl.updateLabels();
         })
         .fetch(data)
         .then( function (res) {
@@ -115,7 +115,7 @@ function messageHandler(camId) {
     messageTemplate = document.getElementById("messageTemplate");
     $(messageTemplate).removeAttr("id");
     messageTemplate.remove();
-    $.ajax(beRoutes.controllers.CampaignCtrl.getMessages(camId))
+    $.ajax(beRoutes.controllers.CampaignAdminCtrl.getMessages(camId))
         .done( function (data) {
             $("#loadingMessages").remove();
             if ( data.length === 0 ) {
@@ -153,7 +153,7 @@ function updateMessages(id) {
     });
     new Playjax(beRoutes)
         .using(function (c) {
-            return c.CampaignCtrl.updateMessages();
+            return c.CampaignAdminCtrl.updateMessages();
         })
         .fetch(data)
         .then( function (res) {
@@ -170,7 +170,7 @@ function socialMediaHandler(camId) {
     smTemplate = document.getElementById("smTemplate");
     $(smTemplate).removeAttr("id");
     smTemplate.remove();
-    $.ajax(beRoutes.controllers.CampaignCtrl.getSocialMedia(camId))
+    $.ajax(beRoutes.controllers.CampaignAdminCtrl.getSocialMedia(camId))
         .done( function (data) {
             $("#loadingSm").remove();
             if ( data.length === 0 ) {
@@ -205,7 +205,7 @@ function updateSm(id) {
     });
     new Playjax(beRoutes)
         .using(function (c) {
-            return c.CampaignCtrl.updateSocialMedia();
+            return c.CampaignAdminCtrl.updateSocialMedia();
         })
         .fetch(data)
         .then( function (res) {
@@ -224,7 +224,7 @@ function changePosition(emt) {
     data.position = emt.id.split("-")[1];
     new Playjax(beRoutes)
         .using(function (c) {
-            return c.CampaignCtrl.updatePosition();
+            return c.CampaignAdminCtrl.updatePosition();
         })
         .fetch(data)
         .then( function (res) {

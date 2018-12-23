@@ -85,7 +85,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
 
-  def showEditKM(id: Long) = deadbolt.SubjectPresent()() { implicit req =>
+  def showEditKM(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     for {
       km <- kms.getKM(id)
       parties <- kms.getAllParties
@@ -98,7 +98,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
 
-  def doEditKM() = deadbolt.SubjectPresent()() { implicit req =>
+  def doEditKM() = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     knessetMemberForm.bindFromRequest().fold(
       formWithErrors => {
         for {
@@ -120,7 +120,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     )
   }
 
-  def deleteKM(id: Long) = deadbolt.SubjectPresent()() { implicit req =>
+  def deleteKM(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     for {
       deleted <- kms.deleteKM(id)
       knessetMembers <- kms.getKms(None, true, SortBy.KnessetMember)
@@ -135,7 +135,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     kms.getContactOptions(id).map(cos => Ok(Json.toJson(cos)))
   }
 
-  def updateContactOption(id: Long) = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
+  def updateContactOption(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson){ implicit req =>
     req.body.validate[Seq[ContactOption]].fold(
       errors => Future(BadRequest(Json.obj("status" -> "error", "data" -> JsError.toJson(errors)))),
       cos => {
@@ -144,7 +144,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     )
   }
 
-  def updateParty() = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
+  def updateParty() = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson){ implicit req =>
     req.body.validate[Party].fold(
       errors => {
         for {
@@ -160,7 +160,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     )
   }
 
-  def deleteParty(id: Long) = deadbolt.SubjectPresent()() { implicit req =>
+  def deleteParty(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     for {
       deleted <- kms.deleteParty(id)
       parties <- kms.getAllParties
@@ -169,7 +169,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
 
-  def doAddImage(kmId: Long, subjectType:String) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData) { implicit req =>
+  def doAddImage(kmId: Long, subjectType:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.multipartFormData){ implicit req =>
     val file = req.body.file("imageFile")
     val imageCredit = req.body.dataParts.getOrElse("imageCredit", Seq[String]()).headOption.getOrElse("")
 
@@ -245,7 +245,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
 
-  def showEditGroup(id: Long) = deadbolt.SubjectPresent()() { implicit req =>
+  def showEditGroup(id: Long) =  deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     for {
       groupOpt <- groups.getGroupDN(id)
       groupKms <- groups.getKmForGroup(id)
@@ -259,7 +259,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     }
   }
 
-  def doEditGroup = deadbolt.SubjectPresent()() { implicit req =>
+  def doEditGroup = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     groupForm.bindFromRequest().fold(
       formWithErrors => {
         for {
@@ -281,7 +281,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     )
   }
 
-  def deleteGroup(id: Long) = deadbolt.SubjectPresent()() { implicit req =>
+  def deleteGroup(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     for {
       deleted <- groups.deleteGroup(id)
       groups <- groups.allGroupsDN

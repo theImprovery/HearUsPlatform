@@ -94,4 +94,11 @@ class UsersDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider,
         ).reduceLeftOption(_||_).getOrElse(true:Rep[Boolean]) )
     }
   }
+
+  def allCampaigners(searchStr:Option[String]):Future[Seq[User]] = {
+    import Mappers.roleSeqMappers
+    db.run (
+      prepareTable(searchStr).filter( u => (u.userRoles === Set(UserRole.Campaigner)) || (u.userRoles === Set(UserRole.Admin, UserRole.Campaigner)) ).result
+    )
+  }
 }
