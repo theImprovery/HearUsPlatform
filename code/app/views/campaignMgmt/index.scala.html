@@ -5,13 +5,17 @@
 
 
 @templates.backEndBase("campaignMgmt.index.title", BackOfficeSections.MyCampaigns) {
+  @comps.pageTitleRow(Messages("campaignMgmt.index.title")){
 
+  }
   <div class="row">
     <div class="col">
       <ul>
         @for( c <- campaigns ){
           <li>
             <strong>@c.title</strong> @if(c.subtitle.trim.nonEmpty){@c.subtitle}
+            <a class="btn btn-sm btn-default" href="@routes.CampaignMgrCtrl.details(c.id)"><i class="fa fa-edit"></i>
+              @Messages("edit")</a>
           </li>
         }
       </ul>

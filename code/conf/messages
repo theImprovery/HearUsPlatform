@@ -175,6 +175,7 @@ website=אתר אינטרנט
 username=שם משתמש
 users=משתמשים
 admin=מנהל
+edit=עריכה
 
 error.required=שדה חובה
 search.empty=אין תוצאות
@@ -188,6 +189,7 @@ campaign.delete=מחיקת קמפיין
 campaigns.deleted=הקמפיין נמחק בהצלחה
 campaign.contactEmail=דוא"ל (מנהל הקמפיין)
 campaigns.noLabels=לא הוכנסו תוויות
+campaignMgmt.index.title=הקמפיינים שלי
 loadingLabels=טוען תוויות
 Against=נגד
 For=בעד

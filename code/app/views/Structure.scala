@@ -1,6 +1,7 @@
 package views
 
 import controllers.routes
+import models.Campaign
 import play.api.mvc.Call
 
 /*
@@ -36,6 +37,12 @@ object BackOfficeSections extends Enumeration {
   val CampaignSettings = Value("CampaignSettings")
   val CampaignKnessetStatus   = Value("CampaignStatus")
   val CampaignAdmin    = Value("CampaignAdmin")
+}
+
+object CampaignEditorSections extends Enumeration {
+  val Details         = Value("Details")
+  val Settings        = Value("Settings")
+  val Positions       = Value("Positions")
 }
 
 
@@ -78,5 +85,13 @@ object Structure {
     )),
     PageSection("navbar.campaigner.campaignKnessetStatus", BackOfficeSections.CampaignKnessetStatus, routes.HomeCtrl.notImplYet())
   )
+
+  def campaignEditorItems(campaign:Campaign):Seq[TopSiteSection[CampaignEditorSections.Value]] = Seq(
+    PageSection("Details", CampaignEditorSections.Details, routes.CampaignMgrCtrl.details(campaign.id)),
+    PageSection("Settings", CampaignEditorSections.Settings, routes.CampaignMgrCtrl.settings(campaign.id)),
+    PageSection("Positions", CampaignEditorSections.Positions, routes.CampaignMgrCtrl.positions(campaign.id))
+  )
+
+
   
 }

@@ -52,20 +52,23 @@ POST    /bkofc/api/km/update          controllers.ParseCtrl.apiKms
 POST    /bkofc/api/committee/update   controllers.ParseCtrl.apiUpdateCommittees
 
 GET     /bkofc/camps/new              controllers.CampaignAdminCtrl.createCampaign
-GET     /bkofc/camps/:name            controllers.CampaignAdminCtrl.getCampaigners(name:String)
+GET     /bkofc/campainers/:name       controllers.CampaignAdminCtrl.getCampaigners(name:String)
 POST    /bkofc/camps/                 controllers.CampaignAdminCtrl.saveCampaign
 GET     /bkofc/camps                  controllers.CampaignAdminCtrl.showCampaigns
-PATCH   /bkofc/camps/details/         controllers.CampaignAdminCtrl.updateDetails
-DELETE  /bkofc/camps/:id              controllers.CampaignAdminCtrl.deleteCampaign(id:Long)
-GET     /bkofc/camps/lbls/:id         controllers.CampaignAdminCtrl.getLabelText(id:Long)
-PATCH   /bkofc/camps/labels/          controllers.CampaignAdminCtrl.updateLabels
-GET     /bkofc/camps/msgs/:id         controllers.CampaignAdminCtrl.getMessages(id:Long)
-PATCH   /bkofc/camps/msgs/            controllers.CampaignAdminCtrl.updateMessages
-GET     /bkofc/camps/sm/:id           controllers.CampaignAdminCtrl.getSocialMedia(id:Long)
-PATCH   /bkofc/camps/sm/              controllers.CampaignAdminCtrl.updateSocialMedia
-PATCH   /bkofc/camps/position         controllers.CampaignAdminCtrl.updatePosition
-POST    /bkofc/camps/actions          controllers.CampaignAdminCtrl.updateAction
+PATCH   /bkofc/camps/sm/              controllers.CampaignMgrCtrl.updateSocialMedia
+PATCH   /bkofc/camps/position         controllers.CampaignMgrCtrl.updatePosition
+PATCH   /bkofc/camps/details/         controllers.CampaignMgrCtrl.updateDetails
+PATCH   /bkofc/camps/labels/          controllers.CampaignMgrCtrl.updateLabels
+PATCH   /bkofc/camps/msgs/            controllers.CampaignMgrCtrl.updateMessages
 PATCH   /bkofc/camps/updatePublish    controllers.CampaignAdminCtrl.updatePublish
+GET     /bkofc/camps/details/:id      controllers.CampaignMgrCtrl.details(id:Long)
+GET     /bkofc/camps/settings/:id     controllers.CampaignMgrCtrl.settings(id:Long)
+GET     /bkofc/camps/positions/:id    controllers.CampaignMgrCtrl.positions(id:Long)
+GET     /bkofc/camps/lbls/:id         controllers.CampaignMgrCtrl.getLabelText(id:Long)
+GET     /bkofc/camps/msgs/:id         controllers.CampaignMgrCtrl.getMessages(id:Long)
+GET     /bkofc/camps/sm/:id           controllers.CampaignMgrCtrl.getSocialMedia(id:Long)
+DELETE  /bkofc/camps/:id              controllers.CampaignMgrCtrl.deleteCampaign(id:Long)
+POST    /bkofc/camps/actions          controllers.CampaignAdminCtrl.updateAction
 GET     /bkofc/camps/:camId           controllers.CampaignMgrCtrl.editCampaign(camId:Long)
 
 
