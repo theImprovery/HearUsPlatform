@@ -36,7 +36,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     db.run{
       campaigns.filter( _.id === id ).result
     } map ( _.headOption )
-  }
+  }/**/
 
   def deleteCampaign( id:Long ):Future[Int] = db.run (campaigns.filter( _ .id === id ).delete )
 
@@ -98,6 +98,23 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   def getActions( camId:Long ):Future[Seq[KmAction]] = {
     db.run( actions.filter( _.camId === camId ).result)
   }
+
+  def getActions( camId:Long, kmId:Long ):Future[Seq[KmAction]] = {
+    db.run( actions.filter( a => (a.camId === camId) && (a.kmId === kmId)).result)
+  }
+
+  def getAction( id:Long ):Future[Option[KmAction]] = {
+    db.run( actions.filter( _.id === id ).result).
+      map( _.headOption )
+  }
+
+  def updateAction( action:KmAction ): Future[KmAction] = {
+    db.run {
+      (actions returning actions).insertOrUpdate(action)
+    }.map( insertRes => insertRes.getOrElse(action) )
+  }
+
+  def deleteAction( id:Long ):Future[Int] = db.run( actions.filter( _.id === id ).delete )
 
   def isAllowToEdit( userId:Long, campaignId: Long ):Future[Boolean] = {
     db.run(

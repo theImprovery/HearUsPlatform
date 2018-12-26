@@ -1,0 +1,67 @@
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import models.ActionType.ActionType
+@import Helpers._
+@(action:Form[KmAction], km:KnessetMember, campaign:Campaign, actionTypes:Seq[ActionType])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@scripts = {
+  <script src="@routes.Assets.versioned("js/campaignEditor/actionEditor.js")"></script>
+}
+
+@templates.backEndBase(action("title").value.getOrElse(Messages("actions.new")), views.BackOfficeSections.MyCampaigns, extraBottom = scripts){
+  @comps.pageTitleRow(action("title").value.getOrElse(Messages("actions.new"))) { }
+  <div class="row">
+    <div class="col">
+      <form action="@routes.CampaignMgrCtrl.saveAction(campaign.id, km.id)" method="POST" id="saveActionForm">
+        @helper.CSRF.formField
+        <input type="hidden" name="camId" value="@campaign.id">
+        <input type="hidden" name="kmId" value="@km.id">
+        <input type="hidden" name="id" value="@action("id").value.getOrElse(-1)">
+        <div class="row">
+          <div class="col-sm-4">
+            <select name="actionType" id="actionType" class="form-control" style="display:inline; width:auto">
+              @for(aType <- actionTypes){
+                <option name="@aType.toString" value="@aType">@Messages("actionType." + aType.toString)</option>
+              }
+            </select>
+          </div>
+          <div class="col-sm-4">
+            <input type="date" name="date" value="@action("date").value.getOrElse("")">
+          </div>
+        </div>
+        <div class="form-group row @Helpers.fieldStatus(action("title"))">
+          <label for="title" class="col-sm-2">@Messages("title")</label>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="title" name="title" value="@action("title").value.getOrElse("")">
+            @formErrors(action("title"))
+          </div>
+        </div>
+        <div class="form-group row @Helpers.fieldStatus(action("link"))">
+          <label for="link" class="col-sm-2">@Messages("link")</label>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="link" name="link" value="@action("link").value.getOrElse("")">
+            @formErrors(action("link"))
+          </div>
+        </div>
+        <div class="form-group row @Helpers.fieldStatus(action("details"))">
+          <label for="name" class="col-sm-2">@Messages("details")</label>
+          <div class="col-sm-8">
+            <textarea type="text" style="direction:ltr" class="form-control" name="details" id="details">@action("details").value.getOrElse("")</textarea>
+            @formErrors(action("details"))
+          </div>
+        </div>
+        <div>
+          <div class="col-2">
+          @if(action("id").value.isDefined) {
+            <button type="button" class="btn btn-danger" onclick="deleteAction(@action("id").value.getOrElse(-1), @campaign.id, @km.id)"><i class="fa fa-trash-o"></i> Delete</button>
+          }
+          </div>
+          <div class="col text-left">
+            <a href="@routes.CampaignMgrCtrl.allActions(campaign.id, km.id)" class="btn btn-secondary"><i class="fa fa-close"></i> @Messages("cancel")</a>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("save")</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}

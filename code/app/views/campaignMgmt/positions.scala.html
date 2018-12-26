@@ -24,6 +24,8 @@
                 @if(kmPosition.isDefinedAt(km.id) && (kmPosition(km.id) == pos.toString)){checked}>
                 <label for="@km.id-@pos.toString" class="buttonLike">@Messages(pos.toString)</label>
               }
+              <a class="btn btn-sm btn-default" href="@routes.CampaignMgrCtrl.allActions(campaign.id, km.id)"><i class="fa fa-edit"></i>
+                @Messages("edit")</a>
             </li>
           }
           </ul>

@@ -1,0 +1,46 @@
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import models.Position.Position
+@(campaign:Campaign, km:KnessetMember, actions: Seq[KmAction])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@scripts = {
+  <script src="@routes.Assets.versioned("js/campaignEditor/positions.js")"></script>
+}
+
+@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Positions, extraBottom = scripts) {
+  @comps.pageTitleRow(campaign.title) {
+    <a href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+  }
+  <div class="row">
+    <div class="col-12">
+    @if(actions.isEmpty) {
+      <div class="noData">
+        @Messages("actions.empty")<br>
+        <a href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+      </div>
+    } else {
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>@Messages("title")</th>
+              <th>@Messages("date")</th>
+            </tr>
+          </thead>
+          <tbody>
+          @for( a <- actions ) {
+            <tr>
+              <td>
+                <a href="@routes.CampaignMgrCtrl.editAction(a.id, campaign.id, km.id)">@a.title</a>
+              </td>
+              <td>
+              @a.date
+              </td>
+            </tr>
+          }
+          </tbody>
+        </table>
+      </div>
+    }
+    </div>
+  </div>
+}

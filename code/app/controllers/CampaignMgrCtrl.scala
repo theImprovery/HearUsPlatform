@@ -1,17 +1,25 @@
 package controllers
 
+import java.sql.{Date, Timestamp}
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
 import dataaccess._
 import javax.inject.Inject
 
 import models._
 import play.api.{Configuration, Logger}
-import play.api.i18n.{Langs, MessagesApi, MessagesImpl, MessagesProvider}
+import play.api.i18n._
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{ControllerComponents, InjectedController, Result}
 import security.HearUsSubject
 import dataaccess.JSONFormats._
+import org.joda.time.DateTime
+import play.api.data.{Form, _}
+import play.api.data.Forms._
+import play.api.data.format.Formatter
 
 import scala.concurrent.Future
 
@@ -24,7 +32,21 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }
-  
+
+
+  val actionForm = Form(
+    mapping(
+      "id" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
+      "camId" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
+      "kmId" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
+      "actionType" -> nonEmptyText.transform[ActionType.Value]( ActionType.withName(_), _.toString),
+      "date" -> sqlDate.transform[Timestamp]( d => new Timestamp(d.getTime), ts => new Date(ts.getTime)),
+      "title" -> nonEmptyText,
+      "details" -> text,
+      "link" -> text
+    )(KmAction.apply)(KmAction.unapply)
+  )
+
   def index() = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     val userId = req.asInstanceOf[AuthenticatedRequest[_]].subject.get.asInstanceOf[HearUsSubject].user.id
     usersCampaigns.getCampaginsForUser( userId ).map( cmps =>
@@ -51,7 +73,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     }
 
   }
-
 
   def details(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     campaignEditorAction(id){
@@ -81,6 +102,69 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
                                         Position.values.toSeq, positions.map(p => (p.kmId, p.position.toString)).toMap,
                                         parties.map(p => (p.id, p.name)).toMap))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
     }
+  }
+
+  def allActions(camId:Long, kmId:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(camId) {
+      for {
+        campaignOpt <- campaigns.getCampaign(camId)
+        knessetMember: Option[KnessetMember] <- campaignOpt.map(_ => kms.getKM(kmId)).getOrElse(Future(None))
+        actions <- campaigns.getActions(camId, kmId)
+      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.actions(campaignOpt.get, km, actions))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+    }
+  }
+
+  def showNewAction(camId:Long, kmId:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(camId) {
+      for {
+        campaignOpt <- campaigns.getCampaign(camId)
+        knessetMember: Option[KnessetMember] <- campaignOpt.map(_ => kms.getKM(kmId)).getOrElse(Future(None))
+      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.kmActionEditor(actionForm, km, campaignOpt.get, ActionType.values.toSeq))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+    }
+  }
+
+  def editAction(id:Long, camId:Long, kmId:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(camId) {
+      for {
+        actionOpt <- campaigns.getAction(id)
+        campaignOpt <- actionOpt.map( _ => campaigns.getCampaign(camId) ).getOrElse(Future(None))
+        knessetMember: Option[KnessetMember] <- campaignOpt.map(_ => kms.getKM(kmId)).getOrElse(Future(None))
+      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.kmActionEditor(actionForm.fill(actionOpt.get), km, campaignOpt.get, ActionType.values.toSeq))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+    }
+  }
+
+  def saveAction(camId:Long, kmId:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    actionForm.bindFromRequest().fold(
+      formWithErrors => {
+        for {
+          campaignOpt <- campaigns.getCampaign(camId)
+          knessetMember: Option[KnessetMember] <- campaignOpt.map(_ => kms.getKM(kmId)).getOrElse(Future(None))
+        } yield {
+          Logger.info(formWithErrors.errors.mkString("\n"))
+          knessetMember.map(km => BadRequest(views.html.campaignMgmt.kmActionEditor(formWithErrors, km, campaignOpt.get, ActionType.values.toSeq)))
+            .getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+        }
+      },
+      action => {
+        campaignEditorAction(camId){
+          val message = Informational(InformationalLevel.Success, Messages("action.update"))
+          campaigns.updateAction(action).map(newAction => Redirect(routes.CampaignMgrCtrl.allActions(action.camId, action.kmId)).flashing(FlashKeys.MESSAGE -> message.encoded))
+        }
+      }
+    )
+
+  }
+
+  def deleteAction(id:Long, camId:Long, kmId:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(camId){
+      for {
+        deleted       <- campaigns.deleteAction(id)
+        campaignOpt   <- campaigns.getCampaign(camId)
+        knessetMember <- kms.getKM(kmId)
+        actions <- campaigns.getActions(camId, kmId)
+      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.actions(campaignOpt.get, km, actions))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+    }
+
   }
 
   def updateDetails = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.tolerantJson) { implicit req =>
@@ -179,7 +263,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       if(ans) {
         action
       } else {
-        Future(Unauthorized("A user cannot edit campaign without permission."))
+        Future(Unauthorized("A user (" + userId +") cannot edit campaign (" + camId + ") without permission."))
       }
     })
   }

@@ -65,8 +65,8 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       },
       adminCampaign => {
         for {
-          usernameExists <- campaigns.campaignNameExists(adminCampaign.name)
-          camOpt:Option[Campaign] <- if(!usernameExists) campaigns.add(Campaign(-1l, adminCampaign.name, "", "", "", "", true)).map(Some(_)) else Future(None)
+          nameExists <- campaigns.campaignNameExists(adminCampaign.name)
+          camOpt:Option[Campaign] <- if(!nameExists) campaigns.add(Campaign(-1l, adminCampaign.name, "", "", "", "", true)).map(Some(_)) else Future(None)
           rel:Option[UserCampaign] <- camOpt.map( cam => campaigns.addUserCampaignRel(UserCampaign(adminCampaign.campaigner, cam.id)
           ).map(Some(_)) ).getOrElse(Future(None))
         } yield {
