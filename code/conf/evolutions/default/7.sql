@@ -2,12 +2,13 @@
 
 # --- !Ups
 create TABLE contact_options (
+  id          SERIAL,
   km_id       INTEGER,
+  campaign_id INTEGER,
   platform    VARCHAR(64),
   title       VARCHAR(256),
   note        text,
-  details     VARCHAR(256),
-  PRIMARY KEY (km_id, platform),
+  details     VARCHAR(512),
   FOREIGN KEY (km_id) REFERENCES knesset_members(id) ON DELETE CASCADE
 );
 

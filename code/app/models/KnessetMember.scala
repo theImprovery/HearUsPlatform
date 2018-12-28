@@ -8,7 +8,9 @@ case class KnessetMember (id:Long,
                           partyId:Long,
                           knessetKey:Long)
 
-case class ContactOption (kmId:Long,
+case class ContactOption (id:Long,
+                          kmId:Option[Long],
+                          campaignId:Option[Long],
                           platform:String,
                           title:String,
                           details:String,

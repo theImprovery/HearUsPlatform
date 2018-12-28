@@ -10,10 +10,10 @@ CREATE VIEW kms_parties AS
 
 
 # --- !Downs
+DROP VIEW kms_parties;
 alter table knesset_members drop column knesset_key;
 alter table parties drop column is_active;
-DROP VIEW kms_parties;
 CREATE VIEW kms_parties AS
-  SELECT knesset_members.*, parties.name as party_name, parties.web_page as party_web_page
-  FROM knesset_members INNER JOIN parties
-           ON knesset_members.party_id = parties.id;
+SELECT knesset_members.*, parties.name as party_name, parties.web_page as party_web_page
+FROM knesset_members INNER JOIN parties
+                                ON knesset_members.party_id = parties.id;

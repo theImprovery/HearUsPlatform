@@ -185,7 +185,7 @@ function deleteKM(id){
 function setupContactOptions(kmId) {
     platformList = document.getElementById("platformList");
     optionTemplate = document.getElementById("optionTemplate");
-    optionTemplate.id = undefined;
+    delete optionTemplate.id;
     optionTemplate.remove();
     if(kmId !== -1) {
         $.ajax(beRoutes.controllers.KnessetMemberCtrl.getContactOptionForKm(kmId))
@@ -195,22 +195,45 @@ function setupContactOptions(kmId) {
                     $("#noContact").slideDown();
                 } else {
                     for (var di in data){
-                        addPlatform(data[di].platform, data[di].details, data[di].note, data[di].title);
+                        addPlatform(data[di]);
                     }
                 }
             });
     } else addPlatform();
 }
 
-function addPlatform(platform, details, note, title) {
-    var newPlatform = optionTemplate.cloneNode(true);
-    if(platform) {
-        $(newPlatform).find("select").val(platform);
-        $(newPlatform).find("input[name='details']").val(details);
-        $(newPlatform).find("input[name='note']").val(note);
-        $(newPlatform).find("input[name='title']").val(title);
+function updateEditorField(select) {
+    var value = $(select).val();
+    var $parentLi = $(select).closest("li");
+    var $detailsContainer = $parentLi.find("label[name='details']");
+    var textField = $detailsContainer.find("input");
+    var textArea = $detailsContainer.find("textarea");
+    
+    if ( value === "Mail" ) {
+        textArea.show();
+        textField.hide();
+    } else {
+        textArea.hide();
+        textField.show();
     }
-    platformList.appendChild(newPlatform);
+}
+
+function addPlatform(contactOption) {
+    var newConOptLi = optionTemplate.cloneNode(true);
+    if(contactOption) {
+        var $newConOptLi = $(newConOptLi);
+        $newConOptLi.find("input[name='contactOptionId']").val(contactOption.id);
+        $newConOptLi.find("select").val(contactOption.platform);
+        $newConOptLi.find("input[name='details']").val(contactOption.details);
+        $newConOptLi.find("input[name='note']").val(contactOption.note);
+        $newConOptLi.find("input[name='title']").val(contactOption.title);
+        $newConOptLi.find("textarea").val(contactOption.details);
+        if ( contactOption.platform === "Mail" ) {
+            $newConOptLi.find("textarea").show();
+            $newConOptLi.find("input[name='details']").hide();
+        }
+    }
+    platformList.appendChild(newConOptLi);
 }
 
 function deleteRow(emt) {
@@ -219,16 +242,26 @@ function deleteRow(emt) {
 
 function updateContactOptions(id){
     var data = [];
-    var values = ["title", "details", "note"];
+    var values = ["contactOptionId", "title", "details", "note"];
     $(platformList).find("li").each( function(idx, emt) {
         var option = {};
         values.forEach(function (val) {
-            $(emt).find("label [name="+ val +"]").each( function() {
+            var $curLi = $(emt);
+            $curLi.find("label [name="+ val +"]").each( function() {
                 option[val] = $(this).val();
             });
-            option.platform = $(emt).find("#contactType option:selected").val();
+            option.platform = $curLi.find("select[name='contactType']").val();
+            if (option.platform === "Mail") {
+                option.details = $curLi.find("textarea").val();
+            }
         });
         option.kmId = Number($("#id").val());
+        if ( Number(option.contactOptionId) > 0 ) {
+            option.id = Number(option.contactOptionId);
+        } else {
+            option.id = 0;
+        }
+        delete option.contactOptionId;
         data.push(option);
     });
     new Playjax(beRoutes)

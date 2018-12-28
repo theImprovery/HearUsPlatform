@@ -124,8 +124,17 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
     }.map( insertRes => insertRes.getOrElse(co) )
   }
 
-  def addContactOption( cos: Seq[ContactOption] ):Future[Seq[ContactOption]] = {
-    Future.sequence(cos.map(co => addContactOption(co)))
+  def addContactOption( cos: Traversable[ContactOption] ):Future[Seq[ContactOption]] = {
+    Future.sequence(cos.map(co => addContactOption(co)).toSeq)
+  }
+  
+  def setContactOptions( kmId:Long, conOps: Traversable[ContactOption] ):Future[Unit] = {
+    val connectedConOps = conOps.map( c => c.copy(kmId=Some(kmId)) )
+    val deleteCurrent = contactOptions.filter( _.kmId === kmId ).delete
+    val insertNew     = DBIO.sequence( connectedConOps.map( contactOptions.insertOrUpdate ) )
+    db.run{
+      DBIO.seq( deleteCurrent, insertNew ).transactionally
+    }.map( _ => () )
   }
 
   def getContactOptions( kmId: Long ):Future[Seq[ContactOption]] = {

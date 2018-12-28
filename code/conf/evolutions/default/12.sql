@@ -9,7 +9,8 @@ create TABLE campaigns (
   theme_data    text,
   contact_email VARCHAR(64)
 );
-
+alter table contact_options add constraint campaign_fkey FOREIGN KEY (campaign_id) references campaigns (id);
 
 # --- !Downs
+alter table contact_options drop constraint campaign_fkey;
 drop table campaigns;

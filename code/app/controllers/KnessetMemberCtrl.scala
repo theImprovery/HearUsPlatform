@@ -135,11 +135,14 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     kms.getContactOptions(id).map(cos => Ok(Json.toJson(cos)))
   }
 
-  def updateContactOption(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson){ implicit req =>
+  def updateContactOption(kmId: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson){ implicit req =>
     req.body.validate[Seq[ContactOption]].fold(
-      errors => Future(BadRequest(Json.obj("status" -> "error", "data" -> JsError.toJson(errors)))),
+      errors => {
+        Logger.warn(errors.mkString("\n"))
+        Future(BadRequest(Json.obj("status" -> "error", "data" -> JsError.toJson(errors))))
+      },
       cos => {
-        kms.addContactOption(cos).map(ans => Ok(Json.toJson(ans)))
+        kms.setContactOptions(kmId, cos).map(_ => Ok(Json.toJson("message"->"ok")) )
       }
     )
   }

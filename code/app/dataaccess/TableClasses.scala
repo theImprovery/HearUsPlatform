@@ -82,14 +82,17 @@ class KnessetMemberTable(tag:Tag) extends Table[KnessetMember](tag,"knesset_memb
 }
 
 class ContactOptionTable(tag:Tag) extends Table[ContactOption](tag, "contact_options"){
-  def kmId = column[Long]("km_id", O.PrimaryKey)
-  def platform = column[String]("platform", O.PrimaryKey)
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def kmId = column[Option[Long]]("km_id")
+  def campaignId = column[Option[Long]]("campaign_id")
+  def platform = column[String]("platform")
   def title = column[String]("title")
   def details = column[String]("details")
   def note = column[String]("note")
 
   def kmFK = foreignKey("knesset_member_contact_fkey", kmId, TableClasses.knessetMembers)(_.id)
-  def * = (kmId, platform, title, details, note) <> (ContactOption.tupled, ContactOption.unapply)
+  def campaignFK = foreignKey("campaign_fkey", campaignId, TableClasses.campaigns)(_.id)
+  def * = (id, kmId, campaignId, platform, title, details, note) <> (ContactOption.tupled, ContactOption.unapply)
 }
 
 class PartyTable(tag:Tag) extends Table[Party](tag, "parties") {

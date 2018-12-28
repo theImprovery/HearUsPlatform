@@ -143,9 +143,9 @@ class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, kn
     } yield {
       val knessetKeyToPerson = currentKms.map( ck => ( ck.knessetKey, ck.id )).toMap
       personToMail = personToMail.filter( p => knessetKeyToPerson.contains(p._1.toLong) )
-      val newContacts = personToMail.map( ptm => ContactOption( knessetKeyToPerson(ptm._1.toLong), "Email",
+      val newContacts = personToMail.map( ptm => ContactOption( 0, Some(knessetKeyToPerson(ptm._1.toLong)), None, "Email",
                                                                 Messages("platform.email.title"), ptm._2, Messages("platform.email.note") )).toSeq
-      knessetMembers.addContactOption(newContacts)
+      knessetMembers.addContactOption(newContacts.toSet)
     }
   }
 }
