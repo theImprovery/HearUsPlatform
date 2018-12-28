@@ -57,14 +57,36 @@ input[type=radio] + label.buttonLike{
 
 .styledNav {
   border: 1px solid transparent;
-  border-top-color: black;
-  border-bottom-color: black;
-  li a{
-    background-color: #EEE;
-    margin: 0 0.5em;
-    border-radius: .25em;
-    &:hover {
-      background-color: lightgray;
+  border-top-color: rgba(0,0,0,.3);
+  border-radius: 5px 5px 0 0;
+  background-color: #EEE;
+  padding: 0.5em 0;
+
+  li {
+    a {
+      background-color: #EEE;
+      margin: 0 0.5em;
+      border-radius: .25em;
+      border: 1px solid rgba(0,0,0,.3);
+
+      &:hover {
+        background-color: lightgray;
+      }
+    }
+    &.active {
+      a {
+        background-color: #cce5ff;
+        border-color: #b8daff;
+      }
+    }
+    &.styledNavTitle {
+      a {
+        border-radius: 0;
+        background-color: #666;
+        color: #FFF;
+        font-weight: bold;
+        border: none;
+      }
     }
   }
 }

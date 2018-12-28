@@ -6,7 +6,7 @@
   <script src="@routes.Assets.versioned("js/campaignEditor/positions.js")"></script>
 }
 
-@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Positions, extraBottom = scripts) {
+@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.KnessetMembers, scripts) {
   @comps.pageTitleRow(campaign.title) {
     <a href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
   }

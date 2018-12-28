@@ -42,7 +42,10 @@ object BackOfficeSections extends Enumeration {
 object CampaignEditorSections extends Enumeration {
   val Details         = Value("Details")
   val Settings        = Value("Settings")
-  val Positions       = Value("Positions")
+  val Messages        = Value("Messages")
+  val Design          = Value("Design")
+  val FrontPage       = Value("FrontPage")
+  val KnessetMembers  = Value("KnessetMembers")
 }
 
 
@@ -87,9 +90,12 @@ object Structure {
   )
 
   def campaignEditorItems(campaign:Campaign):Seq[TopSiteSection[CampaignEditorSections.Value]] = Seq(
-    PageSection("Details", CampaignEditorSections.Details, routes.CampaignMgrCtrl.details(campaign.id)),
-    PageSection("Settings", CampaignEditorSections.Settings, routes.CampaignMgrCtrl.settings(campaign.id)),
-    PageSection("Positions", CampaignEditorSections.Positions, routes.CampaignMgrCtrl.positions(campaign.id))
+    PageSection("navbar.campagins.mgmt.details",   CampaignEditorSections.Details, routes.CampaignMgrCtrl.details(campaign.id)),
+    PageSection("navbar.campagins.mgmt.settings",  CampaignEditorSections.Settings, routes.CampaignMgrCtrl.settings(campaign.id)),
+    PageSection("navbar.campagins.mgmt.messages",  CampaignEditorSections.Messages, routes.HomeCtrl.notImplYet()),
+    PageSection("navbar.campagins.mgmt.design",    CampaignEditorSections.Design, routes.HomeCtrl.notImplYet()),
+    PageSection("navbar.campagins.mgmt.frontPage", CampaignEditorSections.FrontPage, routes.HomeCtrl.notImplYet()),
+    PageSection("navbar.campagins.mgmt.positions", CampaignEditorSections.KnessetMembers, routes.CampaignMgrCtrl.positions(campaign.id))
   )
 
 
