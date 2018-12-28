@@ -10,15 +10,22 @@
   }
   <div class="row">
     <div class="col">
-      <ul>
-        @for( c <- campaigns ){
+      @if(campaigns.nonEmpty) {
+        <ul>
+        @for(c <- campaigns) {
           <li>
-            <strong>@c.title</strong> @if(c.subtitle.trim.nonEmpty){@c.subtitle}
+            <strong>@c.title</strong>
+            @if(c.slogan.trim.nonEmpty) {@c.slogan}
             <a class="btn btn-sm btn-default" href="@routes.CampaignMgrCtrl.details(c.id)"><i class="fa fa-edit"></i>
               @Messages("edit")</a>
           </li>
         }
-      </ul>
+        </ul>
+      } else {
+        <div class="noData">
+          @Messages("campaignMgmt.myCampaigns.noCampaigns")
+        </div>
+      }
     </div>
   </div>
 }

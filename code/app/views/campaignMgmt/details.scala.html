@@ -6,41 +6,39 @@
 }
 
 @templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Details, extraBottom = scripts) {
-  @comps.pageTitleRow(campaign.title) { }
-    <div class="row">
-      <div class="col">
-        <input type="hidden" name="id" id="id" value="@campaign.id">
-        <input type="hidden" name="isPublish" id="isPublish" value="@campaign.isPublished">
-        <div>
-          <input type="hidden" name="themeData" id="themeData" value=" ">
-          <input type="hidden" name=title" id="title" value="@campaign.title">
-          <div class="form-group row">
-            <label for="subtitle" class="col-sm-2">@Messages("subtitle")</label>
-            <div class="col-sm-10">
-              <textarea type="text" style="direction:ltr" class="form-control" name="subtitle" id="subtitle">@campaign.subtitle</textarea>
-            </div>
-          </div> <!-- subtitle -->
-          <div class="form-group row">
-            <label for="website" class="col-sm-2">@Messages("website")</label>
-            <div class="col-sm-10">
-              <input type="text" style="direction:ltr" class="form-control" name="website" id="website" value="@campaign.website">
-            </div>
-          </div> <!-- website -->
-          <div class="form-group row">
-            <label for="contactEmail" class="col-sm-2">@Messages("campaign.contactEmail")</label>
-            <div class="col-sm-10">
-              <input type="email" style="direction:ltr" class="form-control" name="contactEmail" id="contactEmail" value="@campaign.contactEmail">
-            </div>
-          </div> <!-- contactEmail -->
-        </div>
-        <div class="row">
-          <div class="col-4">
-            <div class="text-right">
-              <button onclick="patchDetails()" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> @Messages("updateDetails")</button>
-            </div>
+  @comps.pageTitleRow(campaign.title) {
+    <button onclick="patchDetails()" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("updateDetails")</button>
+  }
+  <div class="row">
+    <div class="col">
+      <input type="hidden" name="id" id="id" value="@campaign.id">
+      <input type="hidden" name="isPublish" id="isPublish" value="@campaign.isPublished">
+      <div>
+        <input type="hidden" name="themeData" id="themeData" value=" ">
+        <input type="hidden" name=title" id="title" value="@campaign.title">
+        <div class="form-group row">
+          <label for="subtitle" class="col-sm-2">@Messages("subtitle")</label>
+          <div class="col-sm-10">
+            <textarea type="text" style="direction:ltr" class="form-control" name="subtitle" id="subtitle">@campaign.slogan</textarea>
           </div>
-        </div>
+        </div> <!-- subtitle -->
+        <div class="form-group row">
+          <label for="website" class="col-sm-2">@Messages("website")</label>
+          <div class="col-sm-10">
+            <input type="text" style="direction:ltr" class="form-control" name="website" id="website" value="@campaign.website">
+          </div>
+        </div> <!-- website -->
+        <div class="form-group row">
+          <label for="contactEmail" class="col-sm-2">@Messages("campaigns.contactEmail")</label>
+          <div class="col-sm-10">
+            <input type="email" class="form-control text-ltr" name="contactEmail" id="contactEmail" value="@campaign.contactEmail">
+            <small id="passwordHelpBlock" class="form-text text-muted">
+              @Messages("campaigns.contactEmail.help")
+            </small>
+          </div>
+        </div> <!-- contactEmail -->
       </div>
-    </div>
 
+    </div>
+  </div>
 }

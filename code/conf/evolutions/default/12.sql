@@ -3,12 +3,15 @@
 # --- !Ups
 create TABLE campaigns (
   id            serial PRIMARY KEY,
-  title         VARCHAR(64),
-  subtitle      text,
-  website       VARCHAR(128),
+  title         VARCHAR(128),
+  slogan        text,
+  slug          VARCHAR(128),
+  website       VARCHAR(256),
   theme_data    text,
   contact_email VARCHAR(64)
 );
+CREATE UNIQUE INDEX lowercase_slugs ON campaigns (lower(slug));
+
 alter table contact_options add constraint campaign_fkey FOREIGN KEY (campaign_id) references campaigns (id);
 
 # --- !Downs

@@ -158,13 +158,14 @@ class KmsPartiesView( tag:Tag ) extends Table[KmsParties](tag, "kms_parties") {
 class CampaignTable( tag:Tag ) extends Table[Campaign](tag, "campaigns") {
   def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
   def title = column[String]("title")
-  def subtitle = column[String]("subtitle")
+  def slogan = column[String]("slogan")
+  def slug   = column[String]("slug")
   def website = column[String]("website")
   def themeData = column[String]("theme_data")
   def contactEmail = column[String]("contact_email")
   def isPublished = column[Boolean]("is_published")
 
-  def * = (id, title, subtitle, website, themeData, contactEmail, isPublished) <> (Campaign.tupled, Campaign.unapply)
+  def * = (id, title, slogan, slug, website, themeData, contactEmail, isPublished) <> (Campaign.tupled, Campaign.unapply)
 }
 
 class LabelTextTable( tag:Tag ) extends Table[LabelText](tag, "label_texts") {

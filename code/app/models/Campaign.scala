@@ -5,7 +5,8 @@ import dataaccess.Platform
 
 case class Campaign( id:Long,
                      title: String,
-                     subtitle: String,
+                     slogan: String,
+                     slug:String,
                      website: String,
                      themeData: String,
                      contactEmail: String,
