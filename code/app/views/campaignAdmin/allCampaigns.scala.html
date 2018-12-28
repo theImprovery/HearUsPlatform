@@ -22,24 +22,29 @@
           <a href="@routes.CampaignAdminCtrl.createCampaign()">@Messages("campaigns.createNew")</a>
         </div>
       } else {
-        <ul>
-        @for( c <- campaigns ){
-          <li>
-            <div class="row">
-              <div class="col-md-2">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>@Messages("campaigns.table.title")</th>
+              <th>@Messages("campaigns.table.isPublished")</th>
+          </tr>
+          </thead>
+          <tbody>
+          @for( c <- campaigns ){
+            <tr>
+              <td>
                 <strong>@c.title</strong> @if(c.subtitle.trim.nonEmpty){@c.subtitle}
-              </div>
-              <div class="col-md-2 bottom">
+              </td>
+              <td>
                 <label class="switch">
                   <input type="checkbox" onchange="updatePublish(this, @c.id)" @if(c.isPublished){checked}>
                   <span class="slider round"></span>
                 </label>
-              </div>
-            </div>
-
-          </li>
-        }
-        </ul>
+              </td>
+            </tr>
+          }
+          </tbody>
+        </table>
       }
     </div>
   </div>
