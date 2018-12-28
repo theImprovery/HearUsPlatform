@@ -136,7 +136,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
 
   def updatePublish( campId:Long, isPublish:Boolean ):Future[Int] = {
     db.run(
-      campaigns.filter( _.id === campId ).map( _.isPublish ).update(isPublish)
+      campaigns.filter( _.id === campId ).map( _.isPublished ).update(isPublish)
     )
   }
 

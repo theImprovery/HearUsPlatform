@@ -208,7 +208,7 @@ function updateEditorField(select) {
     var $detailsContainer = $parentLi.find("label[name='details']");
     var textField = $detailsContainer.find("input");
     var textArea = $detailsContainer.find("textarea");
-    
+
     if ( value === "Mail" ) {
         textArea.show();
         textField.hide();

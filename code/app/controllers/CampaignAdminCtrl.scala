@@ -40,11 +40,11 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def showCampaigns = deadbolt.SubjectPresent()() { implicit req =>
     for {
       camps <- campaigns.getAllCampaigns
-    } yield Ok(views.html.CampaignAdmin.allCampaigns(camps))
+    } yield Ok(views.html.campaignAdmin.allCampaigns(camps))
   }
 
   def createCampaign = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
-    Future(Ok(views.html.CampaignAdmin.createCampaign(newCampaignForm)))
+    Future(Ok(views.html.campaignAdmin.createCampaign(newCampaignForm)))
   }
 
   def getCampaigners(searchStr:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
@@ -61,19 +61,19 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     newCampaignForm.bindFromRequest().fold(
       fwe => {
         Logger.info("errors " + fwe.errors.map(e => fwe.errors(e.key).mkString(", ")).mkString("\n"))
-        Future(BadRequest(views.html.CampaignAdmin.createCampaign(fwe)))
+        Future(BadRequest(views.html.campaignAdmin.createCampaign(fwe)))
       },
       adminCampaign => {
         for {
           nameExists <- campaigns.campaignNameExists(adminCampaign.name)
-          camOpt:Option[Campaign] <- if(!nameExists) campaigns.add(Campaign(-1l, adminCampaign.name, "", "", "", "", true)).map(Some(_)) else Future(None)
+          camOpt:Option[Campaign] <- if(!nameExists) campaigns.add(Campaign(-1l, adminCampaign.name, "", "", "", "", false)).map(Some(_)) else Future(None)
           rel:Option[UserCampaign] <- camOpt.map( cam => campaigns.addUserCampaignRel(UserCampaign(adminCampaign.campaigner, cam.id)
           ).map(Some(_)) ).getOrElse(Future(None))
         } yield {
           var form = newCampaignForm.fill(adminCampaign)
           form = form.withError("name", "error.campaignName.exists")
           rel.map(_=> Redirect(routes.CampaignAdminCtrl.showCampaigns()) )
-            .getOrElse( BadRequest(views.html.CampaignAdmin.createCampaign(form)) )
+            .getOrElse( BadRequest(views.html.campaignAdmin.createCampaign(form)) )
         }
       }
     )

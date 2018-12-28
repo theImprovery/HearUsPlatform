@@ -90,8 +90,8 @@ class ContactOptionTable(tag:Tag) extends Table[ContactOption](tag, "contact_opt
   def details = column[String]("details")
   def note = column[String]("note")
 
-  def kmFK = foreignKey("knesset_member_contact_fkey", kmId, TableClasses.knessetMembers)(_.id)
-  def campaignFK = foreignKey("campaign_fkey", campaignId, TableClasses.campaigns)(_.id)
+  def kmFK = foreignKey("knesset_member_contact_fkey", kmId, TableClasses.knessetMembers)(_.id.?)
+  def campaignFK = foreignKey("campaign_fkey", campaignId, TableClasses.campaigns)(_.id.?)
   def * = (id, kmId, campaignId, platform, title, details, note) <> (ContactOption.tupled, ContactOption.unapply)
 }
 
@@ -113,7 +113,7 @@ class ImageTable(tag:Tag) extends Table[KMImage](tag, "images") {
   def date = column[Timestamp]("date")
   def credit = column[String]("credit")
 
-  def kmFK = foreignKey("image_knesset_member_fkey", kmId, TableClasses.knessetMembers)(_.id)
+  def kmFK = foreignKey("image_knesset_member_fkey", kmId, TableClasses.knessetMembers)( c=> c.id.? )
   def * = (id, kmId, camId, suffix, mimeType, date, credit) <> (KMImage.tupled, KMImage.unapply)
 }
 
@@ -162,9 +162,9 @@ class CampaignTable( tag:Tag ) extends Table[Campaign](tag, "campaigns") {
   def website = column[String]("website")
   def themeData = column[String]("theme_data")
   def contactEmail = column[String]("contact_email")
-  def isPublish = column[Boolean]("is_publish")
+  def isPublished = column[Boolean]("is_published")
 
-  def * = (id, title, subtitle, website, themeData, contactEmail, isPublish) <> (Campaign.tupled, Campaign.unapply)
+  def * = (id, title, subtitle, website, themeData, contactEmail, isPublished) <> (Campaign.tupled, Campaign.unapply)
 }
 
 class LabelTextTable( tag:Tag ) extends Table[LabelText](tag, "label_texts") {
@@ -236,7 +236,7 @@ class KmActionTable( tag:Tag ) extends Table[KmAction](tag, "km_actions") {
   def * = (id, camId, kmId, actionType, date, title, details, link) <> (KmAction.tupled, KmAction.unapply)
 }
 
-class sytemEventTable( tag:Tag ) extends Table[SystemEvent](tag, "system_events") {
+class SystemEventTable(tag:Tag ) extends Table[SystemEvent](tag, "system_events") {
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def userId = column[Long]("user_id")
   def date = column[Timestamp]("date")

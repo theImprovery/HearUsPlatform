@@ -9,7 +9,7 @@ case class Campaign( id:Long,
                      website: String,
                      themeData: String,
                      contactEmail: String,
-                     isPublish: Boolean)
+                     isPublished: Boolean)
 
 case class LabelText( camId: Long,
                       position: Position.Value,
