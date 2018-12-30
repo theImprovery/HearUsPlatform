@@ -21,7 +21,7 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
-case class AdminCampaign(name:String, campaigner:Long)
+case class AdminCampaign(name:String, slug:String, campaigner:Long)
 
 class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                   users:UsersDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
@@ -33,7 +33,8 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   }
 
   val newCampaignForm = Form(mapping(
-    "name"-> text,
+    "name" -> text,
+    "slug" -> text,
     "campaigner" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int])
   )(AdminCampaign.apply)(AdminCampaign.unapply))
 
@@ -65,13 +66,13 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       },
       adminCampaign => {
         for {
-          nameExists <- campaigns.campaignNameExists(adminCampaign.name)
-          camOpt:Option[Campaign] <- if(!nameExists) campaigns.add(Campaign(-1l, adminCampaign.name, "", "", "", "", false)).map(Some(_)) else Future(None)
+          slugExists <- campaigns.campaignSlugExists(adminCampaign.slug)
+          camOpt:Option[Campaign] <- if(!slugExists) campaigns.add(Campaign(-1l, adminCampaign.name, "", adminCampaign.slug, "", "", "", false)).map(Some(_)) else Future(None)
           rel:Option[UserCampaign] <- camOpt.map( cam => campaigns.addUserCampaignRel(UserCampaign(adminCampaign.campaigner, cam.id)
           ).map(Some(_)) ).getOrElse(Future(None))
         } yield {
           var form = newCampaignForm.fill(adminCampaign)
-          form = form.withError("name", "error.campaignName.exists")
+          form = form.withError("slug", "error.campaignSlug.exists")
           rel.map(_=> Redirect(routes.CampaignAdminCtrl.showCampaigns()) )
             .getOrElse( BadRequest(views.html.campaignAdmin.createCampaign(form)) )
         }

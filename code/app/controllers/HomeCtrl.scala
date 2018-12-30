@@ -108,7 +108,8 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.CampaignMgrCtrl.updatePosition,
           routes.javascript.CampaignMgrCtrl.editCampaign,
           routes.javascript.CampaignMgrCtrl.deleteAction,
-          routes.javascript.CampaignMgrCtrl.allActions
+          routes.javascript.CampaignMgrCtrl.allActions,
+          routes.javascript.CampaignPublicCtrl.index
       )).as("text/javascript")
     }
   }

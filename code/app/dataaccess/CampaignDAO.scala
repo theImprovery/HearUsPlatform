@@ -128,9 +128,9 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     }.map( insertRes => insertRes.getOrElse(rel) )
   }
 
-  def campaignNameExists( name:String ):Future[Boolean] = {
+  def campaignSlugExists( name:String ):Future[Boolean] = {
     db.run{
-      campaigns.map( _.title ).filter( _.toLowerCase === name.toLowerCase() ).exists.result
+      campaigns.map( _.slug ).filter( _.toLowerCase === name.toLowerCase() ).exists.result
     }
   }
 

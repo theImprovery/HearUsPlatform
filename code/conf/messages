@@ -66,10 +66,11 @@ signup.confirmationDetails=To email address {0}
 
 error.email=Invalid Email Address.
 error.email.exists=A user with this email has already registered.
-error.username.exists=Username already taken
+#error.username.exists=שם משתמש תפוס
 error.invitation.doesNotExist=Invitation does not exist
 error.password=Passwords must match, and cannot be empty
 error.password.incorrect=Incorrect password
+error.campaignSlug.exists=כבר יש קמפיין עם סלאג כזה
 
 groupEditor.title=עריכת קבוצה
 groupEditor.empty=אין כרגע חברי כנסת בקבוצה זו
@@ -207,7 +208,7 @@ campaigns.website.help=אתר האינטרנט הרשמי של הקמפיין
 campaigns.solgan=סלוגן
 campaigns.slogan.help=אם יש לקמפיין ססמא - אפשר להכניס אותה פה. אם אין לקמפיין ססמא - אולי כדאי להמציא אחת.
 campaigns.slug=שורת סדר (slug)
-campaigns.slug.help=התווים האחרונים של כתובת אתר הקמפיין. חייבים להיות ייחודיים לקמפיין זה. כמו כן, עדיף לא לשנות ערך זה אחרי שמתפרסמים לינקים חיצוניים לאתר זה, כיוון שאז לינקים אלו יפסיקו לעבוד.
+campaigns.slug.help=התווים האחרונים של כתובת אתר הקמפיין. חייבים להיות ייחודיים לקמפיין זה. כמו כן, עדיף לא לשנות ערך זה אחרי שמתפרסמים לינקים חיצוניים לאתר זה, כיוון שאז לינקים אלו יפסיקו לעבוד. 
 campaigns.noLabels=לא הוכנסו תוויות
 campaigns.noCampaignsInSystem=אין קמפיינים במערכת כרגע
 campaigns.createNew=יצירת קמפיין חדש
@@ -229,4 +230,3 @@ campaigns.noMessages=לא הוכנסו הודעות
 background=רקע
 
 newCampaigner.noCampainger=נא לבחור מנהל קמפיין
-error.campaignName.exists=השם תפוס
