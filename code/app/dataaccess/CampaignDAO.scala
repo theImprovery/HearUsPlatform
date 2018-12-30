@@ -26,17 +26,25 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
 
-  def add( cam: Campaign ):Future[Campaign] = {
+  def store(cam: Campaign ):Future[Campaign] = {
     db.run(
       (campaigns returning campaigns).insertOrUpdate(cam)
     ).map( insertRes => insertRes.getOrElse(cam) )
   }
-
+  
+  def updateDetails( id:Long, details:CampaignDetails ) = {
+    db.run(
+      campaigns.filter( _.id === id )
+               .map(row => (row.title, row.slogan, row.contactEmail, row.website) )
+               .update( (details.title, details.slogan, details.contactEmail, details.website) )
+    )
+  }
+  
   def getCampaign( id:Long ):Future[Option[Campaign]] = {
     db.run{
       campaigns.filter( _.id === id ).result
     } map ( _.headOption )
-  }/**/
+  }
 
   def deleteCampaign( id:Long ):Future[Int] = db.run (campaigns.filter( _ .id === id ).delete )
 

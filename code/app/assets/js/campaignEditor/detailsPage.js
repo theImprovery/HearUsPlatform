@@ -1,23 +1,22 @@
 function patchDetails() {
     var data = {};
-    var fields = ["subtitle", "website", "themeData", "contactEmail"];
+    var fields = ["id", "title", "slogan", "website", "contactEmail"];
     fields.forEach(function (value) { data[value] = document.getElementById(value).value; });
-    data.id = Number(document.getElementById("id").value);
-    data.title = document.getElementById("title").value;
-    data.isPublish = Boolean(document.getElementById("isPublish").value);
-    console.log("data", data);
-    var msgDiv = Informationals.showBackgroundProcess("Updating..");
+    Informationals.loader("Updating..");
     new Playjax(beRoutes)
         .using(function (c) {
-            return c.CampaignMgrCtrl.updateDetails();
+            return c.CampaignMgrCtrl.updateDetails(Number(data.id));
         })
         .fetch(data)
         .then( function (res) {
+            Informationals.loader.dismiss();
             if (res.ok) {
-                msgDiv.success();
+                Informationals.makeSuccess("Update Campaign " + data.name, "OK", 1500).show();
             } else {
-                msgDiv.dismiss();
-                Informationals.makeWarning("Update Campaign " + data.name, "Failed", 1500);
+                Informationals.makeDanger("Update Campaign " + data.name, "Failed", 2500).show();
+                res.result().then(function(body){
+                    console.log(body);
+                });
             }
         });
 }

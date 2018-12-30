@@ -52,30 +52,31 @@ DELETE  /bkofc/group/:id              controllers.KnessetMemberCtrl.deleteGroup(
 POST    /bkofc/api/km/update          controllers.ParseCtrl.apiKms
 POST    /bkofc/api/committee/update   controllers.ParseCtrl.apiUpdateCommittees
 
-GET     /bkofc/camps/new              controllers.CampaignAdminCtrl.createCampaign
 GET     /bkofc/campainers/:name       controllers.CampaignAdminCtrl.getCampaigners(name:String)
-POST    /bkofc/camps/                 controllers.CampaignAdminCtrl.saveCampaign
-GET     /bkofc/camps                  controllers.CampaignAdminCtrl.showCampaigns
-PATCH   /bkofc/camps/sm/              controllers.CampaignMgrCtrl.updateSocialMedia
-PATCH   /bkofc/camps/position         controllers.CampaignMgrCtrl.updatePosition
-PATCH   /bkofc/camps/details/         controllers.CampaignMgrCtrl.updateDetails
-PATCH   /bkofc/camps/labels/          controllers.CampaignMgrCtrl.updateLabels
-PATCH   /bkofc/camps/msgs/            controllers.CampaignMgrCtrl.updateMessages
-PATCH   /bkofc/camps/updatePublish    controllers.CampaignAdminCtrl.updatePublish
-GET     /bkofc/camps/details/:id      controllers.CampaignMgrCtrl.details(id:Long)
-GET     /bkofc/camps/settings/:id     controllers.CampaignMgrCtrl.settings(id:Long)
-GET     /bkofc/camps/positions/:id    controllers.CampaignMgrCtrl.positions(id:Long)
-GET     /bkofc/camps/actions/         controllers.CampaignMgrCtrl.allActions(camId:Long, kmId:Long)
-GET     /bkofc/camps/action/new/      controllers.CampaignMgrCtrl.showNewAction(camId:Long, kmId:Long)
-POST    /bkofc/camps/action/          controllers.CampaignMgrCtrl.saveAction(camId:Long, kmId:Long )
-DELETE  /bkofc/camps/action/          controllers.CampaignMgrCtrl.deleteAction(id:Long, camId:Long, kmId:Long)
-GET     /bkofc/camps/action/:id       controllers.CampaignMgrCtrl.editAction(id:Long, camId:Long, kmId:Long)
-GET     /bkofc/camps/lbls/:id         controllers.CampaignMgrCtrl.getLabelText(id:Long)
-GET     /bkofc/camps/msgs/:id         controllers.CampaignMgrCtrl.getMessages(id:Long)
-GET     /bkofc/camps/sm/:id           controllers.CampaignMgrCtrl.getSocialMedia(id:Long)
-DELETE  /bkofc/camps/:id              controllers.CampaignMgrCtrl.deleteCampaign(id:Long)
-POST    /bkofc/camps/actions          controllers.CampaignAdminCtrl.updateAction
-GET     /bkofc/camps/:camId           controllers.CampaignMgrCtrl.editCampaign(camId:Long)
+GET     /bkofc/campaigns/new              controllers.CampaignAdminCtrl.createCampaign
+POST    /bkofc/campaigns/                 controllers.CampaignAdminCtrl.saveCampaign
+GET     /bkofc/campaigns                  controllers.CampaignAdminCtrl.showCampaigns
+PATCH   /bkofc/campaigns/sm/              controllers.CampaignMgrCtrl.updateSocialMedia
+PATCH   /bkofc/campaigns/position         controllers.CampaignMgrCtrl.updatePosition
+PATCH   /bkofc/campaigns/:id/details/     controllers.CampaignMgrCtrl.updateDetails(id:Long)
+PATCH   /bkofc/campaigns/labels/          controllers.CampaignMgrCtrl.updateLabels
+PATCH   /bkofc/campaigns/msgs/            controllers.CampaignMgrCtrl.updateMessages
+PATCH   /bkofc/campaigns/updatePublish    controllers.CampaignAdminCtrl.updatePublish
+GET     /bkofc/campaigns/:id/details/      controllers.CampaignMgrCtrl.details(id:Long)
+GET     /bkofc/campaigns/:id/messages/     controllers.CampaignMgrCtrl.editMessages(id:Long)
+GET     /bkofc/campaigns/:id/settings/     controllers.CampaignMgrCtrl.settings(id:Long)
+GET     /bkofc/campaigns/:id/positions/    controllers.CampaignMgrCtrl.positions(id:Long)
+GET     /bkofc/campaigns/actions/         controllers.CampaignMgrCtrl.allActions(camId:Long, kmId:Long)
+GET     /bkofc/campaigns/action/new/      controllers.CampaignMgrCtrl.showNewAction(camId:Long, kmId:Long)
+POST    /bkofc/campaigns/action/          controllers.CampaignMgrCtrl.saveAction(camId:Long, kmId:Long )
+DELETE  /bkofc/campaigns/action/          controllers.CampaignMgrCtrl.deleteAction(id:Long, camId:Long, kmId:Long)
+GET     /bkofc/campaigns/action/:id       controllers.CampaignMgrCtrl.editAction(id:Long, camId:Long, kmId:Long)
+GET     /bkofc/campaigns/lbls/:id         controllers.CampaignMgrCtrl.getLabelText(id:Long)
+GET     /bkofc/campaigns/msgs/:id         controllers.CampaignMgrCtrl.getMessages(id:Long)
+GET     /bkofc/campaigns/sm/:id           controllers.CampaignMgrCtrl.getSocialMedia(id:Long)
+DELETE  /bkofc/campaigns/:id              controllers.CampaignMgrCtrl.deleteCampaign(id:Long)
+POST    /bkofc/campaigns/actions          controllers.CampaignAdminCtrl.updateAction
+GET     /bkofc/campaigns/:camId           controllers.CampaignMgrCtrl.editCampaign(camId:Long)
 
 
 GET     /campaignMgmt/                controllers.CampaignMgrCtrl.index

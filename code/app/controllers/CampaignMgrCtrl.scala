@@ -81,7 +81,30 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
     }
   }
-
+  
+  def updateDetails(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.tolerantJson) { implicit req =>
+    campaignEditorAction(id){
+      req.body.validate[CampaignDetails].fold(
+        errors => Future(BadRequest(Json.obj("message" -> "can't parse campaign", "details"->errors.mkString(",")))),
+        campaignDtls => {
+          campaigns.updateDetails(id,campaignDtls).map(newC => Ok(Json.toJson(newC)))
+        }
+      )
+    }
+  }
+  
+  def editMessages(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    Logger.info("in messages")
+    campaignEditorAction(id) {
+      for {
+        campaignOpt <- campaigns.getCampaign(id)
+      } yield campaignOpt match {
+        case None => NotFound("campaign with id " + id + "does not exist")
+        case Some(c) => Ok(views.html.campaignMgmt.messages(c, Position.values.toSeq))
+      }
+    }
+  }
+  
   def settings(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     campaignEditorAction(id){
       for {
@@ -167,17 +190,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
 
   }
 
-  def updateDetails = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.tolerantJson) { implicit req =>
-    req.body.validate[Campaign].fold(
-      errors => Future(BadRequest("can't parse campaign")),
-      campaign => {
-        campaignEditorAction(campaign.id){
-          campaigns.add(campaign).map(newC => Ok(Json.toJson(newC)))
-        }
-      }
-    )
-  }
-
   def updatePosition = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
     req.body.validate[KmPosition].fold(
       errors => {
@@ -256,7 +268,8 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       }
     }
   }
-
+  
+  
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {
     val userId = req.subject.get.asInstanceOf[HearUsSubject].user.id
     campaigns.isAllowToEdit(userId, camId).flatMap( ans => {

@@ -4,13 +4,18 @@ import java.sql.Timestamp
 import dataaccess.Platform
 
 case class Campaign( id:Long,
-                     title: String,
+                     title:  String,
                      slogan: String,
-                     slug:String,
-                     website: String,
-                     themeData: String,
+                     slug:   String,
+                     website:      String,
+                     themeData:    String,
                      contactEmail: String,
-                     isPublished: Boolean)
+                     isPublished:  Boolean)
+
+case class CampaignDetails( title:  String,
+                            slogan: String,
+                            website:      String,
+                            contactEmail: String )
 
 case class LabelText( camId: Long,
                       position: Position.Value,

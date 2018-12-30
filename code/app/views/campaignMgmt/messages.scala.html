@@ -1,0 +1,62 @@
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@(campaign:Campaign, positions:Seq[Position.Value])(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+
+@scripts = {
+  <script src="@routes.Assets.versioned("js/campaignEditor/messagesPage.js")"></script>
+  <script >
+    setup();
+  </script>
+}
+
+@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Messages, extraBottom = scripts) {
+  <div class="row my-2">
+    <div class="col-10">
+      <div class="text-muted">
+      @Messages("campaignMgmt.messages.help")
+      </div>
+    </div>
+    <div class="col-2 text-left">
+      <button onclick="patchDetails()" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("updateDetails")</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="form-group row">
+        <label for="title" class="col-sm-2">@Messages("mediaOutlet")</label>
+        <div class="col-sm-10">
+          <input class="hidden" onchange="messageSelectionChanged()" type="radio" name="media" value="Twitter" id="mediaTwitter" checked>
+          <label for="mediaTwitter" class="buttonLike">@Messages("twitter")</label>
+          <input class="hidden" onchange="messageSelectionChanged()" type="radio" name="media" value="Email" id="mediaEmail">
+          <label for="mediaEmail" class="buttonLike">@Messages("email")</label>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="title" class="col-sm-2">@Messages("gender")</label>
+        <div class="col-sm-10">
+          <input class="hidden" onchange="messageSelectionChanged()" type="radio" name="gender" value="Male" id="male" checked>
+          <label for="male" class="buttonLike">@Messages("male")</label>
+          <input class="hidden" onchange="messageSelectionChanged()" type="radio" name="gender" value="Female" id="female">
+          <label for="female" class="buttonLike">@Messages("female")</label>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="title" class="col-sm-2">@Messages("position")</label>
+        <div class="col-sm-10">
+          @for(pos <- positions) {
+            <input class="hidden" type="radio" name="positions"
+              value="@pos" id="@pos.toString" onchange="messageSelectionChanged()" @if(pos.id==0){checked}>
+            <label for="@pos.toString" class="buttonLike pos-@pos.toString.toLowerCase()">@Messages(pos.toString)</label>
+          }
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="content" class="col-sm-2">@Messages("contents")</label>
+        <div class="col-sm-10">
+          <div id="characterCounter" class="bg-success">@Messages("charactersLeft"):  <span style="direction:ltr"></span></div>
+          <textarea class="form-control" onkeyup="updateCharacterCount()" name="content" id="content" cols="30" rows="10"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+}
