@@ -1,6 +1,6 @@
 function patchDetails() {
     var data = {};
-    var fields = ["id", "title", "slogan", "website", "contactEmail"];
+    var fields = ["id", "title", "slogan", "website", "contactEmail", "analyticsCode"];
     fields.forEach(function (value) { data[value] = document.getElementById(value).value; });
     Informationals.loader("Updating..");
     new Playjax(beRoutes)

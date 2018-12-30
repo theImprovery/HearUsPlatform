@@ -35,8 +35,8 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   def updateDetails( id:Long, details:CampaignDetails ) = {
     db.run(
       campaigns.filter( _.id === id )
-               .map(row => (row.title, row.slogan, row.contactEmail, row.website) )
-               .update( (details.title, details.slogan, details.contactEmail, details.website) )
+               .map(row => (row.title, row.slogan, row.contactEmail, row.website, row.analytics) )
+               .update( (details.title, details.slogan, details.contactEmail, details.website, details.analyticsCode) )
     )
   }
   

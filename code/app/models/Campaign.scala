@@ -10,12 +10,14 @@ case class Campaign( id:Long,
                      website:      String,
                      themeData:    String,
                      contactEmail: String,
+                     analytics:    String,
                      isPublished:  Boolean)
 
 case class CampaignDetails( title:  String,
                             slogan: String,
                             website:      String,
-                            contactEmail: String )
+                            contactEmail: String,
+                            analyticsCode: String )
 
 case class LabelText( camId: Long,
                       position: Position.Value,
