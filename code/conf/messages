@@ -223,6 +223,7 @@ campaignMgmt.index.title=הקמפיינים שלי
 campaignMgmt.myCampaigns.noCampaigns=אין כרגע קמפיינים בהשתתפותך
 campaignMgmt.details.help=עריכת פרטים כלליים של הקמפיין
 campaignMgmt.messages.help=עריכת המסרים בקמפיין, לפי מדיה (אימייל/טוויטר), עמדה, ומגדר הח״כ.
+campaignMgr.messages.contents.help=המסר שיוצע למשתתפים לשלוח לחבר/ת הכנסת. השתמשו ב-@twitter בשביל שם המשתמש של הח״כ בטוויטר, וב-@name בשביל שם הח״כ.
 campaigns.table.title=שם הקמפיין
 campaigns.table.isPublished=מפורסם?
 loadingLabels=טוען תוויות

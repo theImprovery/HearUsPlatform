@@ -5,21 +5,44 @@ var curMessageKey;
 var messages = {};
 var $contentPane;
 
-function setup(){
+function messagesPageSetup(){
     $characterCounter = $("#characterCounter");
     counterSpan = $characterCounter.find("span")[0];
     $contentPane = $("#content");
     messageSelectionChanged();
+    loadMessages();
 }
 
 function save( messageKey, content ) {
     messages[keyToString(messageKey)] =  {
-        platform:messageKey.media,
+        platform:messageKey.platform,
         gender:messageKey.gender,
         position:messageKey.position,
         camId:campaignId,
         text:content
     };
+    ["male", "female"].forEach( function(g){
+       ["Email", "Twitter"].forEach( function(platform){
+           positions.forEach(function(pos){
+               var key = {
+                 gender:g,
+                 platform:platform,
+                 position:pos
+               };
+               var hasData = (load(key).trim().length > 0);
+               var $cell = $("#"+g+"_"+platform+"_"+pos);
+               if ( hasData ) {
+                   $cell.removeClass("noMessage");
+                   $cell.addClass("hasMessage");
+               } else {
+                   $cell.removeClass("hasMessage");
+                   $cell.addClass("noMessage");
+               }
+           });
+       });
+    });
+
+
 }
 
 function load( messageKey ) {
@@ -47,7 +70,7 @@ function updateCharacterCount() {
 }
 
 function keyToString( aKey ) {
-    return aKey.media + "/" + aKey.gender + "/" + aKey.position;
+    return aKey.platform + "/" + aKey.gender + "/" + aKey.position;
 }
 
 function getMessageKey() {
@@ -56,7 +79,7 @@ function getMessageKey() {
             return this.id;
         }).get();
 
- retVal.media = (status.indexOf("mediaTwitter")>-1) ? "Twitter" : "Email";
+ retVal.platform = (status.indexOf("platformTwitter")>-1) ? "Twitter" : "Email";
  retVal.gender = (status.indexOf("male")>-1) ? "male" : "female";
  for ( var itm in status ) {
      if ( status[itm]!==retVal.gender && status[itm]!==retVal.media ) {
@@ -70,7 +93,7 @@ function getMessageKey() {
 function saveMessages() {
     Informationals.loader("Saving");
     messageSelectionChanged(); // save current message;
-    
+
     var arr = [];
     for ( var k in messages ) {
         arr.push( messages[k] );
@@ -78,24 +101,56 @@ function saveMessages() {
     new Playjax(beRoutes)
         .using(function (c) {
             return c.CampaignMgrCtrl.updateMessages(campaignId);
-        })
-        .fetch(arr)
+        }).fetch(arr)
         .then( function (res) {
             Informationals.loader.dismiss();
             if (res.ok) {
                 Informationals.makeSuccess("Messages updated " + data.name, "OK", 1500).show();
             } else {
                 Informationals.makeDanger("Update Campaign " + data.name, "Failed", 2500).show();
-                res.result().then(function(body){
+                res.json().then(function(body){
                     console.log(body);
                 });
             }
         });
 }
 
+function parseLoadedData( json ){
+    json.forEach( function(msg){
+        save( msg, msg.text );
+    });
+    $contentPane.val( load(getMessageKey()) );
+    updateCharacterCount();
+}
+
+function loadMessages(){
+    Informationals.loader("Loading messages");
+    new Playjax(beRoutes).using( function(c){
+        return c.CampaignMgrCtrl.getMessages(campaignId);
+
+    }).fetch().then( function( res){
+        if (res.ok) {
+            return res.json();
+        } else {
+            console.log( res );
+            throw new Error("Can't load messages: " + res.status);
+        }
+
+    }).then( function(json){
+        parseLoadedData(json);
+
+    }).catch( function(err){
+        console.log( err );
+        Informationals.makeDanger("Can't load messages:" + err, "", 2000).show();
+
+    }).finally( function(){
+        Informationals.loader.dismiss();
+    });
+}
+
 function messageSelectionChanged() {
     var key = getMessageKey();
-    twitterMode = (key.media==="twitter");
+    twitterMode = (key.platform==="Twitter");
     if ( twitterMode ) {
         $characterCounter.slideDown();
     } else {

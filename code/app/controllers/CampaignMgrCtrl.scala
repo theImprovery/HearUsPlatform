@@ -234,7 +234,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           Future(BadRequest(Json.obj("message"->"can't parse canned message", "details"->errors.mkString("\n"))))
         },
         msgs => {
-          Logger.info("Saving messages " + msgs.length)
           campaigns.setMessages(id, msgs).map(_ => Ok(Json.obj("message"->"Messages Saved")))
         }
       )
