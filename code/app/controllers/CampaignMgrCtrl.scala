@@ -222,22 +222,23 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     )
   }
 
-  def getMessages(id:Long) = deadbolt.SubjectPresent()() {implicit req =>
+  def getMessages(id:Long) = Action.async{implicit req =>
     campaigns.getMessages(id).map(ms => Ok(Json.toJson(ms)))
   }
 
-  def updateMessages() = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
-    req.body.validate[Seq[CannedMessage]].fold(
-      errors => {
-        Logger.info("errors " + errors.mkString("\n"))
-        Future(BadRequest("can't parse canned message"))
-      },
-      msgs => {
-        campaignEditorAction(msgs.head.camId){
-          campaigns.addMessages(msgs).map(ans => Ok(Json.toJson(ans)))
+  def updateMessages(id:Long) = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
+    campaignEditorAction(id){
+      req.body.validate[Seq[CannedMessage]].fold(
+        errors => {
+          Logger.info("errors " + errors.mkString("\n"))
+          Future(BadRequest(Json.obj("message"->"can't parse canned message", "details"->errors.mkString("\n"))))
+        },
+        msgs => {
+          Logger.info("Saving messages " + msgs.length)
+          campaigns.setMessages(id, msgs).map(_ => Ok(Json.obj("message"->"Messages Saved")))
         }
-      }
-    )
+      )
+    }
   }
 
   def getSocialMedia(id:Long) = deadbolt.SubjectPresent()() {implicit req =>

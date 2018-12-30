@@ -13,12 +13,18 @@ function setup(){
 }
 
 function save( messageKey, content ) {
-    messages[keyToString(messageKey)] = content;
+    messages[keyToString(messageKey)] =  {
+        platform:messageKey.media,
+        gender:messageKey.gender,
+        position:messageKey.position,
+        camId:campaignId,
+        text:content
+    };
 }
 
 function load( messageKey ) {
     var message = messages[keyToString(messageKey)];
-    return message ? message : "";
+    return message ? message.text : "";
 }
 
 var lastClass="bg-success";
@@ -50,15 +56,41 @@ function getMessageKey() {
             return this.id;
         }).get();
 
- retVal.media = (status.indexOf("mediaTwitter")>-1) ? "twitter" : "email";
+ retVal.media = (status.indexOf("mediaTwitter")>-1) ? "Twitter" : "Email";
  retVal.gender = (status.indexOf("male")>-1) ? "male" : "female";
  for ( var itm in status ) {
      if ( status[itm]!==retVal.gender && status[itm]!==retVal.media ) {
-         retVal.position = status[itm].toLowerCase();
+         retVal.position = status[itm];
      }
  }
 
  return retVal;
+}
+
+function saveMessages() {
+    Informationals.loader("Saving");
+    messageSelectionChanged(); // save current message;
+    
+    var arr = [];
+    for ( var k in messages ) {
+        arr.push( messages[k] );
+    }
+    new Playjax(beRoutes)
+        .using(function (c) {
+            return c.CampaignMgrCtrl.updateMessages(campaignId);
+        })
+        .fetch(arr)
+        .then( function (res) {
+            Informationals.loader.dismiss();
+            if (res.ok) {
+                Informationals.makeSuccess("Messages updated " + data.name, "OK", 1500).show();
+            } else {
+                Informationals.makeDanger("Update Campaign " + data.name, "Failed", 2500).show();
+                res.result().then(function(body){
+                    console.log(body);
+                });
+            }
+        });
 }
 
 function messageSelectionChanged() {

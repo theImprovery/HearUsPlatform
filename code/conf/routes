@@ -58,12 +58,15 @@ POST    /bkofc/campaigns/                 controllers.CampaignAdminCtrl.saveCamp
 GET     /bkofc/campaigns                  controllers.CampaignAdminCtrl.showCampaigns
 PATCH   /bkofc/campaigns/sm/              controllers.CampaignMgrCtrl.updateSocialMedia
 PATCH   /bkofc/campaigns/position         controllers.CampaignMgrCtrl.updatePosition
+
+GET     /bkofc/campaigns/:id/messages/     controllers.CampaignMgrCtrl.editMessages(id:Long)
+PUT     /bkofc/api/campaigns/:id/messages  controllers.CampaignMgrCtrl.updateMessages(id:Long)
+GET     /api/campaigns/:id/messages        controllers.CampaignMgrCtrl.getMessages(id:Long)
+
 PATCH   /bkofc/campaigns/:id/details/     controllers.CampaignMgrCtrl.updateDetails(id:Long)
 PATCH   /bkofc/campaigns/labels/          controllers.CampaignMgrCtrl.updateLabels
-PATCH   /bkofc/campaigns/msgs/            controllers.CampaignMgrCtrl.updateMessages
 PATCH   /bkofc/campaigns/updatePublish    controllers.CampaignAdminCtrl.updatePublish
 GET     /bkofc/campaigns/:id/details/      controllers.CampaignMgrCtrl.details(id:Long)
-GET     /bkofc/campaigns/:id/messages/     controllers.CampaignMgrCtrl.editMessages(id:Long)
 GET     /bkofc/campaigns/:id/settings/     controllers.CampaignMgrCtrl.settings(id:Long)
 GET     /bkofc/campaigns/:id/positions/    controllers.CampaignMgrCtrl.positions(id:Long)
 GET     /bkofc/campaigns/actions/         controllers.CampaignMgrCtrl.allActions(camId:Long, kmId:Long)
@@ -72,7 +75,6 @@ POST    /bkofc/campaigns/action/          controllers.CampaignMgrCtrl.saveAction
 DELETE  /bkofc/campaigns/action/          controllers.CampaignMgrCtrl.deleteAction(id:Long, camId:Long, kmId:Long)
 GET     /bkofc/campaigns/action/:id       controllers.CampaignMgrCtrl.editAction(id:Long, camId:Long, kmId:Long)
 GET     /bkofc/campaigns/lbls/:id         controllers.CampaignMgrCtrl.getLabelText(id:Long)
-GET     /bkofc/campaigns/msgs/:id         controllers.CampaignMgrCtrl.getMessages(id:Long)
 GET     /bkofc/campaigns/sm/:id           controllers.CampaignMgrCtrl.getSocialMedia(id:Long)
 DELETE  /bkofc/campaigns/:id              controllers.CampaignMgrCtrl.deleteCampaign(id:Long)
 POST    /bkofc/campaigns/actions          controllers.CampaignAdminCtrl.updateAction

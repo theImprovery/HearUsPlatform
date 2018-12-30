@@ -73,9 +73,13 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     }.map( insertRes => insertRes.getOrElse(msg) )
   }
 
-  def addMessages(msgs: Seq[CannedMessage] ):Future[Seq[CannedMessage]] = {
-    db.run( messages.delete )
-    Future.sequence(msgs.map(msg => addMessage(msg)))
+  def setMessages(campaignId:Long, msgs: Seq[CannedMessage] ):Future[Unit] = {
+    db.run(
+      DBIO.seq(
+        messages.filter( _.camId === campaignId ).delete,
+        messages ++= msgs.map( m=>m.copy(camId=campaignId) )
+      ).transactionally
+    )
   }
 
   def getSm( id:Long ):Future[Seq[SocialMedia]] = {

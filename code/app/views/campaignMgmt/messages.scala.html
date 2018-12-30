@@ -5,6 +5,7 @@
   <script src="@routes.Assets.versioned("js/campaignEditor/messagesPage.js")"></script>
   <script >
     setup();
+    campaignId = @campaign.id;
   </script>
 }
 
@@ -16,7 +17,7 @@
       </div>
     </div>
     <div class="col-2 text-left">
-      <button onclick="patchDetails()" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("updateDetails")</button>
+      <button onclick="saveMessages()" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("updateDetails")</button>
     </div>
   </div>
 
@@ -45,7 +46,7 @@
         <div class="col-sm-10">
           @for(pos <- positions) {
             <input class="hidden" type="radio" name="positions"
-              value="@pos" id="@pos.toString" onchange="messageSelectionChanged()" @if(pos.id==0){checked}>
+              value="@pos.toString" id="@pos.toString" onchange="messageSelectionChanged()" @if(pos.id==0){checked}>
             <label for="@pos.toString" class="buttonLike pos-@pos.toString.toLowerCase()">@Messages(pos.toString)</label>
           }
         </div>
