@@ -7,17 +7,23 @@
 }
 
 @templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.KnessetMembers, extraBottom = scripts) {
-  @comps.pageTitleRow(campaign.title) { }
+  <div class="row my-2">
+    <div class="col">
+      <div class="text-muted">
+      @Messages("campaignMgmt.positions.help")
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col">
         <div>
           <input type="hidden" name="id" id="id" value="@campaign.id">
           <label for="searchStr">@Messages("search")</label>
-          <input type="text" placeholder="search" id="searchStr" onkeyup="filterKmsList(this.value)">
+          <input type="text" placeholder="@Messages("KMsearch.placeholder")" id="searchStr" onkeyup="filterKmsList(this.value)">
           <ul id="kmsPositionList" style="list-style-type:none">
           @for(km <- kms) {
             <li data-km-name="@km.name.replaceAll("\"", "\\\\\"")" data-party-name="@parties(km.partyId).replaceAll("\"", "\\\\\"")">
-              <label for="name" class="col-sm-2">@km.name</label>
+              <label for="name" class="col-sm-4">@km.name <span class="text-info">@parties(km.partyId)</span></label>
               @for(pos <- positions) {
                 <input class="hidden" type="radio" name="@km.id-position"
                 value="@pos" id="@km.id-@pos.toString" onchange="changePosition(this)"

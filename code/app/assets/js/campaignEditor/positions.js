@@ -16,3 +16,12 @@ function changePosition(emt) {
             }
         });
 }
+
+var allKms = $("#kmsPositionList");
+function filterKmsList(searchStr) {
+    allKms.find("li").each(function(idx, emt    ) {
+        if((emt.dataset.kmName.indexOf(searchStr) !== -1) || (emt.dataset.partyName.indexOf(searchStr) !== -1)) {
+            emt.style.display = "block";
+        } else emt.style.display = "none";
+    });
+}

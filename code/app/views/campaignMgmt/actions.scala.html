@@ -1,15 +1,24 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import models.Position.Position
-@(campaign:Campaign, km:KnessetMember, actions: Seq[KmAction])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(campaign:Campaign, km:KnessetMember, party:Option[Party], actions: Seq[KmAction])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @scripts = {
-  <script src="@routes.Assets.versioned("js/campaignEditor/positions.js")"></script>
+
 }
 
 @templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.KnessetMembers, scripts) {
-  @comps.pageTitleRow(campaign.title) {
-    <a href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
-  }
+  <div class="row my-2">
+    <div class="col">
+      <h3>@km.name @for(p<-party){<span class="text-info">@p.name</span>}</h3>
+      <div class="text-muted">
+      @Messages("campaignMgmt.actions.help")
+      </div>
+    </div>
+    <div class="col text-left">
+      <a href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-12">
     @if(actions.isEmpty) {
@@ -19,10 +28,11 @@
       </div>
     } else {
       <div class="table-responsive">
-        <table class="table">
+        <table class="table table-sm table-striped">
           <thead>
             <tr>
               <th>@Messages("title")</th>
+              <th>@Messages("actionType")</th>
               <th>@Messages("date")</th>
             </tr>
           </thead>
@@ -32,8 +42,9 @@
               <td>
                 <a href="@routes.CampaignMgrCtrl.editAction(a.id, campaign.id, km.id)">@a.title</a>
               </td>
+              <td>@Messages("actionType." + a.actionType.toString)</td>
               <td>
-              @a.date
+              @Helpers.formatDate(a.date)
               </td>
             </tr>
           }

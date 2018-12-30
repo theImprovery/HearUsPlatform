@@ -94,7 +94,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   }
   
   def editMessages(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
-    Logger.info("in messages")
     campaignEditorAction(id) {
       for {
         campaignOpt <- campaigns.getCampaign(id)
@@ -131,9 +130,10 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(camId) {
       for {
         campaignOpt <- campaigns.getCampaign(camId)
-        knessetMember: Option[KnessetMember] <- campaignOpt.map(_ => kms.getKM(kmId)).getOrElse(Future(None))
+        knessetMember <- campaignOpt.map(_ => kms.getKM(kmId)).getOrElse(Future(None))
         actions <- campaigns.getActions(camId, kmId)
-      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.actions(campaignOpt.get, km, actions))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+        party <- knessetMember.map( km=> kms.getParty(km.partyId) ).getOrElse(Future(None))
+      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.actions(campaignOpt.get, km, party, actions))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
     }
   }
 
@@ -184,8 +184,9 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         deleted       <- campaigns.deleteAction(id)
         campaignOpt   <- campaigns.getCampaign(camId)
         knessetMember <- kms.getKM(kmId)
+        party <- knessetMember.map( km=> kms.getParty(km.partyId) ).getOrElse(Future(None))
         actions <- campaigns.getActions(camId, kmId)
-      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.actions(campaignOpt.get, km, actions))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.actions(campaignOpt.get, km, party, actions))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
     }
 
   }

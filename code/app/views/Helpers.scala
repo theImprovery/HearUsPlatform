@@ -32,6 +32,7 @@ object Helpers {
   def formatDateTime( ldt: Timestamp ):String = formatDateTime( LocalDateTime.ofInstant(Instant.ofEpochMilli(ldt.getTime), TimeZone.getDefault().toZoneId()))
   def formatDate( ldt: LocalDateTime ):String = ldt.format( dateFormatter )
   def formatDate( ldt: LocalDate ):String = ldt.format( dateFormatter )
+  def formatDate( sts: java.sql.Timestamp ):String = formatDate( LocalDateTime.ofInstant(Instant.ofEpochMilli(sts.getTime), TimeZone.getDefault().toZoneId()) )
   
   
   def encodeUriComponent( s:String ) = UriEncoding.encodePathSegment(s, java.nio.charset.StandardCharsets.UTF_8)

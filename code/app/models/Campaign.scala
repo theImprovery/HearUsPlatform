@@ -59,5 +59,6 @@ object Position extends Enumeration {
 
 object ActionType extends Enumeration {
   type ActionType = Value
-  val Interview = Value
+  val Interview, Vote, OfficialPosition, Post, EMail = Value
+  
 }
