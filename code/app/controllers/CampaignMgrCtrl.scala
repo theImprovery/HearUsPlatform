@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
 import dataaccess._
 import javax.inject.Inject
-
 import models._
 import play.api.{Configuration, Logger}
 import play.api.i18n._
@@ -21,6 +20,7 @@ import play.api.data.{Form, _}
 import play.api.data.Forms._
 import play.api.data.format.Formatter
 
+import scala.collection.mutable
 import scala.concurrent.Future
 
 class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
@@ -58,7 +58,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(camId){
       for {
         campaign <- campaigns.getCampaign(camId)
-        imageOp <- images.getImageForCamps(camId)
+        imageOp <- images.getImageForCampaign(camId)
         knessetMembers <- kms.getAllKms
         positions <- campaigns.getPositions(camId)
         actions <- campaigns.getActions(camId)
@@ -108,7 +108,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id){
       for {
         campaignOpt <- campaigns.getCampaign(id)
-        imageOp <- images.getImageForCamps(id)
+        imageOp <- images.getImageForCampaign(id)
       } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.settings(c, Platform.values.toSeq, Position.values.toSeq, imageOp, conf.get[String]("hearUs.files.camImages.url")))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
     }
   }
@@ -274,9 +274,17 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id) {
       for {
         campaign <- campaigns.getCampaign(id)
+        campImg  <- images.getImageForCampaign(id)
       } yield campaign match {
-        case None=>NotFound("Can't find campaign")
-        case Some(c) => Ok( views.html.campaignMgmt.design(c, Position.values.toSeq, None, "") )
+        case None => NotFound("Can't find campaign")
+        case Some(c) => {
+          val csses = c.themeData.split("/*---*/")
+          val cssMap = parseCampaignDesign(csses(0))
+          Ok( views.html.campaignMgmt.design(c, Position.values.toSeq,
+              campImg, conf.get[String]("hearUs.files.campaignImages.url"),
+              cssMap, if (csses.length>1){csses(1)}else{""})
+          )
+        }
       }
     }
   }
@@ -289,9 +297,20 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   def doUpdateCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.multipartFormData) { implicit req =>
     campaignEditorAction(id) {
       val bf = designForm.bindFromRequest()
-      Logger.info(bf.toString)
-      Logger.info(req.body.file("imageFile").toString)
-      Future(Ok("done"))
+      
+      val fileOpt = req.body.file("imageFile")
+      for {
+        designUpdated <- campaigns.updateDesign(id, bf.get._1)
+        _ = fileOpt.foreach(tf => images.storeCampaignImageFile(id, tf) )
+        campaignImage <- images.getImageForCampaign(id)
+        updatedImage   = campaignImage.map( ci => ci.copy(credit=bf.get._2) )
+                                      .orElse( fileOpt.map(file=>KMImage(0, None, Some(id), file.filename.split("\\.").last,
+                                                                           file.contentType.getOrElse("application/octet-stream"),
+                                                                           new Timestamp(System.currentTimeMillis()), bf.get._2)))
+        savedImage    <- updatedImage.map(images.storeImage).getOrElse(Future(None))
+      } yield {
+        Ok("done. Design Updated:" + designUpdated + " savedImage:"+savedImage)
+      }
     }
   }
   
@@ -304,5 +323,20 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         Future(Unauthorized("A user (" + userId +") cannot edit campaign (" + camId + ") without permission."))
       }
     })
+  }
+  
+  private def parseCampaignDesign(css:String):Map[(String,String),String] = {
+    val lines = css.split("\n").map(_.trim).filter(_.nonEmpty)
+    val retVal = mutable.Map[(String,String),String]()
+    var curSelector = ""
+    lines.foreach(line => {
+      if ( line.endsWith("{") ) {
+        curSelector = line.split(" ")(0)
+      } else if ( line.contains(":")) {
+        val kv = line.replaceAll(";", "").split(":").map(_.trim)
+        retVal((curSelector,kv(0))) = kv(1)
+      }
+    })
+    retVal.toMap
   }
 }

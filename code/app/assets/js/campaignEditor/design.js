@@ -13,9 +13,6 @@ function collectCss() {
        cssObj[t[0]][t[1]]=t[2];
     });
 
-    cssObj["h1,h2,h3,h4,h5,h6"] = cssObj.h;
-    delete cssObj.h;
-
     var codeLines = [];
     for ( var k in cssObj ) {
         codeLines.push( k + " { ");
@@ -23,7 +20,7 @@ function collectCss() {
         codeLines.push( "}" );
     }
 
-    codeLines.push("/*******/");
+    codeLines.push("/*---*/");
     codeLines.push( $("#extraCss").val() );
 
     return codeLines.join("\n");
@@ -64,4 +61,12 @@ function postForm() {
 
     xhr.send( formData );
 
+}
+
+function setColor( selector, key, value ) {
+    $("input[type='color']"
+     ).filter(function(i,c){
+         var data = $(c).data();
+         return data.selector === selector && data.key===key;
+    }).val(value);
 }

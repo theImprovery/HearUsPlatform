@@ -1,10 +1,16 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaign:Campaign,positions:Seq[Position.Value], imageOpt:Option[KMImage], prefix:String)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(campaign:Campaign,positions:Seq[Position.Value], imageOpt:Option[KMImage], prefix:String,
+        cssMap:Map[(String,String),String], extraCss:String )(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/campaignEditor/design.js")"></script>
   <script >
     var campaignId = @campaign.id;
+    $(document).ready(function(){
+      @for(kv<-cssMap){
+        setColor( "@kv._1._1", "@kv._1._2", "@kv._2" );
+      }
+    });
   </script>
 }
 
@@ -38,7 +44,7 @@
     <div class="form-group row">
       <label for="hTextColor" class="col-sm-2">@Messages("campaignMgmt.design.hTextColor")</label>
       <div class="col-sm-10">
-        <input type="color" data-selector="h" data-key="color" class="form-control" name="hTextColor" id="hTextColor" value="">
+        <input type="color" data-selector="h1,h2,h3,h4,h5,h6" data-key="color" class="form-control" name="hTextColor" id="hTextColor" value="">
       </div>
     </div>
 
@@ -119,7 +125,7 @@
       <label for="extraCss" class="col-sm-2">@Messages("campaignMgmt.design.extraCss")</label>
       <div class="col-sm-10">
         <small class="form-text text-muted">@Messages("campaignMgmt.design.extraCss.help")</small>
-        <textarea rows="10" class="form-control text-ltr text-left text-code" name="extraCss" id="extraCss"></textarea>
+        <textarea rows="10" class="form-control text-ltr text-left text-code" name="extraCss" id="extraCss">@extraCss</textarea>
       </div>
     </div>
 

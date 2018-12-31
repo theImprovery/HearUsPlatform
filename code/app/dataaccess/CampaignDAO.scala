@@ -40,6 +40,12 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     )
   }
   
+  def updateDesign( id:Long, design:String ):Future[Boolean] = {
+    db.run {
+      campaigns.filter( _.id === id ).map( _.themeData ).update(design)
+    }.map( res => res > 0 )
+  }
+  
   def getCampaign( id:Long ):Future[Option[Campaign]] = {
     db.run{
       campaigns.filter( _.id === id ).result
