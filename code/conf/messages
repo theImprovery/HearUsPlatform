@@ -247,6 +247,7 @@ campaignMgmt.design.color=צבע טקסט
 campaignMgmt.design.background-color=צבע רקע
 campaignMgmt.design.imageCredit=קרדיט
 campaignMgmt.design.imageFile=קובץ
+campaignMgmt.design.deleteImage=מחיקת תמונה
 campaignMgmt.design.extraCss=קוד CSS נוסף
 campaignMgmt.design.extraCss.help=קוד בשפת CSS שיתווסף לאתר הקמפיין. מאפשר לשנות כמעט כל היבט עיצובי באתר, אבל גם יכול להרוס. מומלץ קודם ללמוד את השפה, ורק אחרי זה להשתמש.
 campaignMgr.messages.contents.help=המסר שיוצע למשתתפים לשלוח לחבר/ת הכנסת. השתמשו ב-@twitter בשביל שם המשתמש של הח״כ בטוויטר, וב-@name בשביל שם הח״כ.

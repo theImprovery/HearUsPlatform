@@ -3,7 +3,7 @@ package dataaccess
 
 import javax.inject.Inject
 import models.KMImage
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.Files.TemporaryFile
 import slick.jdbc.JdbcProfile
@@ -13,7 +13,7 @@ import java.nio.file.{CopyOption, Files, Paths, StandardCopyOption}
 import play.api.mvc.MultipartFormData
 
 import scala.collection.JavaConversions._
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
@@ -46,26 +46,41 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
     } map { _.headOption}
   }
 
-  def deleteImage( kmId:Long):Future[Int] = {
+  def deleteImageRecord(id:Long):Future[Int] = {
     db.run {
-      images.filter(_.kmId === kmId).delete
+      images.filter(_.id === id).delete
     }
   }
   
   def storeCampaignImageFile( campaignId:Long, filePart:MultipartFormData.FilePart[TemporaryFile] ):Unit = {
+    import scala.concurrent.duration._
+    Logger.info("Storing image for campaign %d: %s (%s)".format(campaignId, filePart.filename, filePart.contentType.toString))
     val folderPath = Paths.get(conf.get[String]("hearUs.files.campaignImages.folder"))
     if (!Files.exists(folderPath)) {
       Files.createDirectories(folderPath)
       Files.setPosixFilePermissions(folderPath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
     }
-    val i = filePart.filename.lastIndexOf('.')
-    val suffix = if (i >= 0) filePart.filename.substring(i + 1) else ""
+    
+    val previousImage = Await.result(getImageForCampaign(campaignId), 30 seconds )
+    previousImage.foreach( deleteCampaignImageFile )
+    
+    val suffix = filePart.filename.split("\\.").last
     val filePathTemp = folderPath.resolve(campaignId.toString + ".-temp-." + suffix)
     val filePath = folderPath.resolve(campaignId.toString + "." + suffix)
     filePart.ref.moveTo(filePathTemp.toFile, replace = true)
     Files.copy(filePathTemp, filePath, StandardCopyOption.REPLACE_EXISTING)
     Files.delete(filePathTemp)
     Files.setPosixFilePermissions(filePath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
-  
   }
+  
+  def deleteCampaignImageFile( image:KMImage ): Unit = {
+    val folderPath = Paths.get(conf.get[String]("hearUs.files.campaignImages.folder"))
+    if (Files.exists(folderPath)) {
+      val path = folderPath.resolve(image.filename)
+      if ( Files.exists(path) ) {
+        Files.delete(path)
+      }
+    }
+  }
+  
 }

@@ -110,6 +110,7 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.CampaignMgrCtrl.deleteAction,
           routes.javascript.CampaignMgrCtrl.allActions,
           routes.javascript.CampaignMgrCtrl.doUpdateCampaignDesign,
+          routes.javascript.CampaignMgrCtrl.deleteCampaignImage,
           routes.javascript.CampaignPublicCtrl.index
       )).as("text/javascript")
     }

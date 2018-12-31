@@ -303,13 +303,25 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         designUpdated <- campaigns.updateDesign(id, bf.get._1)
         _ = fileOpt.foreach(tf => images.storeCampaignImageFile(id, tf) )
         campaignImage <- images.getImageForCampaign(id)
-        updatedImage   = campaignImage.map( ci => ci.copy(credit=bf.get._2) )
-                                      .orElse( fileOpt.map(file=>KMImage(0, None, Some(id), file.filename.split("\\.").last,
-                                                                           file.contentType.getOrElse("application/octet-stream"),
-                                                                           new Timestamp(System.currentTimeMillis()), bf.get._2)))
-        savedImage    <- updatedImage.map(images.storeImage).getOrElse(Future(None))
+        newImageOpt   = fileOpt.map(file=>KMImage(campaignImage.map(_.id).getOrElse(0), None, Some(id), file.filename.split("\\.").last,
+                                                   file.contentType.getOrElse("application/octet-stream"),
+                                                   new Timestamp(System.currentTimeMillis()), bf.get._2))
+        updatedImageOpt = campaignImage.map( ci => ci.copy(credit=bf.get._2) )
+        updateImageRes <- Seq(newImageOpt, updatedImageOpt).flatten.headOption.map( images.storeImage ).getOrElse(Future(None))
       } yield {
-        Ok("done. Design Updated:" + designUpdated + " savedImage:"+savedImage)
+        Ok("done. Design Updated:" + designUpdated + " savedImage:" + updateImageRes)
+      }
+    }
+  }
+  
+  def deleteCampaignImage(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(id) {
+      for {
+        image <- images.getImageForCampaign(id)
+        deletedCount <- image.map( img => images.deleteImageRecord(img.id) ).getOrElse(Future(0))
+      } yield {
+        image.filter( _ => deletedCount>0 ).foreach( img => images.deleteCampaignImageFile(img) )
+        Ok("Deleted")
       }
     }
   }

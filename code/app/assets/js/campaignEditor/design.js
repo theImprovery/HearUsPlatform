@@ -50,12 +50,18 @@ function postForm() {
     xhr.setRequestHeader("Csrf-Token", document.getElementById("Playjax_csrfTokenValue").innerText);
 
     xhr.onload = function(oEvent) {
-        Informationals.loader.dismiss();
         if (xhr.status !== 200) {
+            Informationals.loader.dismiss();
             Informationals.makeDanger("Error " + xhr.status + " occurred when trying to upload your file.", "", 2000).show();
             console.log("Error uploading design data");
             console.log(oEvent);
             console.log(xhr.status);
+        } else {
+            if ( $("#imageFile")[0].files[0] ) {
+                window.setTimeout(function(){window.location.reload();}, 3000);
+            } else {
+                Informationals.loader.dismiss();
+            }
         }
     };
 
@@ -69,4 +75,37 @@ function setColor( selector, key, value ) {
          var data = $(c).data();
          return data.selector === selector && data.key===key;
     }).val(value);
+}
+
+function deleteImage() {
+    swal({
+        title: "Are you sure?",
+        text: "This operation cannot be undone",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true
+    }).then(function(willDelete){
+        if (willDelete) {
+            new Playjax(beRoutes)
+                .using(function(c){return c.CampaignMgrCtrl.deleteCampaignImage(campaignId);})
+                .fetch()
+                .then( function(res){
+                   if ( res.ok ) {
+                       Informationals.makeSuccess("Image Deleted", "", 2000).show();
+                       setHasImage( false );
+                   }
+                });
+    }});
+}
+
+function setHasImage( hasImage ) {
+    if ( hasImage ) {
+        $("#noImage").hide();
+        $("#imageDiv").show();
+        $("#deleteImageBtn").show();
+    } else {
+        $("#noImage").show();
+        $("#imageDiv").hide();
+        $("#deleteImageBtn").hide();
+    }
 }

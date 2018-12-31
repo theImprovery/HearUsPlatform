@@ -10,6 +10,8 @@
       @for(kv<-cssMap){
         setColor( "@kv._1._1", "@kv._1._2", "@kv._2" );
       }
+      setHasImage( @imageOpt.nonEmpty.toString );
+
     });
   </script>
 }
@@ -105,19 +107,27 @@
               <input type="file" name="imageFile" id="imageFile" class="form-control">
             </div>
           </div>
+        <div class="row">
+          <div class="col">
+            <button id="deleteImageBtn" onclick="deleteImage()" type="button" class="btn btn-danger">@Messages("campaignMgmt.design.deleteImage")</button>
+          </div>
+        </div>
       </div>
       <div class="col-md-5">
-      @if( imageOpt.isEmpty ){
-        <div class="noData">
+
+        <div id="noImage" class="noData">
           <i class="fa fa-5x fa-file-image-o"></i><br>
           @Messages("noImage")
         </div>
-      }else{
-        <div class="text-center">
-          <img style="max-height: 300px; max-width:300px" src="@prefix@imageOpt.get.filename" alt=""><br>
-          @Messages("imageCredit"): @imageOpt.get.credit
+
+        <div id="imageDiv" class="text-center">
+          @if( imageOpt.isEmpty ){
+            <img style="max-height: 300px; max-width:300px" src="" alt="">
+          } else {
+            <img style="max-height: 300px; max-width:300px" src="@prefix@imageOpt.get.filename" alt="">
+          }
         </div>
-      }
+
       </div>
     </div>
 
