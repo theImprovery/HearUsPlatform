@@ -259,7 +259,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     )
   }
 
-  def deleteCampaign(id:Long) = deadbolt.SubjectPresent()() { implicit req =>
+  def deleteCampaign(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     campaignEditorAction(id){
       for {
         deleted <- campaigns.deleteCampaign(id)
@@ -270,7 +270,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     }
   }
   
-  def showCampaignDesign( id:Long ) = deadbolt.SubjectPresent()() { implicit req =>
+  def showCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
     campaignEditorAction(id) {
       for {
         campaign <- campaigns.getCampaign(id)
@@ -278,6 +278,20 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         case None=>NotFound("Can't find campaign")
         case Some(c) => Ok( views.html.campaignMgmt.design(c, Position.values.toSeq, None, "") )
       }
+    }
+  }
+  
+  val designForm = Form( tuple(
+    "css"->text,
+    "imageCredit"->text
+  ))
+  
+  def doUpdateCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.multipartFormData) { implicit req =>
+    campaignEditorAction(id) {
+      val bf = designForm.bindFromRequest()
+      Logger.info(bf.toString)
+      Logger.info(req.body.file("imageFile").toString)
+      Future(Ok("done"))
     }
   }
   

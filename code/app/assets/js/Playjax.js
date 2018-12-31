@@ -55,7 +55,7 @@ var Playjax = function(router){
                     properties.headers.append("Content-Type", "application/json");
                     break;
                 case "function":
-                    throw "Cannot send function object over HTTP yet";
+                    throw new Error("Cannot send function object over HTTP yet");
 
             }
         }
