@@ -22,7 +22,7 @@
           <input type="text" placeholder="@Messages("KMsearch.placeholder")" id="searchStr" onkeyup="filterKmsList(this.value)">
           <ul id="kmsPositionList" style="list-style-type:none">
           @for(km <- kms) {
-            <li data-km-name="@km.name.replaceAll("\"", "\\\\\"")" data-party-name="@parties(km.partyId).replaceAll("\"", "\\\\\"")">
+            <li data-km-name="@km.name.replaceAll("'", "%").replaceAll("\"", "@")" data-party-name="@parties(km.partyId).replaceAll("'", "%").replaceAll("\"", "@")">
               <label for="name" class="col-sm-4">@km.name <span class="text-info">@parties(km.partyId)</span></label>
               @for(pos <- positions) {
                 <input class="hidden" type="radio" name="@km.id-position"

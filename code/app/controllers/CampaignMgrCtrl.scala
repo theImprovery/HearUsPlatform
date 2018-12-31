@@ -270,6 +270,16 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     }
   }
   
+  def showCampaignDesign( id:Long ) = deadbolt.SubjectPresent()() { implicit req =>
+    campaignEditorAction(id) {
+      for {
+        campaign <- campaigns.getCampaign(id)
+      } yield campaign match {
+        case None=>NotFound("Can't find campaign")
+        case Some(c) => Ok( views.html.campaignMgmt.design(c, Position.values.toSeq, None, "") )
+      }
+    }
+  }
   
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {
     val userId = req.subject.get.asInstanceOf[HearUsSubject].user.id
