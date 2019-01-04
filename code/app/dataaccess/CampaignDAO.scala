@@ -2,8 +2,6 @@ package dataaccess
 
 import javax.inject.Inject
 
-import com.fasterxml.jackson.databind.ser.std.StdArraySerializers.BooleanArraySerializer
-import com.sun.org.apache.xpath.internal.functions.FuncTrue
 import models._
 import play.api.Configuration
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -23,6 +21,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   private val positions = TableQuery[KmPositionTable]
   private val actions = TableQuery[KmActionTable]
   private val usersCampaigns = TableQuery[UserCampaignTable]
+  private val users = TableQuery[UserTable]
   private val texts = TableQuery[CampaignTextTable]
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
@@ -154,12 +153,6 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     db.run(
       usersCampaigns.filter(row => (row.userId === userId) && (row.campaignId === campaignId) ).result
     ) map ( _.nonEmpty)
-  }
-
-  def addUserCampaignRel( rel:UserCampaign ):Future[UserCampaign] = {
-    db.run{
-      (usersCampaigns returning usersCampaigns).insertOrUpdate(rel)
-    }.map( insertRes => insertRes.getOrElse(rel) )
   }
 
   def campaignSlugExists( name:String ):Future[Boolean] = {

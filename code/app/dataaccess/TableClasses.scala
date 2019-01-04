@@ -26,8 +26,6 @@ object Mappers {
   )
 }
 
-case class UserCampaign(userId:Long, campaignId:Long)
-
 class UserTable(tag:Tag) extends Table[User](tag,"users") {
   import Mappers.roleSeqMappers
   def id                = column[Long]("id",O.PrimaryKey, O.AutoInc)
@@ -43,8 +41,9 @@ class UserTable(tag:Tag) extends Table[User](tag,"users") {
 class UserCampaignTable(tag:Tag) extends Table[UserCampaign](tag,"user_campaign") {
   def userId     = column[Long]("user_id", O.PrimaryKey                                       )
   def campaignId = column[Long]("campaign_id", O.PrimaryKey)
+  def admin      = column[Boolean]("admin")
   
-  def * = (userId, campaignId) <> (UserCampaign.tupled, UserCampaign.unapply)
+  def * = (userId, campaignId, admin) <> (UserCampaign.tupled, UserCampaign.unapply)
   
   def userFK = foreignKey("user_campaign_user_id_fkey", userId, TableClasses.knessetMembers)(_.id)
   def campaignFK = foreignKey("user_campaign_campaign_id_fkey", userId, TableClasses.campaigns)(_.id)

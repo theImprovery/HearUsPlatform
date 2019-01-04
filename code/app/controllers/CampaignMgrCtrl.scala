@@ -292,6 +292,22 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     )
   }
 
+  def showCampaignTeam( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
+    campaignEditorAction(id) {
+      for {
+        campaign <- campaigns.getCampaign(id)
+        team     <- usersCampaigns.getTeam(id)
+      } yield campaign match {
+        case None => NotFound("Can't find campaign")
+        case Some(c) => {
+          val curUser = req.subject.get.asInstanceOf[HearUsSubject].user
+          Ok( views.html.campaignMgmt.campaignTeam(c, team, curUser )
+          )
+        }
+      }
+    }
+  }
+  
   def showCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
     campaignEditorAction(id) {
       for {

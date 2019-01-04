@@ -55,6 +55,8 @@ input[type=radio] + label.buttonLike{
   font-style: italic;
 }
 
+@navColor: #697787;
+
 .styledNav {
   border: 1px solid transparent;
   border-top-color: rgba(0,0,0,.3);
@@ -68,18 +70,18 @@ input[type=radio] + label.buttonLike{
       margin: 0 0.5em;
       border-radius: .25em;
       border: 1px solid rgba(0,0,0,.3);
-
+      color: @navColor;
       &:hover {
-        background-color: lightgray;
+        background-color: #FFE;
       }
     }
     &.active {
       a {
-        background-color: #007bff;
-        border-color: #05A;
+        background-color: @navColor;
+        border-color: darken(@navColor, 10);
         color: #FFF;
         &:hover{
-          background-color: #004f9d;
+          background-color: lighten(@navColor, 10);
         }
       }
     }

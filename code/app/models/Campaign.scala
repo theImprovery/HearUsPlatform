@@ -9,6 +9,18 @@ object Gender extends Enumeration {
   val Male = Value("male")
 }
 
+
+object Position extends Enumeration {
+  type Position = Value
+  val Against, Undecided, Neutral, For = Value
+}
+
+object ActionType extends Enumeration {
+  type ActionType = Value
+  val Interview, Vote, OfficialPosition, Post, EMail = Value
+  
+}
+
 case class Campaign( id:Long,
                      title:  String,
                      slogan: String,
@@ -82,14 +94,13 @@ case class KmAction(id: Long,
                     link: String )
 
 
+case class UserCampaign( userId:Long,
+                         campaignId:Long,
+                         isAdmin:Boolean )
 
-object Position extends Enumeration {
-  type Position = Value
-  val Against, Undecided, Neutral, For = Value
-}
 
-object ActionType extends Enumeration {
-  type ActionType = Value
-  val Interview, Vote, OfficialPosition, Post, EMail = Value
+class CampaignTeam(val users:Set[User], campaignRelation:Iterable[UserCampaign] ) {
+  private val adminIds = campaignRelation.filter(_.isAdmin).map(_.userId).toSet
   
+  def isAdmin( aUser:User ) = adminIds(aUser.id)
 }

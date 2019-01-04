@@ -26,11 +26,11 @@ navbar.campaigner.campaignSettings.users=משתמשים
 navbar.campaigner.campaignSettings.goLive=פרסום
 
 navbar.campagins.mgmt.details=פרטים
-navbar.campagins.mgmt.settings=XXX
 navbar.campagins.mgmt.messages=מסרים
 navbar.campagins.mgmt.design=עיצוב
 navbar.campagins.mgmt.frontPage=עמוד ראשי
 navbar.campagins.mgmt.positions=עמדות הח״כים
+navbar.campagins.mgmt.CampaignTeam=צוות הקמפיין
 
 forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
 forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
@@ -72,6 +72,7 @@ error.password=Passwords must match, and cannot be empty
 error.password.incorrect=Incorrect password
 error.campaignSlug.exists=כבר יש קמפיין עם סלאג כזה
 errors.campaignNotFound=קמפיין לא נמצא.
+errors.noUsersFound=לא נמצאו משתמשים בשם זה
 
 groupEditor.title=עריכת קבוצה
 groupEditor.empty=אין כרגע חברי כנסת בקבוצה זו
@@ -147,6 +148,7 @@ actions.empty=אין פעולות במערכת
 
 # Common verbs
 add=הוספה
+addUser=צירוף לצוות
 cancel=ביטול
 back=חזור
 delete=מחיקה
@@ -196,11 +198,13 @@ passwordAgain=ססמא (שוב)
 website=אתר אינטרנט
 username=שם משתמש
 users=משתמשים
+user=משתמש/ת
 admin=מנהל
 position=עמדה
 contents=תוכן
 edit=עריכה
 mediaOutlet=מדיום
+me=אני
 noImage=אין תמונה
 backgroundImage=תמונת רקע
 charactersLeft=מספר תווים שעוד אפשר להוסיף
@@ -267,6 +271,11 @@ campaignMgr.frontPage.bodyText.help=הטקסט המרכזי בדף הקמפיי�
 campaignMgmt.frontPage.footer=הערת סיום
 campaignMgmt.frontPage.footer.help=מופיעה בתחתית העמוד, מתחת לרשימת חברי הכנסת.
 campaignMgmt.frontPage.saved=השינויים בעמוד הראשי נשמרו בהצלחה
+campaignMgmt.team.help=צוות הקמפיין. מנהלי קמפיין יכולים גם לקבוע את הרכב הצוות.
+campaignMgmt.team.roster=צוות נוכחי
+campaignMgmt.team.add=הוספת משתמש/ת חדש/ה
+campaignMgmt.team.userSearch=חיפוש משתמש
+campaignMgmt.team.userSearch.placeholder=שם משתמש, או שם רגיל
 campaigns.table.title=שם הקמפיין
 campaigns.table.isPublished=מפורסם?
 loadingLabels=טוען תוויות

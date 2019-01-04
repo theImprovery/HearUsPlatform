@@ -1,0 +1,102 @@
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@(campaign:Campaign, team:CampaignTeam, currentUser:User)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+
+@scripts = {
+  <script src="@routes.Assets.versioned("/js/campaignEditor/campaignTeam.js")"></script>
+  <script >
+    document.addEventListener("DOMContentLoaded", campaignTeamSetup );
+  </script>
+}
+
+@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.CampaignTeam, extraBottom = scripts) {
+
+  <div class="row my-2">
+    <div class="col">
+      <div class="text-muted">
+      @Messages("campaignMgmt.team.help")
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h3>@Messages("campaignMgmt.team.roster")</h3>
+      <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th>@Messages("user")</th>
+            <th>@Messages("admin")</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if( team.isAdmin(currentUser) ) {
+            @for( user <- team.users ) {
+              <tr>
+                <td>
+                  @user.name <span class="text-muted">@user.username</span>
+                  @if( user.id == currentUser.id ){<span class="badge badge-info">@Messages("me")</span> }
+                </td>
+                <td>
+                @if(team.isAdmin(user)){
+                  <i class="fa fa-check-square-o text-success"></i>
+                } else {
+                  <i class="fa fa-square-o text-muted"></i>
+                }
+                </td>
+              </tr>
+            }
+          } else {
+            @for( user <- team.users ) {
+              <tr>
+                <td>
+                  @user.name <span class="text-muted">@user.username</span>
+                  @if( user.id == currentUser.id ){<span class="badge badge-info">@Messages("me")</span> }
+                </td>
+                <td>
+                    @if(team.isAdmin(user)){
+                      <i class="fa fa-check-square-o text-success"></i>
+                    } else {
+                      <i class="fa fa-square-o text-muted"></i>
+                    }
+                    @if( user.id == currentUser.id ){<span class="badge badge-info">@Messages("me")</span> }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if( team.isAdmin(currentUser) ) {
+      <div class="col">
+        <h3>@Messages("campaignMgmt.team.add")</h3>
+        <div class="form-row row mb-2">
+          <label for="userSearchField" class="col-sm-4 col-form-label">@Messages("campaignMgmt.team.userSearch")</label>
+          <div class="col-sm-8">
+            <div class="input-group">
+              <input type="text" onchange="searchCampaigners(this.value)" class="form-control" name="userSearchField" id="userSearchField" placeholder="@Messages("campaignMgmt.team.userSearch.placeholder")">
+              <div class="input-group-append">
+                <button onclick="searchCampaigners(document.getElementById('userSearchField').value)" class="btn btn-primary"><i class="fa fa-search"></i> </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div id="noResults" class="noData py-5">
+              @Messages("errors.noUsersFound")
+            </div>
+            <div id="campaignersListCtnr">
+              <ul id="campaignersList">
+                <li class="py-1" id="campaignerTemplate"><em>Name</em> <span class="text-muted">Username</span>
+                  <button type="button" class="btn btn-xs btn-outline-secondary" onclick="addUser(this)"><i class="fa fa-plus-circle"></i> @Messages("addUser")</button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+}
