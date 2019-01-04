@@ -1,9 +1,0 @@
-@import be.objectify.deadbolt.scala.AuthenticatedRequest
-
-@(campaigns:Seq[Campaign])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
-
-
-
-@templates.campaignNavbar("title", views.Structure.campaignEditorItems(campaigns(0)), views.CampaignEditorSections.Settings ) {
-      TEST
-}

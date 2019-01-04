@@ -123,7 +123,14 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id) {
       frontPageForm.bindFromRequest().fold(
         fwe => Future(BadRequest(fwe.errors.mkString("\n"))),
-        texts => Future(Ok(texts.copy(campaignId=id).toString))
+        texts => {
+          campaigns.updateTexts(texts.copy(campaignId=id)).map( i =>
+            Redirect( routes.CampaignMgrCtrl.showFrontPageEditor(id))
+              .flashing(FlashKeys.MESSAGE ->
+                          Informational(InformationalLevel.Success, Messages("campaignMgmt.frontPage.saved")).encoded)
+          )
+          
+        }
       )
     }
   }
@@ -139,15 +146,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     }
   }
   
-  def settings(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
-    campaignEditorAction(id){
-      for {
-        campaignOpt <- campaigns.getCampaign(id)
-        imageOp <- images.getImageForCampaign(id)
-      } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.settings(c, Platform.values.toSeq, Position.values.toSeq, imageOp, conf.get[String]("hearUs.files.camImages.url")))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
-    }
-  }
-
   def positions(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     campaignEditorAction(id) {
       for {
@@ -294,17 +292,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     )
   }
 
-  def deleteCampaign(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
-    campaignEditorAction(id){
-      for {
-        deleted <- campaigns.deleteCampaign(id)
-        camps <- campaigns.getAllCampaigns
-      } yield {
-        Ok(views.html.knesset.campaigns(camps)).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("campaigns.deleted"))
-      }
-    }
-  }
-  
   def showCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
     campaignEditorAction(id) {
       for {

@@ -71,7 +71,6 @@ PATCH   /bkofc/campaigns/labels/          controllers.CampaignMgrCtrl.updateLabe
 PATCH   /bkofc/campaigns/updatePublish    controllers.CampaignAdminCtrl.updatePublish
 
 GET     /bkofc/campaigns/:id/details/      controllers.CampaignMgrCtrl.details(id:Long)
-GET     /bkofc/campaigns/:id/settings/     controllers.CampaignMgrCtrl.settings(id:Long)
 GET     /bkofc/campaigns/:id/positions/    controllers.CampaignMgrCtrl.positions(id:Long)
 
 GET     /bkofc/campaigns/:id/design/      controllers.CampaignMgrCtrl.showCampaignDesign(id:Long)
@@ -86,7 +85,7 @@ GET     /bkofc/campaigns/:id/action/:actId       controllers.CampaignMgrCtrl.edi
 
 GET     /bkofc/campaigns/lbls/:id         controllers.CampaignMgrCtrl.getLabelText(id:Long)
 GET     /bkofc/campaigns/:id/sm           controllers.CampaignMgrCtrl.getSocialMedia(id:Long)
-DELETE  /bkofc/campaigns/:id              controllers.CampaignMgrCtrl.deleteCampaign(id:Long)
+DELETE  /bkofc/campaigns/:id              controllers.CampaignAdminCtrl.deleteCampaign(id:Long)
 POST    /bkofc/campaigns/actions          controllers.CampaignAdminCtrl.updateAction
 GET     /bkofc/campaigns/:camId           controllers.CampaignMgrCtrl.editCampaign(camId:Long)
 

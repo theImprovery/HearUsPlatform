@@ -41,7 +41,6 @@ object BackOfficeSections extends Enumeration {
 
 object CampaignEditorSections extends Enumeration {
   val Details         = Value("Details")
-  val Settings        = Value("Settings")
   val Messages        = Value("Messages")
   val Design          = Value("Design")
   val FrontPage       = Value("FrontPage")
@@ -77,24 +76,14 @@ object Structure {
   )
   
   val campaignManagerItems:Seq[TopSiteSection[BackOfficeSections.Value]] = Seq(
-    PageSection("navbar.campaigner.myCampaigns", BackOfficeSections.MyCampaigns, routes.CampaignMgrCtrl.index()),
-    MultiPageSection("navbar.campaigner.campaignAdmin", BackOfficeSections.CampaignAdmin, Seq(
-      PageSectionItem("navbar.campaigner.campaignSettings.users", routes.HomeCtrl.notImplYet()),
-      PageSectionItem("navbar.campaigner.campaignSettings.goLive", routes.HomeCtrl.notImplYet())
-    )),
-    MultiPageSection("navbar.campaigner.campaignSettings", BackOfficeSections.CampaignSettings, Seq(
-      PageSectionItem("navbar.campaigner.campaignSettings.texts", routes.HomeCtrl.notImplYet()),
-      PageSectionItem("navbar.campaigner.campaignSettings.webPage", routes.HomeCtrl.notImplYet())
-    )),
-    PageSection("navbar.campaigner.campaignKnessetStatus", BackOfficeSections.CampaignKnessetStatus, routes.HomeCtrl.notImplYet())
+    PageSection("navbar.campaigner.myCampaigns", BackOfficeSections.MyCampaigns, routes.CampaignMgrCtrl.index())
   )
 
   def campaignEditorItems(campaign:Campaign):Seq[TopSiteSection[CampaignEditorSections.Value]] = Seq(
     PageSection("navbar.campagins.mgmt.details",   CampaignEditorSections.Details, routes.CampaignMgrCtrl.details(campaign.id)),
-    PageSection("navbar.campagins.mgmt.settings",  CampaignEditorSections.Settings, routes.CampaignMgrCtrl.settings(campaign.id)),
     PageSection("navbar.campagins.mgmt.messages",  CampaignEditorSections.Messages, routes.CampaignMgrCtrl.editMessages(campaign.id)),
-    PageSection("navbar.campagins.mgmt.design",    CampaignEditorSections.Design, routes.CampaignMgrCtrl.showCampaignDesign(campaign.id)),
     PageSection("navbar.campagins.mgmt.frontPage", CampaignEditorSections.FrontPage, routes.CampaignMgrCtrl.showFrontPageEditor(campaign.id)),
+    PageSection("navbar.campagins.mgmt.design",    CampaignEditorSections.Design, routes.CampaignMgrCtrl.showCampaignDesign(campaign.id)),
     PageSection("navbar.campagins.mgmt.positions", CampaignEditorSections.KnessetMembers, routes.CampaignMgrCtrl.positions(campaign.id))
   )
 

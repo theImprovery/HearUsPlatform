@@ -100,7 +100,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     texts.filter( _.campaignId === campaignId ).result
   ).map( _.headOption )
   
-  def storeTexts( campaignTexts:CampaignText ): Future[Int] = db.run {
+  def updateTexts( campaignTexts:CampaignText ): Future[Int] = db.run {
     texts.insertOrUpdate( campaignTexts )
   }
   

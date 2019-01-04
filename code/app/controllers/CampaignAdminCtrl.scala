@@ -79,6 +79,15 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       }
     )
   }
+  
+  def deleteCampaign(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
+    for {
+      deleted <- campaigns.deleteCampaign(id)
+      camps <- campaigns.getAllCampaigns
+    } yield {
+      Redirect(routes.CampaignAdminCtrl.showCampaigns()).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("campaigns.deleted"))
+    }
+  }
 
 //  def editCampaign(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
 //    for{
