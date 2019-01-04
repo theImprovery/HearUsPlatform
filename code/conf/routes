@@ -63,6 +63,9 @@ GET     /bkofc/campaigns/:id/messages/     controllers.CampaignMgrCtrl.editMessa
 PUT     /bkofc/api/campaigns/:id/messages  controllers.CampaignMgrCtrl.updateMessages(id:Long)
 GET     /api/campaigns/:id/messages        controllers.CampaignMgrCtrl.getMessages(id:Long)
 
+GET     /bkofc/campaigns/:id/frontPage    controllers.CampaignMgrCtrl.showFrontPageEditor(id:Long)
+POST    /bkofc/campaigns/:id/frontPage    controllers.CampaignMgrCtrl.updateFrontPage(id:Long)
+
 PATCH   /bkofc/campaigns/:id/details/     controllers.CampaignMgrCtrl.updateDetails(id:Long)
 PATCH   /bkofc/campaigns/labels/          controllers.CampaignMgrCtrl.updateLabels
 PATCH   /bkofc/campaigns/updatePublish    controllers.CampaignAdminCtrl.updatePublish

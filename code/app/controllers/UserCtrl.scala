@@ -313,11 +313,11 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   def showResetPassword(requestId:String) = Action.async { implicit req =>
     forgotPasswords.get(requestId).map( {
-      case None => NotFound( views.html.errorPage(404, Messages("passwordReset.requestNotFound"), None, None, req, messagesProvider ) )
+      case None => NotFound( views.html.errorPage(404, Messages("passwordReset.requestNotFound"), None, None)(req, messagesProvider ) )
       case Some(prr) => {
         if ( isRequestExpired(prr) ) {
           forgotPasswords.deleteForUser(requestId)
-          Gone(views.html.errorPage(410, Messages("passwordReset.requestExpired"), None, None, req, messagesProvider ))
+          Gone(views.html.errorPage(410, Messages("passwordReset.requestExpired"), None, None)(req, messagesProvider ))
         } else {
           Ok(views.html.users.passwordReset(prr, None))
         }
@@ -328,7 +328,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   def doResetPassword() = Action.async{ implicit req =>
     resetPassForm.bindFromRequest().fold(
-      fwi => Future(BadRequest(views.html.users.passwordReset(new PasswordResetRequest("","",null), Some("Error processing reset password form")))),
+      fwi => Future(BadRequest(views.html.users.passwordReset(PasswordResetRequest("","",null), Some("Error processing reset password form")))),
       fd => {
         for {
           prrOpt      <- forgotPasswords.get(fd.uuid)
@@ -338,15 +338,15 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
           
         } yield {
           prrOpt match {
-            case None => NotFound( views.html.errorPage(404, Messages("passwordReset.requestNotFound"), None, None, req, messagesProvider ) )
+            case None => NotFound( views.html.errorPage(404, Messages("passwordReset.requestNotFound"), None, None)(req, messagesProvider ) )
             case Some(prr) => {
               if ( invalidPass ) BadRequest(views.html.users.passwordReset(prr, Some(Messages("passwordReset.validationFailed"))))
-              else if (reqExpired ) Gone(views.html.errorPage(410, Messages("passwordReset.requestExpired"), None, None, req, messagesProvider ))
+              else if (reqExpired ) Gone(views.html.errorPage(410, Messages("passwordReset.requestExpired"), None, None)(req, messagesProvider ))
               else {
                 userOpt match {
                   case None => {
                     // user might have been deleted
-                    Gone(views.html.errorPage(410, Messages("passwordReset.requestExpired"), None, None, req, messagesProvider ))
+                    Gone(views.html.errorPage(410, Messages("passwordReset.requestExpired"), None, None)(req, messagesProvider ))
                   }
                   case Some(user) => {
                     // we're OK to reset

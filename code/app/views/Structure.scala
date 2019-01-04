@@ -94,7 +94,7 @@ object Structure {
     PageSection("navbar.campagins.mgmt.settings",  CampaignEditorSections.Settings, routes.CampaignMgrCtrl.settings(campaign.id)),
     PageSection("navbar.campagins.mgmt.messages",  CampaignEditorSections.Messages, routes.CampaignMgrCtrl.editMessages(campaign.id)),
     PageSection("navbar.campagins.mgmt.design",    CampaignEditorSections.Design, routes.CampaignMgrCtrl.showCampaignDesign(campaign.id)),
-    PageSection("navbar.campagins.mgmt.frontPage", CampaignEditorSections.FrontPage, routes.HomeCtrl.notImplYet()),
+    PageSection("navbar.campagins.mgmt.frontPage", CampaignEditorSections.FrontPage, routes.CampaignMgrCtrl.showFrontPageEditor(campaign.id)),
     PageSection("navbar.campagins.mgmt.positions", CampaignEditorSections.KnessetMembers, routes.CampaignMgrCtrl.positions(campaign.id))
   )
 

@@ -39,7 +39,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       "id" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
       "camId" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
       "kmId" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
-      "actionType" -> nonEmptyText.transform[ActionType.Value]( ActionType.withName(_), _.toString),
+      "actionType" -> nonEmptyText.transform[ActionType.Value]( ActionType.withName, _.toString),
       "date" -> sqlDate.transform[Timestamp]( d => new Timestamp(d.getTime), ts => new Date(ts.getTime)),
       "title" -> nonEmptyText,
       "details" -> text,
@@ -89,6 +89,41 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         campaignDtls => {
           campaigns.updateDetails(id,campaignDtls).map(newC => Ok(Json.toJson(newC)))
         }
+      )
+    }
+  }
+  
+  def showFrontPageEditor( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
+    campaignEditorAction(id){
+      for {
+        campaignOpt <- campaigns.getCampaign(id)
+        text    <- campaigns.getTextsFor(id).map( _.getOrElse(CampaignText(id, "", "", "", "", "", "")))
+      } yield {
+        campaignOpt match {
+          case None => NotFound( views.html.errorPage(404, Messages("errors.campaignNotFound")) )
+          case Some(campaign) => Ok(views.html.campaignMgmt.frontPageEditor(campaign, text, Position.values, Gender.values))
+        }
+      }
+    
+    }
+  }
+  
+  val frontPageForm = Form(
+    mapping(
+      "campaignId" -> ignored(0l), // we get that from the url.
+      "title"->text,
+      "subtitle" -> text,
+      "bodyText" -> text,
+      "footer" -> text,
+      "groupLabels" -> text,
+      "kmLabels" -> text
+  )(CampaignText.apply)(CampaignText.unapply))
+  
+  def updateFrontPage( id:Long )  = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(id) {
+      frontPageForm.bindFromRequest().fold(
+        fwe => Future(BadRequest(fwe.errors.mkString("\n"))),
+        texts => Future(Ok(texts.copy(campaignId=id).toString))
       )
     }
   }
@@ -222,7 +257,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       }
     )
   }
-
+  
   def getMessages(id:Long) = Action.async{implicit req =>
     campaigns.getMessages(id).map(ms => Ok(Json.toJson(ms)))
   }

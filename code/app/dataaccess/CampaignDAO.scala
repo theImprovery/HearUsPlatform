@@ -23,6 +23,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   private val positions = TableQuery[KmPositionTable]
   private val actions = TableQuery[KmActionTable]
   private val usersCampaigns = TableQuery[UserCampaignTable]
+  private val texts = TableQuery[CampaignTextTable]
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
 
@@ -52,7 +53,14 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     } map ( _.headOption )
   }
 
-  def deleteCampaign( id:Long ):Future[Int] = db.run (campaigns.filter( _ .id === id ).delete )
+  def deleteCampaign( id:Long ):Future[Unit] = {
+    db.run(
+      DBIO.seq(
+        texts.filter( _.campaignId === id ).delete,
+        campaigns.filter( _ .id === id ).delete
+      ).transactionally
+    )
+  }
 
   def getLabelText( id:Long ):Future[Seq[LabelText]] = {
     db.run (labels.filter( _.camId === id ).result)
@@ -87,7 +95,15 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
       ).transactionally
     )
   }
-
+  
+  def getTextsFor( campaignId:Long ):Future[Option[CampaignText]] = db.run (
+    texts.filter( _.campaignId === campaignId ).result
+  ).map( _.headOption )
+  
+  def storeTexts( campaignTexts:CampaignText ): Future[Int] = db.run {
+    texts.insertOrUpdate( campaignTexts )
+  }
+  
   def getSm( id:Long ):Future[Seq[SocialMedia]] = {
     db.run (socialMedia.filter( _.camId === id ).result)
   }

@@ -3,6 +3,12 @@ package models
 import java.sql.Timestamp
 import dataaccess.Platform
 
+object Gender extends Enumeration {
+  type Gender = Value
+  val Female = Value("female")
+  val Male = Value("male")
+}
+
 case class Campaign( id:Long,
                      title:  String,
                      slogan: String,
@@ -13,11 +19,36 @@ case class Campaign( id:Long,
                      analytics:    String,
                      isPublished:  Boolean)
 
+
+/** Subset of `Campaign`, when there's no need to transfer
+  * the entire object over app boundaries/network.
+  *
+  * @param title
+  * @param slogan
+  * @param website
+  * @param contactEmail
+  * @param analyticsCode
+  */
 case class CampaignDetails( title:  String,
                             slogan: String,
                             website:      String,
                             contactEmail: String,
                             analyticsCode: String )
+
+case class CampaignText( campaignId: Long,
+                         title:String,
+                         subtitle:String,
+                         bodyText:String,
+                         footer:String,
+                         groupLabels:String,
+                         kmLabels:String) {
+  val groupLabel:Map[Position.Value, String] = Position.values.toSeq.zipAll( groupLabels.split("\t").take(Position.values.size).map(_.trim), Position.For, "" ).toMap
+  val kmLabel:Map[(Gender.Value,Position.Value),String] = Gender.values.toSeq.flatMap( g => Position.values.toSeq.map(p=>(g,p)) )
+                                                                .zipAll(kmLabels.split("\t").map(_.trim)
+                                                                                .take(Gender.values.size*Position.values.size),
+                                                                        (Gender.Female, Position.For), ""
+                                                                ).toMap
+}
 
 case class LabelText( camId: Long,
                       position: Position.Value,

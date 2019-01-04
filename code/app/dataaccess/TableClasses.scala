@@ -77,7 +77,7 @@ class KnessetMemberTable(tag:Tag) extends Table[KnessetMember](tag,"knesset_memb
   def partyId = column[Long]("party_id")
   def knessetKey = column[Long]("knesset_key")
 
-  def patryFK = foreignKey("knesset_member_party_fkey", partyId, TableClasses.parties)(_.id)
+  def partyFK = foreignKey("knesset_member_party_fkey", partyId, TableClasses.parties)(_.id)
   def * = (id, name, gender, isActive, webPage, partyId, knessetKey) <> (KnessetMember.tupled, KnessetMember.unapply)
 }
 
@@ -166,7 +166,22 @@ class CampaignTable( tag:Tag ) extends Table[Campaign](tag, "campaigns") {
   def analytics = column[String]("analytics_code")
   def isPublished = column[Boolean]("is_published")
 
-  def * = (id, title, slogan, slug, website, themeData, contactEmail, analytics, isPublished) <> (Campaign.tupled, Campaign.unapply)
+  def * = (id, title, slogan, slug, website, themeData, contactEmail, analytics, isPublished
+            ) <> (Campaign.tupled, Campaign.unapply)
+}
+
+class CampaignTextTable( tag:Tag ) extends Table[CampaignText](tag, "campaign_texts") {
+  def campaignId = column[Long]("campaign_id", O.PrimaryKey)
+  def title = column[String]("title")
+  def subtitle = column[String]("subtitle")
+  def bodyText = column[String]("body_text")
+  def footer   = column[String]("footer")
+  def groupLabels = column[String]("group_labels")
+  def mkLabels = column[String]("km_labels")
+  
+  def * = (campaignId, title, subtitle, bodyText, footer, groupLabels, mkLabels
+            )<>(CampaignText.tupled, CampaignText.unapply)
+  def fkCampaignId = foreignKey("campaign_texts_campaign_id_fkey", campaignId, TableClasses.campaigns)(_.id)
 }
 
 class LabelTextTable( tag:Tag ) extends Table[LabelText](tag, "label_texts") {
