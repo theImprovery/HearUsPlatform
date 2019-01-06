@@ -2,10 +2,19 @@
 @(campaign:Campaign, team:CampaignTeam, currentUser:User)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
 
 @scripts = {
-  <script src="@routes.Assets.versioned("/js/campaignEditor/campaignTeam.js")"></script>
-  <script >
-    document.addEventListener("DOMContentLoaded", campaignTeamSetup );
-  </script>
+  @if( team.isAdmin(currentUser) ) {
+    <script src="@routes.Assets.versioned("/js/campaignEditor/campaignTeam.js")"></script>
+    <script >
+      const csrfValue="@helper.CSRF.getToken.value";
+      const csrfName="@helper.CSRF.getToken.name";
+      const campaignId = @campaign.id;
+      const currentUserId = @currentUser.id;
+      let teamIds = [@Html(team.users.map(_.id).mkString(","))];
+      let teamNames = {@Html(team.users.map( u=>u.id + ":\"" + u.name.replaceAll("\"","\\\"") + "\"").mkString(","))};
+      let teamUsernames = {@Html(team.users.map( u=>u.id + ":\"" + u.username.replaceAll("\"","\\\"") + "\"").mkString(","))};
+      document.addEventListener("DOMContentLoaded", campaignTeamSetup);
+    </script>
+  }
 }
 
 @templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.CampaignTeam, extraBottom = scripts) {
@@ -37,11 +46,12 @@
                   @if( user.id == currentUser.id ){<span class="badge badge-info">@Messages("me")</span> }
                 </td>
                 <td>
-                @if(team.isAdmin(user)){
-                  <i class="fa fa-check-square-o text-success"></i>
-                } else {
-                  <i class="fa fa-square-o text-muted"></i>
-                }
+                  @if(team.isAdmin(user)){
+                    <button onclick="removeAdmin(@user.id)" class="btn btn-sm btn-outline-warning">@Messages("campaignMgmt.team.removeAdmin")</button>
+                  } else {
+                    <button onclick="makeAdmin(@user.id)" class="btn btn-sm btn-outline-success">@Messages("campaignMgmt.team.makeAdmin")</button>
+                  }
+                  <button onclick="removeFromTeam(@user.id)" class="btn btn-sm btn-outline-danger">@Messages("campaignMgmt.team.removeFromTeam")</button>
                 </td>
               </tr>
             }

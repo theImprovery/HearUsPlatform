@@ -4,6 +4,7 @@ import javax.inject.Inject
 import models.{CampaignTeam, UserCampaign}
 import play.api.Configuration
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import slick.dbio.DBIOAction
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
@@ -28,6 +29,32 @@ class UserCampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigPr
   def connectUserToCampaign( rel:UserCampaign ):Future[UserCampaign] = {
     db.run( (userCampaign returning userCampaign).insertOrUpdate(rel)
      ).map( insertRes => insertRes.getOrElse(rel) )
+  }
+  
+  def removeFromTeam(userId:Long, campaignId:Long ): Future[Boolean] = {
+    val plan = for {
+      isAdmin <- userCampaign.filter( r => r.campaignId===campaignId && r.userId === userId && r.admin=== true).exists.result
+      adminCount <- userCampaign.filter( r => r.campaignId===campaignId  && r.admin=== true).size.result
+      removed <- {
+        if (!isAdmin || adminCount > 1 ) {
+          userCampaign.filter( r => r.campaignId===campaignId && r.userId === userId).delete
+        } else DBIOAction.successful(0)
+      }
+    } yield (isAdmin, adminCount, removed)
+    
+    db.run( plan.transactionally ).map( res => res._3==1 )
+  }
+  
+  def removeAdminFromTeam(userId:Long, campaignId:Long ): Future[Boolean] = {
+    val plan = for {
+      adminCount <- userCampaign.filter( r => r.campaignId===campaignId  && r.admin=== true).size.result
+      removed    <- {
+        if (adminCount > 1) userCampaign.filter(r=>r.campaignId===campaignId && r.userId===userId ).map(_.admin).update(false)
+        else DBIOAction.successful(0)
+      }
+    } yield removed
+    
+    db.run( plan.transactionally ).map( res => res==1 )
   }
   
   def getTeam( campaignId:Long ):Future[CampaignTeam]={

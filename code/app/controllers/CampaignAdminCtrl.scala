@@ -51,7 +51,7 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def getCampaigners(searchStr:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     val sqlSearch = "%"+searchStr.trim+"%"
-    users.allCampaigners(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans)))
+    users.allCampaigners(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans.map(_.dn))))
   }
 
   def updatePublish = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson) { implicit req =>

@@ -109,6 +109,10 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.CampaignMgrCtrl.allActions,
           routes.javascript.CampaignMgrCtrl.doUpdateCampaignDesign,
           routes.javascript.CampaignMgrCtrl.deleteCampaignImage,
+          routes.javascript.CampaignMgrCtrl.doAddToTeam,
+          routes.javascript.CampaignMgrCtrl.doMakeAdminInTeam,
+          routes.javascript.CampaignMgrCtrl.doRemoveAdminInTeam,
+          routes.javascript.CampaignMgrCtrl.doRemoveFromTeam,
           routes.javascript.CampaignPublicCtrl.index
       )).as("text/javascript")
     }

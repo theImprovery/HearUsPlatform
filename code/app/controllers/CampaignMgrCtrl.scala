@@ -308,6 +308,113 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     }
   }
   
+  val userIdForm = Form( single(
+    "userId" -> longNumber
+  ))
+  
+  def doAddToTeam(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
+    campaignEditorAction(id) {
+      userIdForm.bindFromRequest().fold(
+        fwe => {
+          Logger.warn( fwe.errors.mkString("\n") )
+          Future(BadRequest("Error"))
+        },
+        userId => {
+          for {
+            userOpt <- users.get(userId)
+            didAdd <- {
+              if (userOpt.isDefined)
+                usersCampaigns.connectUserToCampaign(UserCampaign(userId, id, isAdmin=false)).map(_ => true)
+              else Future(false)
+            }
+          } yield {
+            if ( didAdd ) {
+               Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
+                  FlashKeys.MESSAGE->Informational(InformationalLevel.Success,
+                                                    Messages("campaginMgmt.team.userAdded", userOpt.get.username)).encoded)
+            } else {
+              NotFound("Can't add to team. Are you sure the user exist?")
+  }}})}}
+  
+  def doMakeAdminInTeam(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
+    campaignEditorAction(id) {
+      userIdForm.bindFromRequest().fold(
+        fwe => {
+          Logger.warn( fwe.errors.mkString("\n") )
+          Future(BadRequest("Error"))
+        },
+        userId => {
+          for {
+            userOpt <- users.get(userId)
+            madeAdmin <- {
+              if (userOpt.isDefined) usersCampaigns.connectUserToCampaign(UserCampaign(userId, id, isAdmin=true)).map(_=>true)
+              else Future(false)
+            }
+          } yield {
+            if ( madeAdmin ){
+              Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
+                FlashKeys.MESSAGE->Informational(InformationalLevel.Success,
+                  Messages("campaginMgmt.team.userMadeAdmin", userOpt.get.username)).encoded)
+            } else {
+              NotFound("Can't add to team. Are you sure the user exist?")
+            }
+  }})}}
+  
+  
+  def doRemoveAdminInTeam(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
+    campaignEditorAction(id) {
+      userIdForm.bindFromRequest().fold(
+        fwe => {
+          Logger.warn( fwe.errors.mkString("\n") )
+          Future(BadRequest("Error"))
+        },
+        userId => {
+          for {
+            userOpt <- users.get(userId)
+            removed <- if (userOpt.isDefined) {
+              usersCampaigns.removeAdminFromTeam(userId, id)
+            } else Future(false)
+          } yield {
+            if ( userOpt.isDefined ) {
+              if ( removed ) {
+                Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
+                  FlashKeys.MESSAGE->Informational(InformationalLevel.Success,
+                    Messages("campaginMgmt.team.userRemovedFromAdmin", userOpt.get.username)).encoded)
+              } else {
+                Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
+                  FlashKeys.MESSAGE->Informational(InformationalLevel.Danger,
+                    Messages("campaginMgmt.team.cantRemoveLastAdmin"),
+                    Messages("campaginMgmt.team.cantRemoveLastAdmin.details")).encoded)
+              }
+            } else {
+              NotFound("User not found")
+            }
+  }})}}
+  
+  def doRemoveFromTeam(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
+    campaignEditorAction(id) {
+      userIdForm.bindFromRequest().fold(
+        fwe => {
+          Logger.warn( fwe.errors.mkString("\n") )
+          Future(BadRequest("Error"))
+        },
+        userId => {
+          for {
+            userOpt <- users.get(userId)
+            userPresent = userOpt.isDefined
+            removed <- if (userPresent) usersCampaigns.removeFromTeam(userId, id) else Future(false)
+          } yield {
+            (userPresent, removed) match {
+              case (false, _) => NotFound("Can't add to team. Are you sure the user exist?")
+              case (true, false) => Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
+                  FlashKeys.MESSAGE->Informational(InformationalLevel.Danger,
+                                                    Messages("campaginMgmt.team.cantRemoveLastAdmin"),
+                                                    Messages("campaginMgmt.team.cantRemoveLastAdmin.details")).encoded)
+              case (true, true) => Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
+                  FlashKeys.MESSAGE->Informational(InformationalLevel.Success, Messages("campaginMgmt.team.userRemovedFromTeam",
+                                                                                          userOpt.get.username)).encoded)
+  }}})}}
+  
   def showCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
     campaignEditorAction(id) {
       for {

@@ -66,7 +66,11 @@ GET     /api/campaigns/:id/messages        controllers.CampaignMgrCtrl.getMessag
 GET     /bkofc/campaigns/:id/frontPage    controllers.CampaignMgrCtrl.showFrontPageEditor(id:Long)
 POST    /bkofc/campaigns/:id/frontPage    controllers.CampaignMgrCtrl.updateFrontPage(id:Long)
 
-GET     /bkofc/campaigns/:id/team      controllers.CampaignMgrCtrl.showCampaignTeam(id:Long)
+GET     /bkofc/campaigns/:id/team           controllers.CampaignMgrCtrl.showCampaignTeam(id:Long)
+POST    /bkofc/campaigns/:id/team           controllers.CampaignMgrCtrl.doAddToTeam(id:Long)
+POST    /bkofc/campaigns/:id/team/admins    controllers.CampaignMgrCtrl.doMakeAdminInTeam(id:Long)
+POST    /bkofc/campaigns/:id/team/nonadmins controllers.CampaignMgrCtrl.doRemoveAdminInTeam(id:Long)
+POST    /bkofc/campaigns/:id/team/expel     controllers.CampaignMgrCtrl.doRemoveFromTeam(id:Long)
 
 PATCH   /bkofc/campaigns/:id/details/     controllers.CampaignMgrCtrl.updateDetails(id:Long)
 PATCH   /bkofc/campaigns/labels/          controllers.CampaignMgrCtrl.updateLabels
