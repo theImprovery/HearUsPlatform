@@ -37,6 +37,7 @@ object BackOfficeSections extends Enumeration {
   val CampaignSettings = Value("CampaignSettings")
   val CampaignKnessetStatus   = Value("CampaignStatus")
   val CampaignAdmin    = Value("CampaignAdmin")
+  val InviteUsers      = Value("InviteUsers")
 }
 
 object CampaignEditorSections extends Enumeration {
@@ -77,7 +78,8 @@ object Structure {
   )
   
   val campaignManagerItems:Seq[TopSiteSection[BackOfficeSections.Value]] = Seq(
-    PageSection("navbar.campaigner.myCampaigns", BackOfficeSections.MyCampaigns, routes.CampaignMgrCtrl.index())
+    PageSection("navbar.campaigner.myCampaigns", BackOfficeSections.MyCampaigns, routes.CampaignMgrCtrl.index()),
+    PageSection("navbar.users.invite",           BackOfficeSections.InviteUsers, routes.UserCtrl.showInviteUser())
   )
 
   def campaignEditorItems(campaign:Campaign):Seq[TopSiteSection[CampaignEditorSections.Value]] = Seq(

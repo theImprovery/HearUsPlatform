@@ -366,8 +366,8 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   def showInviteUser = deadbolt.SubjectPresent()(){ implicit req =>
     val user = req.subject.get.asInstanceOf[HearUsSubject].user
     for {
-      invitations <- invitations.all
-    } yield Ok(views.html.users.inviteUser(invitations))
+      invitations <- if (user.roles.contains(UserRole.Admin)) invitations.all else Future(Seq())
+    } yield Ok(views.html.users.inviteUser(invitations, user.roles.contains(UserRole.Admin)))
   }
 
   def doInviteUser = deadbolt.SubjectPresent()(){ implicit req =>

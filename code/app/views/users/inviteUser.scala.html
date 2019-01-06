@@ -1,5 +1,5 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(invitations: Seq[Invitation])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(invitations: Seq[Invitation], isAdmin:Boolean=true)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 @scripts = {
   <script >
           $(document).ready( function(){
@@ -9,7 +9,7 @@
   <script src="@routes.Assets.versioned("js/inviteUserPage.js")"></script>
 }
 
-@templates.backEndBase("Invite User", views.BackOfficeSections.Users, Html(""), scripts){
+@templates.backEndBase("Invite User", if ( isAdmin ) views.BackOfficeSections.Users else views.BackOfficeSections.InviteUsers, Html(""), scripts){
   <div class="container">
     @comps.pageTitleRow(Messages("users.inviteUser")){ }
     <div class="row justify-content-md-center">
@@ -31,6 +31,7 @@
         </form>
       </div>
     </div>
+    @if( isAdmin ) {
       <div class="row justify-content-md-center">
         <div class="col col-md-8">
           @if(invitations.nonEmpty) {
@@ -48,5 +49,6 @@
           }
         </div>
       </div>
+    }
   </div>
 }

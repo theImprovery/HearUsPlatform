@@ -16,7 +16,7 @@
           <li>
             <strong>@c.title</strong>
             @if(c.slogan.trim.nonEmpty) {@c.slogan}
-            <a class="btn btn-sm btn-default" href="@routes.CampaignMgrCtrl.details(c.id)"><i class="fa fa-edit"></i>
+            <a class="btn btn-sm btn-outline-primary" href="@routes.CampaignMgrCtrl.details(c.id)"><i class="fa fa-edit"></i>
               @Messages("edit")</a>
           </li>
         }

@@ -30,43 +30,45 @@
     </div>
     @helper.CSRF.formField
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group row">
-          <label for="textColor" class="col-sm-4">@Messages("campaignMgmt.design.textColor")</label>
-          <div class="col-sm-8">
-            <input type="color" data-selector="body" data-key="color" class="form-control" name="textColor" id="textColor" value="">
+          <label for="textColor" class="col-sm-5">@Messages("campaignMgmt.design.textColor")</label>
+          <div class="col-sm-7">
+            <input type="color" data-selector="body" data-key="color" name="textColor" id="textColor" value="">
           </div>
         </div>
         <div class="form-group row">
-          <label for="emTextColor" class="col-sm-4">@Messages("campaignMgmt.design.emTextColor")</label>
-          <div class="col-sm-8">
-            <input type="color" data-selector="em" data-key="color" class="form-control" name="emTextColor" id="emTextColor" value="">
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="backgroundColor" class="col-sm-4">@Messages("campaignMgmt.design.backgroundColor")</label>
-          <div class="col-sm-8">
-            <input type="color" class="form-control" data-selector="body" data-key="background-color" name="backgroundColor" id="backgroundColor" value="">
+          <label for="emTextColor" class="col-sm-5">@Messages("campaignMgmt.design.emTextColor")</label>
+          <div class="col-sm-7">
+            <input type="color" data-selector="em" data-key="color" name="emTextColor" id="emTextColor" value="">
           </div>
         </div>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group row">
-          <label for="hTextColor" class="col-sm-4">@Messages("campaignMgmt.design.hTextColor")</label>
-          <div class="col-sm-8">
-            <input type="color" data-selector="h1,h2,h3,h4,h5,h6" data-key="color" class="form-control" name="hTextColor" id="hTextColor" value="">
+          <label for="hTextColor" class="col-sm-5">@Messages("campaignMgmt.design.hTextColor")</label>
+          <div class="col-sm-7">
+            <input type="color" data-selector="h1,h2,h3,h4,h5,h6" data-key="color" name="hTextColor" id="hTextColor" value="">
           </div>
         </div>
-
         <div class="form-group row">
-          <label for="aTextColor" class="col-sm-4">@Messages("campaignMgmt.design.aTextColor")</label>
-          <div class="col-sm-8">
-            <input type="color" class="form-control" data-selector="a" data-key="color" name="aTextColor" id="aTextColor" value="">
+          <label for="aTextColor" class="col-sm-5">@Messages("campaignMgmt.design.aTextColor")</label>
+          <div class="col-sm-7">
+            <input type="color" data-selector="a" data-key="color" name="aTextColor" id="aTextColor" value="">
           </div>
         </div>
-
       </div>
+
+      <div class="col-md-4">
+        <div class="form-group row">
+          <label for="backgroundColor" class="col-sm-5">@Messages("campaignMgmt.design.backgroundColor")</label>
+          <div class="col-sm-7">
+            <input type="color" data-selector="body" data-key="background-color" name="backgroundColor" id="backgroundColor" value="">
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="form-group row">
