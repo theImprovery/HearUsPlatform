@@ -22,22 +22,22 @@ case class PageSection[T](title:String, id:T, call:Call) extends TopSiteSection[
 case class MultiPageSection[T](title:String, id:T, children:Seq[SectionItem]) extends TopSiteSection[T]
 
 object PublicSections extends Enumeration {
-  val Home = Value("Home")
-  val Login = Value("Login")
+  val Home       = Value("Home")
+  val Login      = Value("Login")
   val Components = Value("Components")
-  val Others = Value("Others")
+  val Others     = Value("Others")
 }
 
 object BackOfficeSections extends Enumeration {
-  val Home             = Value("Home")
-  val Users            = Value("Users")
-  val Knesset          = Value("Knesset")
+  val Home                  = Value("Home")
+  val Users                 = Value("Users")
+  val Knesset               = Value("Knesset")
   val ManageSystemCampaigns = Value("Campaigns")
-  val MyCampaigns      = Value("MyCampaigns")
-  val CampaignSettings = Value("CampaignSettings")
-  val CampaignKnessetStatus   = Value("CampaignStatus")
-  val CampaignAdmin    = Value("CampaignAdmin")
-  val InviteUsers      = Value("InviteUsers")
+  val MyCampaigns           = Value("MyCampaigns")
+  val CampaignSettings      = Value("CampaignSettings")
+  val CampaignKnessetStatus = Value("CampaignStatus")
+  val CampaignAdmin         = Value("CampaignAdmin")
+  val InviteUsers           = Value("InviteUsers")
 }
 
 object CampaignEditorSections extends Enumeration {

@@ -1,14 +1,6 @@
 # -- Create campaigns' related table
 
 # --- !Ups
-create TABLE label_texts (
-  cam_id     INTEGER,
-  position   VARCHAR(16),
-  gender     VARCHAR(8),
-  text       text,
-  PRIMARY KEY (cam_id, position, gender),
-  FOREIGN KEY (cam_id) REFERENCES campaigns(id) ON DELETE CASCADE
-);
 
 create TABLE relevant_groups (
   cam_id     INTEGER,
@@ -60,7 +52,6 @@ create TABLE km_actions (
 );
 
 # --- !Downs
-drop table label_texts;
 drop table relevant_groups;
 drop table canned_messages;
 drop table social_media;

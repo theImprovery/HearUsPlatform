@@ -1,11 +1,11 @@
 /*jshint esversion:6*/
 
 let campaignerRowTemplate;
-let teamTableRowTemplate;
 let campaignersList;
 
 function campaignTeamSetup() {
     $("#campaignersListCtnr").hide();
+    $("#noResults").hide();
     campaignersList = document.getElementById("campaignersList");
 
     campaignerRowTemplate = document.getElementById("campaignerTemplate");
