@@ -21,11 +21,12 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   private val positions = TableQuery[KmPositionTable]
   private val actions = TableQuery[KmActionTable]
   private val usersCampaigns = TableQuery[UserCampaignTable]
-  private val users = TableQuery[UserTable]
   private val texts = TableQuery[CampaignTextTable]
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
-
+  
+  def count:Future[Int] = db.run( campaigns.size.result )
+  
   def store(cam: Campaign ):Future[Campaign] = {
     db.run(
       (campaigns returning campaigns).insertOrUpdate(cam)

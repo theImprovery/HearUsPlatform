@@ -68,7 +68,11 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       adminCampaign => {
         for {
           slugExists <- campaigns.campaignSlugExists(adminCampaign.slug)
-          camOpt:Option[Campaign] <- if(!slugExists) campaigns.store(Campaign(-1l, adminCampaign.name, "", adminCampaign.slug, "", "", "", "", false)).map(Some(_)) else Future(None)
+          camOpt:Option[Campaign] <- {
+            if (!slugExists) campaigns.store(Campaign(-1l, adminCampaign.name, "", adminCampaign.slug, "",
+                                               conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""), "", "", false)).map(Some(_))
+            else Future(None)
+          }
           rel:Option[UserCampaign] <- camOpt.map( cam => userCampaigns.connectUserToCampaign(UserCampaign(adminCampaign.campaigner, cam.id, isAdmin=true)
           ).map(Some(_)) ).getOrElse(Future(None))
         } yield {

@@ -54,7 +54,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
                          cached: Cached, cc:ControllerComponents,
                          users: UsersDAO, invitations:InvitationDAO,
                          forgotPasswords:PasswordResetRequestDAO,
-                         knesset: KnessetMemberDAO,
+                         knesset: KnessetMemberDAO, campaigns:CampaignDAO,
                          committees: KmGroupDAO,
                          mailerClient: MailerClient, langs:Langs, messagesApi:MessagesApi) extends InjectedController {
 
@@ -132,9 +132,10 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     for {
       mkCount <- knesset.countKMs
       ptCount <- knesset.countParties
-      comCount <- committees.countGroups
+      comCount <- committees.countGroups()
+      campaignCount <- campaigns.count
     } yield {
-      Ok( views.html.users.userHome(user, mkCount, ptCount, comCount) )
+      Ok( views.html.users.userHome(user, mkCount, ptCount, comCount, campaignCount) )
     }
   }
 

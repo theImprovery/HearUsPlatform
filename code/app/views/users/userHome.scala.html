@@ -1,5 +1,5 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(u:User, mkCount:Int, ptCount:Int, comCount:Int)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(u:User, mkCount:Int, ptCount:Int, comCount:Int, campaignCount:Int)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/userHome.js")"></script>
@@ -13,28 +13,29 @@
           <div class="buttonBox">
             @if(u.roles.contains(UserRole.Admin)){
               <a href="@routes.KnessetMemberCtrl.showKms(None, None, None)" class="btn btn-lg btn-primary">
-              @Messages("userHome.editKMs")
+                @Messages("userHome.editKMs")
               </a>
               <a href="@routes.KnessetMemberCtrl.showParties()" class="btn btn-lg btn-primary">
-              @Messages("userHome.editParties")
+                @Messages("userHome.editParties")
               </a>
 
-              <a href="javascript:alert('Coming soon')" class="btn btn-lg btn-success">
-              @Messages("userHome.editCampaigns")
+              <hr>
+              <a href="@routes.CampaignMgrCtrl.index()" class="btn btn-lg btn-success">
+                @Messages("userHome.editCampaigns")
               </a>
-              <button type="button" onclick="updateKmsAndPartes()" class="btn btn-sm btn-danger">
-              @Messages("km.api.update")
+              <button type="button" onclick="updateKmsAndPartes()" class="btn btn-lg btn-danger">
+                @Messages("km.api.update")
               </button>
-              <button type="button" onclick="updateCommittees()" class="btn btn-sm btn-danger">
-              @Messages("committee.api.update")
+              <button type="button" onclick="updateCommittees()" class="btn btn-lg btn-danger">
+                @Messages("committee.api.update")
               </button>
             }
-
+            <hr>
             <a href="@routes.UserCtrl.showEditUserPage(u.username)" class="btn btn-lg btn-secondary">
-            @Messages("userEditor.title")
+              @Messages("userEditor.title")
             </a>
             <a href="@routes.UserCtrl.showInviteUser()" class="btn btn-lg btn-secondary">
-            @Messages("users.inviteUser")
+              @Messages("users.inviteUser")
             </a>
           </div>
         </div>
@@ -44,7 +45,7 @@
             <li>@Messages("knessetMembers"): @mkCount</li>
             <li>@Messages("parties"): @ptCount</li>
             <li>@Messages("committees"): @comCount</li>
-            <li>@Messages("campaigns"): <span class="badge badge-pill badge-secondary">n/a</span></li>
+            <li>@Messages("campaigns"): @campaignCount</li>
           </ul>
         </div>
       </div>
