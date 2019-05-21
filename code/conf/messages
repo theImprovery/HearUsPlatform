@@ -299,6 +299,7 @@ campaignMgmt.groups.added={0} הוספה לקמפיין
 campaignMgmt.groups.groupAdded={0} הוספה לקמפיין
 campaigns.table.title=שם הקמפיין
 campaigns.table.isPublished=מפורסם?
+campaigns.table.slug=סלאג
 loadingLabels=טוען תוויות
 groupName=שם הוועדה
 Against=נגד
