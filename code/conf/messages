@@ -31,6 +31,7 @@ navbar.campagins.mgmt.design=עיצוב
 navbar.campagins.mgmt.frontPage=עמוד ראשי
 navbar.campagins.mgmt.positions=עמדות הח״כים
 navbar.campagins.mgmt.CampaignTeam=צוות הקמפיין
+navbar.campagins.mgmt.CampaignGroups=ועדות רלוונטיות
 
 forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
 forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
@@ -73,6 +74,7 @@ error.password.incorrect=Incorrect password
 error.campaignSlug.exists=כבר יש קמפיין עם סלאג כזה
 errors.campaignNotFound=קמפיין לא נמצא.
 errors.noUsersFound=לא נמצאו משתמשים בשם זה
+errors.noGroupsFound=לא נמצאו ועדות בשם זה
 
 groupEditor.title=עריכת קבוצה
 groupEditor.empty=אין כרגע חברי כנסת בקבוצה זו
@@ -172,6 +174,7 @@ updateDesign=עדכון עיצוב
 saveChanges=שמירת שינויים
 campaigner=מנהל קמפיין
 link=קישור
+addGroup=הוסף ועדה
 
 # Common nouns
 campaign=קמפיין
@@ -214,8 +217,8 @@ search.empty=אין תוצאות
 search.text=הקלד טקסט לחיפוש
 search=חיפוש
 KMsearch.placeholder=שם ח״כ או מפלגה
-km.api.update=שאב מידע
-committee.api.update=עדכן ועדות
+km.api.update=ייבוא חברי כנסת
+committee.api.update=ייבוא ועדות
 
 
 campaigns.delete=מחיקת קמפיין
@@ -279,15 +282,25 @@ campaignMgmt.team.userSearch.placeholder=שם משתמש, או שם רגיל
 campaignMgmt.team.removeAdmin=הפוך למשתתף
 campaignMgmt.team.makeAdmin=הפוך למנהל
 campaignMgmt.team.removeFromTeam=הסרה
-campaginMgmt.team.userAdded={0} נוספ/ה לצוות הקמפיין
-campaginMgmt.team.userMadeAdmin={0} קיבל/ה זכויות ניהול בקמפיין זה
-campaginMgmt.team.userRemovedFromAdmin={0} כבר לא מנהל/ת בקמפיין זה
-campaginMgmt.team.userRemovedFromTeam={0} עזב/ה את צוות הקמפיין
-campaginMgmt.team.cantRemoveLastAdmin=לא ניתן להסיר את המנהל האחרון בקמפיין
-campaginMgmt.team.cantRemoveLastAdmin.details=יש למנות משתמש אחר למנהל, ולנסות שוב
+campaignMgmt.team.userAdded={0} נוספ/ה לצוות הקמפיין
+campaignMgmt.team.userMadeAdmin={0} קיבל/ה זכויות ניהול בקמפיין זה
+campaignMgmt.team.userRemovedFromAdmin={0} כבר לא מנהל/ת בקמפיין זה
+campaignMgmt.team.userRemovedFromTeam={0} עזב/ה את צוות הקמפיין
+campaignMgmt.team.cantRemoveLastAdmin=לא ניתן להסיר את המנהל האחרון בקמפיין
+campaignMgmt.team.cantRemoveLastAdmin.details=יש למנות משתמש אחר למנהל, ולנסות שוב
+campaignMgmt.groups.help=ועדות רלוונטיות לקמפיין
+campaignMgmt.groups.part=ועדות רלוונטיות
+campaignMgmt.groups.add=הוספת ועדה חדשה
+campaignMgmt.groups.groupSearch=חיפוש ועדה
+campaignMgmt.groups.groupSearch.placeholder=שם ועדה או חלק ממנה
+campaignMgmt.groups.removeFromCampaign=הסר
+campaignMgmt.groups.groupRemoved=הוועדה הוסרה
+campaignMgmt.groups.added={0} הוספה לקמפיין
+campaignMgmt.groups.groupAdded={0} הוספה לקמפיין
 campaigns.table.title=שם הקמפיין
 campaigns.table.isPublished=מפורסם?
 loadingLabels=טוען תוויות
+groupName=שם הוועדה
 Against=נגד
 For=בעד
 Neutral=נייטרלי

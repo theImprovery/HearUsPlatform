@@ -47,6 +47,7 @@ object CampaignEditorSections extends Enumeration {
   val FrontPage       = Value("FrontPage")
   val KnessetMembers  = Value("KnessetMembers")
   val CampaignTeam    = Value
+  val CampaignGroups  = Value("CampaignGroups")
 }
 
 
@@ -88,7 +89,8 @@ object Structure {
     PageSection("navbar.campagins.mgmt.frontPage", CampaignEditorSections.FrontPage, routes.CampaignMgrCtrl.showFrontPageEditor(campaign.id)),
     PageSection("navbar.campagins.mgmt.design",    CampaignEditorSections.Design, routes.CampaignMgrCtrl.showCampaignDesign(campaign.id)),
     PageSection("navbar.campagins.mgmt.positions", CampaignEditorSections.KnessetMembers, routes.CampaignMgrCtrl.positions(campaign.id)),
-    PageSection("navbar.campagins.mgmt.CampaignTeam", CampaignEditorSections.CampaignTeam, routes.CampaignMgrCtrl.showCampaignTeam(campaign.id))
+    PageSection("navbar.campagins.mgmt.CampaignTeam", CampaignEditorSections.CampaignTeam, routes.CampaignMgrCtrl.showCampaignTeam(campaign.id)),
+    PageSection("navbar.campagins.mgmt.CampaignGroups", CampaignEditorSections.CampaignGroups, routes.CampaignMgrCtrl.showCampaignGroups(campaign.id))
   )
 
 
