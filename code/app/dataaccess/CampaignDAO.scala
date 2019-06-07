@@ -161,6 +161,10 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
       campaigns.map( _.slug ).filter( _.toLowerCase === name.toLowerCase() ).exists.result
     }
   }
+  
+  def getBySlug( slug:String ):Future[Option[Campaign]] = {
+    db.run( campaigns.filter( _.slug.toLowerCase === slug.toLowerCase).result ).map( _.headOption )
+  }
 
   def updatePublish( campId:Long, isPublish:Boolean ):Future[Int] = {
     db.run(
