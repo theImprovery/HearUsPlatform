@@ -5,12 +5,13 @@ import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
+import com.sun.org.glassfish.gmbal.ManagedObjectManager.RegistrationDebugLevel
 import dataaccess._
 import javax.inject.Inject
 import models._
 import play.api.{Configuration, Logger}
 import play.api.i18n._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{ControllerComponents, InjectedController, Result}
 import security.HearUsSubject
@@ -25,6 +26,7 @@ import scala.concurrent.Future
 
 class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                 campaigns:CampaignDAO, users:UsersDAO, usersCampaigns:UserCampaignDAO,
+                                groups:KmGroupDAO,
                                 langs:Langs, messagesApi:MessagesApi, images: ImagesDAO,
                                 conf:Configuration, ws:WSClient) extends InjectedController {
   
@@ -32,6 +34,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }
+  private val logger = Logger(classOf[CampaignMgrCtrl])
 
 
   val actionForm = Form(
@@ -331,7 +334,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
             if ( didAdd ) {
                Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
                   FlashKeys.MESSAGE->Informational(InformationalLevel.Success,
-                                                    Messages("campaginMgmt.team.userAdded", userOpt.get.username)).encoded)
+                                                    Messages("campaignMgmt.team.userAdded", userOpt.get.username)).encoded)
             } else {
               NotFound("Can't add to team. Are you sure the user exist?")
   }}})}}
@@ -354,7 +357,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
             if ( madeAdmin ){
               Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
                 FlashKeys.MESSAGE->Informational(InformationalLevel.Success,
-                  Messages("campaginMgmt.team.userMadeAdmin", userOpt.get.username)).encoded)
+                  Messages("campaignMgmt.team.userMadeAdmin", userOpt.get.username)).encoded)
             } else {
               NotFound("Can't add to team. Are you sure the user exist?")
             }
@@ -379,12 +382,12 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
               if ( removed ) {
                 Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
                   FlashKeys.MESSAGE->Informational(InformationalLevel.Success,
-                    Messages("campaginMgmt.team.userRemovedFromAdmin", userOpt.get.username)).encoded)
+                    Messages("campaignMgmt.team.userRemovedFromAdmin", userOpt.get.username)).encoded)
               } else {
                 Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
                   FlashKeys.MESSAGE->Informational(InformationalLevel.Danger,
-                    Messages("campaginMgmt.team.cantRemoveLastAdmin"),
-                    Messages("campaginMgmt.team.cantRemoveLastAdmin.details")).encoded)
+                    Messages("campaignMgmt.team.cantRemoveLastAdmin"),
+                    Messages("campaignMgmt.team.cantRemoveLastAdmin.details")).encoded)
               }
             } else {
               NotFound("User not found")
@@ -408,13 +411,13 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
               case (false, _) => NotFound("Can't add to team. Are you sure the user exist?")
               case (true, false) => Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
                   FlashKeys.MESSAGE->Informational(InformationalLevel.Danger,
-                                                    Messages("campaginMgmt.team.cantRemoveLastAdmin"),
-                                                    Messages("campaginMgmt.team.cantRemoveLastAdmin.details")).encoded)
+                                                    Messages("campaignMgmt.team.cantRemoveLastAdmin"),
+                                                    Messages("campaignMgmt.team.cantRemoveLastAdmin.details")).encoded)
               case (true, true) => Redirect(routes.CampaignMgrCtrl.showCampaignTeam(id)).flashing(
-                  FlashKeys.MESSAGE->Informational(InformationalLevel.Success, Messages("campaginMgmt.team.userRemovedFromTeam",
+                  FlashKeys.MESSAGE->Informational(InformationalLevel.Success, Messages("campaignMgmt.team.userRemovedFromTeam",
                                                                                           userOpt.get.username)).encoded)
   }}})}}
-  
+
   def showCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
     campaignEditorAction(id) {
       for {
@@ -426,11 +429,87 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           val csses = c.themeData.split("/*---*/")
           val cssMap = parseCampaignDesign(csses(0))
           Ok( views.html.campaignMgmt.design(c, Position.values.toSeq,
-              campImg, conf.get[String]("hearUs.files.campaignImages.url"),
-              cssMap, if (csses.length>1){csses(1)}else{""})
+            campImg, conf.get[String]("hearUs.files.campaignImages.url"),
+            cssMap, if (csses.length>1){csses(1)}else{""})
           )
         }
       }
+    }
+  }
+
+  def showCampaignGroups( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
+    campaignEditorAction(id) {
+      for {
+        campaign <- campaigns.getCampaign(id)
+          groups <- groups.getGroupsForCampaign(id)
+      } yield campaign match{
+        case None => NotFound("Can't find campaign")
+        case Some(c) => {
+          val curUser = req.subject.get.asInstanceOf[HearUsSubject].user
+          Ok( views.html.campaignMgmt.campaignGroups(c, groups, curUser )
+          )
+        }
+      }
+    }
+  }
+
+
+  def getGroups(searchStr:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
+    val sqlSearch = "%"+searchStr.trim+"%"
+    groups.allGroupsDN(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans)))
+  }
+
+  val groupIdForm = Form( single(
+    "groupId" -> longNumber
+  ))
+
+  def doAddGroupToCampaign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(id) {
+      groupIdForm.bindFromRequest().fold(
+        fwe => {
+          Logger.warn( fwe.errors.mkString("\n") )
+          Future(BadRequest("Error"))
+        },
+        groupId => {
+          for {
+            groupOpt <- groups.getGroupDN(groupId)
+            added <- if (groupOpt.isDefined)
+              groups.addGroupToCampaign(RelevantGroup(id, groupId)).map(_ => true)
+            else Future(false)
+          } yield {
+            if (added) {
+              Redirect(routes.CampaignMgrCtrl.showCampaignGroups(id)).flashing(
+                FlashKeys.MESSAGE -> Informational(InformationalLevel.Success,
+                  Messages("campaignMgmt.groups.groupAdded", groupOpt.get.name)).encoded)
+            } else {
+              NotFound("Can't find group " + groupId)
+            }
+          }
+        }
+      )
+    }
+  }
+
+  def doRemoveGroupFromCampaign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.tolerantJson) { implicit req =>
+    campaignEditorAction(id) {
+      req.body.validate[JsObject].fold(
+        fwe => {
+          Logger.warn( fwe.mkString("\n") )
+          Future(BadRequest("Error"))
+        },
+        json => {
+          val groupId = json("groupId").as[Long]
+          for {
+            groupOpt <- groups.getGroupDN(groupId)
+          } yield groupOpt match {
+            case None => NotFound("Can't find group " + groupId)
+            case Some(group) => {
+              groups.removeGroupFromCamp(id, groupId)
+              Ok("").flashing(
+                FlashKeys.MESSAGE->Informational(InformationalLevel.Success, Messages("campaignMgmt.groups.groupRemoved")).encoded)
+            }
+          }
+        })
     }
   }
   

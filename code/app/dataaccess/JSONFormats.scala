@@ -59,4 +59,5 @@ object JSONFormats {
   implicit val userFormat:Format[User] = Json.format[User]
   implicit val userDnFormat:Format[UserDN] = Json.format[UserDN]
   implicit val campaignDetailsFormat:Format[CampaignDetails] = Json.format[CampaignDetails]
+  implicit val groupsDNFormat:Format[KmGroupDN] = Json.format[KmGroupDN]
 }

@@ -1,7 +1,7 @@
 package dataaccess
 
 import javax.inject.Inject
-import models.{GroupIdKmId, KmGroupDN, KmGroups, KnessetMember}
+import models._
 import play.api.Configuration
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
@@ -15,6 +15,8 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
   import profile.api._
   private val groups = TableQuery[GroupTable]
   private val kmsGroups = TableQuery[KmGroupTable]
+  private val camGroups = TableQuery[RelevantGroupTable]
+  private val campaigns = TableQuery[CampaignTable]
 
   def addGroup( group:KmGroups ):Future[KmGroups] = {
     val groupRow = KmGroupDN(group.id, group.name, group.knessetKey)
@@ -68,7 +70,15 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
     ) map( s => s.map( _.kmId ))
   }
 
-  def allGroupsDN:Future[Seq[KmGroupDN]] = db.run( groups.result )
+  def allGroupsDN(searchStr:Option[String]):Future[Seq[KmGroupDN]] = {
+    db.run{
+      searchStr match {
+        case None => groups.result
+        case Some(str) => groups.filter( row =>
+          row.name.like(str)).result
+      }
+    }
+  }
 
   def allGroups: Future[Seq[KmGroups]] = {
     val groupsAndKms = for {
@@ -86,6 +96,7 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
     }
   }
 
+
   def deleteGroup( id:Long ):Future[Int] = {
     db.run{
       kmsGroups.filter( _.groupId === id ).delete
@@ -97,6 +108,22 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
   }
 
   def countGroups():Future[Int] = db.run(groups.size.result)
+
+  def getGroupsForCampaign(id:Long): Future[Seq[KmGroupDN]] = {
+    db.run(
+      camGroups.join(groups).on((cg, g) => cg.groupId === g.id )
+        .filter( _._1.camId ===id)
+        .map( _._2).result
+    )
+  }
+
+  def addGroupToCampaign(row:RelevantGroup) = db.run(camGroups += row)
+
+  def removeGroupFromCamp(camId: Long, groupId: Long) = {
+    db.run(
+      camGroups.filter(r => r.camId === camId && r.groupId === groupId).delete
+    )
+  }
 
   private def idsToSet( ids:Iterable[Long] ):Set[KnessetMember] = {
     val res = Future.sequence(ids.map(knessetMembers.getKM).toSet)

@@ -234,7 +234,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def showGroups = deadbolt.SubjectPresent()() { implicit req =>
     for {
-      groupList <- groups.allGroupsDN
+      groupList <- groups.allGroupsDN(None)
     } yield {
       Ok(views.html.knesset.groups(groupList))
     }
@@ -287,7 +287,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def deleteGroup(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     for {
       deleted <- groups.deleteGroup(id)
-      groups <- groups.allGroupsDN
+      groups <- groups.allGroupsDN(None)
     } yield {
       Ok(views.html.knesset.groups(groups))
     }
