@@ -18,7 +18,8 @@
   <meta name="description" content="@campaign.title - @campaign.slogan">
   <link rel="canonical" href="@campaign.website">
 @*  <link rel="icon" type="image/x-icon" href="{{ "/favicon.ico"  | prepend: site.baseurl }}" />*@
-
+  <link rel="stylesheet" href="@routes.Assets.versioned("vnd/grayscale/grayscale.min.css")">
+  <link rel="stylesheet" href="@routes.Assets.versioned("css/publics.min.css")">
   <style type="text/css">
     @Html(campaign.themeData)
   </style>
@@ -28,6 +29,7 @@
 @bottom = {
   @campaign.analytics
   @extraBottom
+  <script src="@routes.Assets.versioned("vnd/grayscale/grayscale.min.js")"></script>
 }
 
 @bsBase(campaign.title, top, bottom){

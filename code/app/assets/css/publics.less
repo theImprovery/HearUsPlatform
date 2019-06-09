@@ -1,0 +1,135 @@
+@btn-round-edge: 4em;
+.btn-round {
+  border: 1px solid currentColor;
+  border-radius: @btn-round-edge/2;
+  width: @btn-round-edge;
+  height: @btn-round-edge;
+  padding: 0;
+  text-align: center;
+  line-height: @btn-round-edge;
+  i.fa {
+    text-align: center;
+  }
+}
+
+ul.km-list {
+  padding: 0;
+  list-style: outside none none;
+  text-align: center;
+
+  li {
+    position: relative;
+    display: inline-block;
+    width: 110px;
+    height: 170px;
+    margin: 14px;
+    text-align: center;
+    vertical-align: text-bottom;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-size: 14px;
+
+    a.km-card {
+      display: block;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+
+      &:hover {
+        color: white;
+        background-color: rgba(0, 0, 0, 0.4);
+        box-shadow: 0 0 4px rgba(255, 255, 255, 0.4);
+
+        .act-tag {
+          opacity: 1;
+        }
+
+        div.km-mask {
+          opacity: 0;
+        }
+      }
+
+
+      .km-image {
+        margin-top: 5px;
+        width: 100px;
+      }
+
+      .km-name {
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .km-party {
+        font-weight: normal;
+      }
+
+      div.km-mask {
+        display: block;
+        position: absolute;
+        top: 5px;
+        height: 100px;
+        left: 5px;
+        right: 5px;
+        opacity: 0.3;
+        transition: opacity 0.5s;
+      }
+    }
+
+    .act-tag {
+      border: 1px solid currentColor;
+      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
+      opacity: .8;
+      position: absolute;
+      left: 5px;
+      top: 72px;
+      width: auto;
+      height: auto;
+      transform: rotate(20deg);
+      -o-transform: rotate(20deg);
+      -moz-transform: rotate(20deg);
+      -webkit-transform: rotate(20deg);
+      border-radius: 5px;
+      padding: 5px;
+      font-size: 0.9em;
+      transition: opacity .5s;
+    }
+  }
+
+  li.status-for .act-tag {
+    border-color: #32b33b;
+    color: #32b33b;
+  }
+
+  li.status-against .act-tag {
+    border-color: #f62c10;
+    color: #f62c10;
+  }
+
+  li.status-undecided .act-tag {
+    border-color: #888888;
+    color: #888888;
+  }
+
+  li.status-neutral .act-tag {
+    border-color: #666666;
+    color: #666666;
+  }
+
+  li.status-for div.mk-mask {
+    background-color: rgba(50, 179, 59, 0.25);
+  }
+
+  li.status-against div.mk-mask {
+    background-color: rgba(246, 44, 16, 0.25);
+  }
+
+  li.status-undecided div.mk-mask {
+    background-color: rgba(136, 136, 136, 0.25);
+  }
+
+  li.status-neutral div.mk-mask {
+    background-color: rgba(100, 100, 100, 0.25);
+  }
+}
+

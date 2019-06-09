@@ -1,26 +1,40 @@
-@(campaign:Campaign, texts:CampaignText)(implicit request: RequestHeader, msgs:MessagesProvider)
+@(campaign:Campaign, texts:CampaignText, kms:Seq[KnessetMember],
+        km2Party:Map[Long,Party],  km2Image:Map[Long,String], km2Pos:Map[Long,models.Position.Value]
+
+)(implicit request: RequestHeader, msgs:MessagesProvider)
 
 @templates.publicCampaign(campaign){
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <h1><pre>NAV GOES HERE</pre></h1>
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">@campaign.title</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        @Messages("public.navbar.menu")
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#sectionMainText">@Messages("public.navbar.about")</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#sectionKMs">@Messages("public.navbar.mks")</a>
+          </li>
+        </ul>
       </div>
     </div>
-  </div>
-<!-- Header -->
-<header class="masthead">
-  <div class="container d-flex h-100 align-items-center">
-    <div class="mx-auto text-center">
-      <h1 class="mx-auto my-0 text-uppercase">@texts.title</h1>
-      <h2 class="mx-auto mt-2 mb-5">@texts.subtitle</h2>
-      <a href="#mainText" class="btn btn-primary js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
-    </div>
-  </div>
-</header>
+  </nav>
 
-  <!-- About Section -->
-  <section id="mainText" class="about-section text-center">
+  <header class="masthead" id="page-top">
+    <div class="container d-flex h-100 align-items-center">
+      <div class="mx-auto text-center">
+        <h1 class="mx-auto my-0 text-uppercase">@texts.title</h1>
+        <h2 class="mx-auto mt-2 mb-5">@texts.subtitle</h2>
+        <a href="#sectionMainText" class="btn btn-round js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
+      </div>
+    </div>
+  </header>
+
+  <section id="sectionMainText">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
@@ -29,29 +43,28 @@
       </div>
       <div class="row">
         <div class="col text-center">
-          <a href="#mkSection" class="btn btn-primary js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
+          <a href="#sectionKMs" class="btn btn-round js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
         </div>
       </div>
     </div>
   </section>
 
-
-  <section id="mkSection" class="about-section text-center">
+  <section id="sectionKMs" class="text-center">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
-        <pre>MK IMAGES GO HERE.</pre>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col text-center">
-          <a href="#mkSection" class="btn btn-primary js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
+        <h2>@Messages("public.sections.mks.title")</h2>
+          <ul id="kms" class="km-list">
+            @for(km <- kms){
+              <li class="@km2Pos(km.id).toString">@comps.kmCard(km, km2Party.get(km.id), km2Pos(km.id), km2Image(km.id), texts.kmLabel((models.Gender.withName(km.gender.toLowerCase), km2Pos(km.id))) )</li>
+            }
+          </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="footerSecion" class="about-section text-center">
+  <section id="footerSection" class="text-center">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
@@ -60,5 +73,4 @@
       </div>
     </div>
   </section>
-
 }

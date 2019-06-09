@@ -5,8 +5,8 @@ import dataaccess.Platform
 
 object Gender extends Enumeration {
   type Gender = Value
-  val Female = Value("female")
-  val Male = Value("male")
+  val Female:Gender = Value("female")
+  val Male:Gender = Value("male")
 }
 
 
