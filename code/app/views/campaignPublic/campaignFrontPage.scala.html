@@ -1,0 +1,64 @@
+@(campaign:Campaign, texts:CampaignText)(implicit request: RequestHeader, msgs:MessagesProvider)
+
+@templates.publicCampaign(campaign){
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h1><pre>NAV GOES HERE</pre></h1>
+      </div>
+    </div>
+  </div>
+<!-- Header -->
+<header class="masthead">
+  <div class="container d-flex h-100 align-items-center">
+    <div class="mx-auto text-center">
+      <h1 class="mx-auto my-0 text-uppercase">@texts.title</h1>
+      <h2 class="mx-auto mt-2 mb-5">@texts.subtitle</h2>
+      <a href="#mainText" class="btn btn-primary js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
+    </div>
+  </div>
+</header>
+
+  <!-- About Section -->
+  <section id="mainText" class="about-section text-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          @Html(texts.bodyText)
+        </div>
+      </div>
+      <div class="row">
+        <div class="col text-center">
+          <a href="#mkSection" class="btn btn-primary js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="mkSection" class="about-section text-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+        <pre>MK IMAGES GO HERE.</pre>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col text-center">
+          <a href="#mkSection" class="btn btn-primary js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="footerSecion" class="about-section text-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          @texts.footer
+        </div>
+      </div>
+    </div>
+  </section>
+
+}

@@ -1,5 +1,6 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 application.title=תשמעו אותנו
+application.url=http://hear-us.codeworth.io
 
 navbar.title=תשמעו אותנו
 navbar.logout=התנתקות
@@ -230,7 +231,7 @@ campaigns.slug.help=התווים האחרונים של כתובת אתר הקמ�
 campaigns.title=שם הקמפיין
 campaigns.title.help=שם הקמפיין, מופיע בכותרת הדף וברשימות
 campaigns.analyticsCode=קוד איסוף סטטיסטיקה
-campaigns.analyticsCode.help=משמש לצורך איסוף סטטיסטיקות על המשתמשים באתר. ניתן לקבל קוד כזה משירותים שאוספים סטטיסטיקה כזו, כדוגמת Google Analytics או matomo.org.
+campaigns.analyticsCode.help=משמש לצורך איסוף סטטיסטיקות על המשתמשים באתר. ניתן לקבל קוד כזה משירותים שאוספים סטטיסטיקה כזו, כדוגמת Google Analytics או matomo.org. יש להכניס את הקוד בשלמותו, כולל תגיות ה-<script>.
 campaigns.noLabels=לא הוכנסו תוויות
 campaigns.noCampaignsInSystem=אין קמפיינים במערכת כרגע
 campaigns.createNew=יצירת קמפיין חדש
@@ -301,3 +302,4 @@ campaigns.noMessages=לא הוכנסו הודעות
 background=רקע
 
 newCampaigner.noCampainger=נא לבחור מנהל קמפיין
+

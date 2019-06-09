@@ -1,0 +1,41 @@
+@(campaign:Campaign, extraHead: Html=Html(""), extraBottom: Html=Html(""))(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
+
+
+@top = {
+  <meta property="og:title" content="@campaign.title"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="@campaign.website"/>
+  <meta property="og:site_name" content="@campaign.title"/>
+@*  <meta property="og:image" content="@campaign." />*@
+  <meta property="og:description" content="@campaign.title - @campaign.slogan"/>
+  <meta name="twitter:card" content="summary" />
+@*  <meta name="twitter:site" content="{{ site.twitter_username }}" />*@
+  <meta name="twitter:title" content="@campaign.title" />
+  <meta name="twitter:description" content="@campaign.title - @campaign.slogan" />
+@*  <meta name="twitter:image" content="{{site.url}}{{site.baseurl}}{% if include.twimage %}{{ include.twimage }}{% else %}{{ site.twimage }}{% endif %}" />*@
+  <meta name="twitter:url" content="@campaign.website" />
+
+  <meta name="description" content="@campaign.title - @campaign.slogan">
+  <link rel="canonical" href="@campaign.website">
+@*  <link rel="icon" type="image/x-icon" href="{{ "/favicon.ico"  | prepend: site.baseurl }}" />*@
+
+  <style type="text/css">
+    @Html(campaign.themeData)
+  </style>
+  @extraHead
+}
+
+@bottom = {
+  @campaign.analytics
+  @extraBottom
+}
+
+@bsBase(campaign.title, top, bottom){
+  @content
+
+  <footer class="bg-black small text-center">
+    <div class="container" style="direction: ltr">
+      Powered by <a href="@Messages("application.url")">@Messages("application.title")</a>. Layout based on <a href="https://startbootstrap.com/themes/grayscale/">Grayscale</a>.
+    </div>
+  </footer>
+}
