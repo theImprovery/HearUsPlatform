@@ -28,7 +28,7 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
   def getImageForKm(kmId:Long ):Future[Option[KMImage]] = {
     db.run {
       images.filter( _.kmId === kmId ).result
-    } map { _.headOption}
+    }.map(_.headOption)
   }
 
   def getImageForCampaign(camId:Long ):Future[Option[KMImage]] = {
@@ -45,6 +45,10 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
       }
     } map { _.headOption}
   }
+  
+  def getAllKmImages:Future[Map[Long,KMImage]] = db.run {
+    images.filter( _.kmId.nonEmpty ).result
+  }.map( res => res.map(r=>(r.kmId.get,r)).toMap )
 
   def deleteImageRecord(id:Long):Future[Int] = {
     db.run {

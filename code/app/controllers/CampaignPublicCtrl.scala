@@ -25,6 +25,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
       parties <- kms.getAllParties.map( pSeq => pSeq.map( p=>(p.id, p) ).toMap )
       campId = campOpt.map( _.id ).getOrElse(-1l)
       dbPositions <- campaigns.getPositions(campId).map( posSeq => posSeq.map( p => (p.kmId, p.position)).toMap )
+      kmImages <- images.getAllKmImages
     } yield {
       campOpt match {
         case None => NotFound( views.html.errorPage(404, messagesApi.preferred(req)("errors.campaignNotFound")))
@@ -33,7 +34,10 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
                                .filter( _._2.isDefined)
                                .map( p => (p._1, p._2.get)).toMap
           val imagePrefix = conf.get[String]("hearUs.files.mkImages.url")
-          val km2Image = kmsSeq.map( km=> (km.id, "/assets/images/kmNoImage.jpg")).toMap
+          
+          val km2Image = kmsSeq.map( km => (km.id,
+                                            kmImages.get(km.id).map( imagePrefix + _.filename ).getOrElse("/assets/images/kmNoImage.jpg")
+                                           ) ).toMap
           val km2Position = kmsSeq.map( km => (km.id, dbPositions.getOrElse(km.id, Position.Undecided))).toMap
           Ok( views.html.campaignPublic.campaignFrontPage(c, texts.get, kmsSeq, km2Party, km2Image, km2Position) )
         }
