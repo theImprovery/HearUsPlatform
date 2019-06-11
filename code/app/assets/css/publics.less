@@ -148,7 +148,6 @@ ul.km-list {
     border: 1px solid black;
     margin: 0;
     padding: .3em;
-    background-color: transparent;
     transition: background-color 0.5s;
     border-radius: 0;
     border-left: none;
@@ -163,13 +162,26 @@ ul.km-list {
     }
 
     &:hover {
-      background-color: white;
+      box-shadow: 0 0 8px white inset;
+      border-color: currentColor;
+
+      span.badge {
+        box-shadow: 0 0 8px white;
+      }
     }
 
     &:active {
       top: 2px;
-      background-color: yellow;
       box-shadow: 0 2px 2px rgba(0,0,0,.5);
+    }
+
+    &.selected {
+      top: 2px;
+      box-shadow: 0 2px 2px rgba(0,0,0,.5);
+      border-left-width: 1px;
+      span.badge {
+        border: 1px solid currentColor;
+      }
     }
   }
 }
