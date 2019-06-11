@@ -1,9 +1,17 @@
-@(campaign:Campaign, texts:CampaignText, kms:Seq[KnessetMember],
-        km2Party:Map[Long,Party],  km2Image:Map[Long,String], km2Pos:Map[Long,models.Position.Value]
+@(campaign:Campaign, texts:CampaignText, kms:Seq[KnessetMember], parties:Seq[Party], committees:Seq[KmGroupDN],
+        km2Party:Map[Long,Party],  km2Image:Map[Long,String], km2Pos:Map[Long,models.Position.Value], km2Cmt:Map[Long,Iterable[Long]]
 
 )(implicit request: RequestHeader, msgs:MessagesProvider)
 
-@templates.publicCampaign(campaign){
+@scripts={
+  <script>
+    let mk2cmt = {
+      @km2Cmt.map( kc => kc._1 + ": " + kc._2.mkString("[",",","]") ).mkString(",\n")
+    };
+  </script>
+}
+
+@templates.publicCampaign(campaign, scripts){
   <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
     <div class="container">
       <a class="navbar-brand js-scroll-trigger" href="#page-top">@campaign.title</a>
@@ -53,10 +61,33 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
-        <h2>@Messages("public.sections.mks.title")</h2>
+          <h2>@Messages("public.sections.mks.title")</h2>
+          <div>
+            <select id="groupSelect" class="custom-select" onchange="filterByGroup( this.value ); updateMkDisplay();" autocomplete="off">
+              <option id="all" value="p_all">@Messages("public.filter.menu.all")</option>
+              <optgroup label="@Messages("public.filter.menu.parties")">
+                @for( p<-parties ){ <option value="p_@p.id">@p.name</option>}
+              </optgroup>
+              <optgroup label="@Messages("public.filter.menu.committees")">
+              @for( c<-committees ){ <option value="c_@c.id">@c.name</option>}
+              </optgroup>
+            </select>
+            <br />
+            <div class="filter-btns">
+              <button class="btn btn-sm active" onclick="filterBySupport(null)" id="btnAllLabel">@Messages("public.filter.all")
+                <br>
+                <span class="badge badge-pill badge-secondary" id="allCount">0</span>
+              </button>
+              @for( pos <- Seq(Position.Undecided, Position.Against, Position.Neutral, Position.For) ) {
+                <button class="btn btn-no btn-sm" onclick="filterBySupport('@pos.toString')" id="btn@{pos.toString}">
+                  @texts.groupLabel(pos)<br>
+                  <span class="badge badge-pill badge-secondary" id="@{pos.toString.toLowerCase}Count">0</span>
+                </button>
+              }
+            </div>
           <ul id="kms" class="km-list">
             @for(km <- kms){
-              <li class="@km2Pos(km.id).toString">@comps.kmCard(km, km2Party.get(km.id), km2Pos(km.id), km2Image(km.id), texts.kmLabel((models.Gender.withName(km.gender.toLowerCase), km2Pos(km.id))) )</li>
+              <li data-kmId="@km.id" data-kmParty="@km.partyId" class="@km2Pos(km.id).toString">@comps.kmCard(km, km2Party.get(km.id), km2Pos(km.id), km2Image(km.id), texts.kmLabel((models.Gender.withName(km.gender.toLowerCase), km2Pos(km.id))) )</li>
             }
           </ul>
         </div>

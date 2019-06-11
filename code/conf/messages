@@ -321,3 +321,7 @@ public.navbar.menu=תפריט
 public.navbar.about=אודות
 public.navbar.mks=ללחוץ
 public.sections.mks.title=ללחוץ על ח״כ
+public.filter.all=כולם
+public.filter.menu.all=כל חברי הכנסת
+public.filter.menu.parties=מפלגות
+public.filter.menu.committees=וועדות
