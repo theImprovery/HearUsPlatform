@@ -38,7 +38,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
     
     Logger.info( s"got file $filename with suffix $suffix")
     Logger.info( "Uploaded: " + uploadedFile.toString  + " -- " + uploadedFile.ref.toString )
-    val related = (subjectType) match {
+    val related = subjectType match {
       case "kms" => (Some(subjectId.toLong), None)
       case "camps" => (None, Some(subjectId.toLong))
     }
@@ -59,6 +59,16 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
         Ok(Json.obj( "success"->true, "record"->Json.toJson(fileDbRecord)) )
       })
 
+  }
+  
+  def getKmImage( id:Long ) = Action.async{ req =>
+    images.getImageForKm(id).map({
+      case None => NotFound("no mk image")
+      case Some( img ) => {
+        val filePath = Paths.get(config.get[String]("hearUs.files.mkImages.folder"))
+        Ok.sendPath(filePath.resolve(img.filename))
+      }
+    })
   }
   
   def apiFilesForKm( kmId:Long ) = Action.async{ req =>

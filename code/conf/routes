@@ -129,3 +129,4 @@ GET     /routes/be     controllers.HomeCtrl.backEndRoutes
 
 # Upoaded files
 GET     /files/*file   controllers.ExternalFilesCtrl.getFile(file)
+GET     /images/kms/:id  controllers.FilesCtrl.getKmImage(id:Long)

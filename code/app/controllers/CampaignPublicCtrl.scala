@@ -40,7 +40,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
           val imagePrefix = conf.get[String]("hearUs.files.mkImages.url")
           
           val km2Image = kmsSeq.map( km => (km.id,
-                                            kmImages.get(km.id).map( imagePrefix + _.filename ).getOrElse("/assets/images/kmNoImage.jpg")
+                                            kmImages.get(km.id).map( _ => imagePrefix + km.id ).getOrElse("/assets/images/kmNoImage.jpg")
                                            ) ).toMap
           val km2Position = kmsSeq.map( km => (km.id, dbPositions.getOrElse(km.id, Position.Undecided))).toMap
           val km2Cmt = memberships.map( kv => kv._2.map(km =>(km,kv._1)) ).flatten.groupBy(_._1).map( kv => (kv._1, kv._2.map(_._2).toSet))

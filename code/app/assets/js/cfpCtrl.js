@@ -50,7 +50,7 @@ const cfpCtrl = (function () {
 
     function updateKmDisplay() {
         if (blockKmUpdates) return;
-        // MK card animation
+        // KM card animation
         d3Selection.transition().duration(1000).style("width", function (mk) {
             return (groupFilter(mk) && statusFilter(mk)) ? "110px" : "0px";
         }).style("margin-left", function (mk) {

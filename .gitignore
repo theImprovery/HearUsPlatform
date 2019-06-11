@@ -6,3 +6,10 @@ target
 /.project
 /.settings
 /RUNNING_PID
+/var/files/kms/*.png
+/var/files/kms/*.jpg
+/var/files/kms/*.gif
+/var/files/km/*.png
+/var/files/km/*.jpg
+/var/files/km/*.gif
+~
