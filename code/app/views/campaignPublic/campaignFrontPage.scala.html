@@ -45,11 +45,21 @@
   </nav>
 
   <header class="masthead" id="page-top">
-    <div class="container d-flex h-100 align-items-center">
-      <div class="mx-auto text-center">
-        <h1 class="mx-auto my-0 text-uppercase">@texts.title</h1>
-        <h2 class="mx-auto mt-2 mb-5">@texts.subtitle</h2>
-        <a href="#sectionMainText" class="btn btn-round js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
+    <div class="container">
+      <div class="row">
+        <div class="col text-center">
+          <h1 class="mx-auto my-0 text-uppercase">@texts.title</h1>
+          <h2 class="mx-auto mt-2 mb-5">@texts.subtitle</h2>
+          <a href="#sectionMainText" class="btn btn-round js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
+          <ul class="socialLinks">
+            @defining( helper.urlEncode(campaign.title + ": " + campaign.slogan) ){ encText=>
+              <li><a href=""><i class="fa fa-twitter"></i></a></li>
+              <li><a href=""><i class="fa fa-facebook"></i></a></li>
+              <li><a href="mailto:?subject=@encText"><i class="fa fa-envelope"></i></a></li>
+              <li><a href="whatsapp://send?text=@encText" data-action="share/whatsapp/share"><i class="fa fa-whatsapp"></i></a></li>
+            }
+          </ul>
+        </div>
       </div>
     </div>
   </header>
