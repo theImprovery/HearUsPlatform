@@ -1,5 +1,5 @@
 /*!
- * Start Bootstrap - Grayscale-adapted2 v5.0.7 (https://startbootstrap.com/template-overviews/grayscale)
+ * Start Bootstrap - Grayscale-adapted 3 v5.0.7 (https://startbootstrap.com/template-overviews/grayscale)
  * Copyright 2013-2019 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-grayscale/blob/master/LICENSE)
  */
@@ -116,7 +116,6 @@
 @media (min-width: 992px) {
   .masthead {
     height: 100vh;
-    padding: 0;
   }
   .masthead h1 {
     font-size: 6.5rem;
