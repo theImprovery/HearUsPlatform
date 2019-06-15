@@ -122,7 +122,11 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   def getPositions( camId:Long ):Future[Seq[KmPosition]] = {
     db.run( positions.filter( _.camId === camId ).result)
   }
-
+  
+  def getPosition( camId:Long, kmId:Long ):Future[Option[KmPosition]] = {
+    db.run( positions.filter( r => (r.camId===camId) && (r.kmId===kmId) ).result).map(_.headOption)
+  }
+  
   def updatePosition( pos: KmPosition ):Future[KmPosition] = {
     db.run(
       (positions returning positions).insertOrUpdate(pos)
@@ -134,7 +138,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   }
 
   def getActions( camId:Long, kmId:Long ):Future[Seq[KmAction]] = {
-    db.run( actions.filter( a => (a.camId === camId) && (a.kmId === kmId)).result)
+    db.run( actions.filter( a => (a.camId === camId) && (a.kmId === kmId)).sortBy(_.date.desc).result)
   }
 
   def getAction( id:Long ):Future[Option[KmAction]] = {

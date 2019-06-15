@@ -1,0 +1,41 @@
+@(campaign:Campaign, texts:CampaignText, km:KnessetMember, party:Option[Party], position:Position.Value,
+        imageUrl:String, imageCredit:Option[String],
+        actions:Seq[KmAction], contactOptions:Seq[ContactOption]
+)(implicit request: RequestHeader, msgs:MessagesProvider)
+
+@templates.publicCampaign(campaign, campaign.title + ": " + km.name){
+  <div class="container">
+    <div class="row my-2">
+      <div class="col">
+        <a class="navbar-brand" href="@routes.CampaignPublicCtrl.index(campaign.slug)#sectionKMs"><i class="fa fa-arrow-circle-o-right"></i> @campaign.title</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3 text-center">
+        <img style="width:100px" alt="picture of @km.name" src="@imageUrl" />
+        @for( credit <- imageCredit ) {
+          <br><small class="text-muted">@Messages("public.mk.imageCredit") @credit</small>
+        }
+      </div>
+      <div class="col-sm-9">
+        <h1><b>@km.name</b> @for(p<-party){<i>@p.name</i>}</h1>
+        <h2 class="@position.toString p-1">@texts.kmLabel(km.genderVal, position)</h2>
+      </div>
+    </div>
+    @if( actions.nonEmpty ) {
+      <div class="row">
+        <div class="col"></div>
+      </div>
+    }
+    <div class="row">
+      <div class="col">
+        <h2>@Messages("public.kmPage.contactOptions")</h2>
+        <ul>
+          @for( co<-contactOptions  ){
+            <li>@co.platform @co.title @co.details @co.note</li>
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+}

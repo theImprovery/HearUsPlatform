@@ -50,5 +50,29 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
     }
   }
   
+  def kmPage( campaignSlug:String, kmId:Long ) = Action.async{ implicit req =>
+    val imagePrefix = conf.get[String]("hearUs.files.mkImages.url")
+    for {
+      campOpt <- campaigns.getBySlug(campaignSlug)
+      campId = campOpt.map( _.id ).getOrElse(-1l)
+      texts   <- campaigns.getTextsFor(campId)
+      kmOpt      <- kms.getKM(kmId)
+      party      <- kmOpt.map( km=>kms.getParty(km.partyId) ).getOrElse(Future(None))
+      actions    <- campaigns.getActions(campId, kmId)
+      kmPosition <- campaigns.getPosition(campId, kmId)
+      kmContact  <- kms.getContactOptions(kmId)
+      kmImageOpt <- images.getImageForKm(kmId)
+      kmImageUrl    = kmImageOpt.map( _ => imagePrefix + kmId ).getOrElse("/assets/images/kmNoImage.jpg")
+      kmImageCredit = kmImageOpt.map( _.credit )
+    } yield {
+      (campOpt, kmOpt) match {
+        case (Some(campaign), Some(km)) => {
+          Ok(views.html.campaignPublic.campaignKMPage(campaign, texts.get, km, party, kmPosition.map( _.position).getOrElse(Position.Undecided), kmImageUrl, kmImageCredit, actions, kmContact ))
+        }
+        case _ => NotFound( views.html.errorPage(404, messagesApi.preferred(req)("errors.campaignNotFound")))
+      }
+    }
+  }
+  
   
 }

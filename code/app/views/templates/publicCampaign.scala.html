@@ -1,4 +1,4 @@
-@(campaign:Campaign, extraHead: Html=Html(""), extraBottom: Html=Html(""))(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
+@(campaign:Campaign, pageTitle:String, extraHead: Html=Html(""), extraBottom: Html=Html(""))(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
 
 
 @top = {
@@ -32,7 +32,7 @@
   <script src="@routes.Assets.versioned("vnd/grayscale/grayscale.min.js")"></script>
 }
 
-@bsBase(campaign.title, top, bottom){
+@bsBase(pageTitle, top, bottom){
   @content
 
   <footer class="small text-center">

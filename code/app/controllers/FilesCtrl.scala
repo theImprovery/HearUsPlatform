@@ -63,9 +63,19 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
   
   def getKmImage( id:Long ) = Action.async{ req =>
     images.getImageForKm(id).map({
-      case None => NotFound("no mk image")
+      case None => NotFound("no km image")
       case Some( img ) => {
         val filePath = Paths.get(config.get[String]("hearUs.files.mkImages.folder"))
+        Ok.sendPath(filePath.resolve(img.filename))
+      }
+    })
+  }
+  
+  def getCampaignImage( id:Long ) = Action.async{ req =>
+    images.getImageForCampaign(id).map({
+      case None => NotFound("no campaign image")
+      case Some( img ) => {
+        val filePath = Paths.get(config.get[String]("hearUs.files.campaignImages.folder"))
         Ok.sendPath(filePath.resolve(img.filename))
       }
     })

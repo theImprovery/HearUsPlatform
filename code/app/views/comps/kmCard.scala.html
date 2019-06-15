@@ -1,5 +1,5 @@
-@(km:KnessetMember, party:Option[Party], pos:models.Position.Value, imageUrl:String, actLabelText:String)
-<a class="km-card @pos.toString" id="km@km.id" href="TODO">
+@(km:KnessetMember, party:Option[Party], pos:models.Position.Value, imageUrl:String, actLabelText:String, campaignSlug:String)
+<a class="km-card @pos.toString" id="km@km.id" href="@routes.CampaignPublicCtrl.kmPage(campaignSlug, km.id)">
   <img class="km-image"  alt="picture of @km.name" src="@imageUrl" />
   <div class="km-mask @pos.toString">&nbsp;</div>
   <div class="km-name">@km.name</div>

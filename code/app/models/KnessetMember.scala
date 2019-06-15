@@ -6,7 +6,9 @@ case class KnessetMember (id:Long,
                           isActive:Boolean,
                           webPage:String,
                           partyId:Long,
-                          knessetKey:Long)
+                          knessetKey:Long) {
+  val genderVal = Gender.withName(gender.toLowerCase)
+}
 
 case class ContactOption (id:Long,
                           kmId:Option[Long],
