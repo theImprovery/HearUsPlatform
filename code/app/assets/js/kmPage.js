@@ -205,7 +205,7 @@ function setupContactOptions(kmId) {
 function updateEditorField(select) {
     var value = $(select).val();
     var $parentLi = $(select).closest("li");
-    var $detailsContainer = $parentLi.find("label[name='details']");
+    var $detailsContainer = $parentLi.find("label[data-role='detailsCtnr']");
     var textField = $detailsContainer.find("input");
     var textArea = $detailsContainer.find("textarea");
 

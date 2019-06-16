@@ -191,8 +191,8 @@
                       <input type="text" class="form-control" name="title" placeholder="" maxlength="256"> <span>@Messages("title")</span> </label>
                     <label>
                       <input type="text" class="form-control" name="note" placeholder=""> <span>@Messages("note")</span> </label>
-                    <label style="vertical-align: top; width:300px;">
-                      <input type="text" class="form-control" name="details" placeholder="" maxlength="256"> <span>@Messages("details")</span>
+                    <label style="vertical-align: top; width:300px;" data-role="detailsCtnr">
+                      <input type="text" class="form-control" name="details" placeholder="" maxlength="256"><span>@Messages("details")</span>
                       <textarea style="display:none; direction:rtl; text-align: right;" class="form-control" name="detailsMail" cols="30" rows="5"></textarea>
                     </label>
                     <button type="button" class="btn btn-danger" style="vertical-align: baseline" onclick="deleteRow(this)"><i class="fa fa-close"></i></button>
