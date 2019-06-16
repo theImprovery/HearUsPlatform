@@ -1,7 +1,6 @@
 package models
 
 import java.sql.Timestamp
-import dataaccess.Platform
 
 object Gender extends Enumeration {
   type Gender = Value

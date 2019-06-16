@@ -1,6 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 
-@import dataaccess.Platform.Platform
+@import Platform.Platform
 @import models.Position.Position
 @(campaign:Campaign, positions:Seq[Position], platforms:Seq[Platform], imageOpt:Option[KMImage], prefix:String,
         kms:Seq[KnessetMember], kmPosition:Map[Long, String], actions:Seq[KmAction],

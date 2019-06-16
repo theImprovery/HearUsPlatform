@@ -1,7 +1,7 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import Helpers._
 
-@import dataaccess.Platform.Platform
+@import Platform.Platform
 @import dataaccess.KnessetMemberDAO
 @(group:Form[GroupData], kms:Seq[KnessetMember])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 

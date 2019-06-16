@@ -1,13 +1,14 @@
 package dataaccess
 
 import javax.inject.Inject
-import models.{ContactOption, KmsParties, KnessetMember, Party}
+import models.{ContactOption, KmsParties, KnessetMember, Party, Platform}
 import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
 class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
 
@@ -152,10 +153,7 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   private def order( col:Rep[String], isAsc:Boolean ) = if ( isAsc ) col.asc else col.desc
 }
 
-object Platform extends Enumeration {
-  type Platform = Value
-  val Phone, Email, Mail, Fax, Facebook, Twitter, Instagram, Telegram, YouTube = Value
-}
+
 
 object SortBy extends Enumeration {
   val Parties = Value("parties")
