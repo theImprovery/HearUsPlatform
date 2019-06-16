@@ -18,7 +18,7 @@
   }
 }
 
-@contactOption(conOp:ContactOption)={
+@showContactOption(conOp:ContactOption)={
   <div class="contactOption contactOption-@conOp.platform">@defining(Platform.tryConvert(conOp.platform)){ platformOpt =>
     @platformIcon(platformOpt) @conOp.title: @platformOpt match {
       case Some(Platform.Mail)=>{ <address>@Html(conOp.details.trim.replaceAll("\\n", "<br>"))</address> }
@@ -31,6 +31,21 @@
     }
     @if( conOp.note.trim.nonEmpty ){<small>@conOp.note</small>}
   }</div>
+}
+
+@actionIcon( actType:ActionType.Value )={@actType match {
+  case ActionType.Interview =>{<i class="fa fa-newspaper-o"></i>}
+  case ActionType.Vote =>{<i class="fa fa-hand-pointer-o"></i>}
+  case ActionType.OfficialPosition =>{<i class="fa fa-bank"></i>}
+  case ActionType.Post =>{<i class="fa fa-globe"></i>}
+  case ActionType.EMail =>{<i class="fa fa-envelope"></i>}
+  } @Messages("actionType."+actType.toString):
+}
+@showAction(act:KmAction)={
+<div class="kmAction">
+  @actionIcon(act.actionType) @if( act.link.trim.nonEmpty ){ <a href="@act.link">@act.title<a>}else{@act.title}
+  @if( act.details.trim.nonEmpty ){<p class="details">@act.details</p>}
+</div>
 }
 
 @templates.publicCampaign(campaign, campaign.title + ": " + km.name){
@@ -52,17 +67,21 @@
         <h2 class="@position.toString p-1">@texts.kmLabel(km.genderVal, position)</h2>
       </div>
     </div>
-    @if( actions.nonEmpty ) {
-      <div class="row">
-        <div class="col"></div>
-      </div>
-    }
-    <div class="row">
-      <div class="col">
+
+    <div class="row my-2">
+      <div class="col-md">
         <h2>@Messages("public.kmPage.contactOptions")</h2>
-        <ul class="list-unstyled">
+        <ul class="mkItemList">
           @for( co<-contactOptions  ){
-            <li>@contactOption(co)</li>
+            <li>@showContactOption(co)</li>
+          }
+        </ul>
+      </div>
+      <div class="col-md">
+        <h2>@Messages("public.kmPage.actions")</h2>
+        <ul class="mkItemList">
+          @for( act<-actions  ){
+            <li>@showAction(act)</li>
           }
         </ul>
       </div>
