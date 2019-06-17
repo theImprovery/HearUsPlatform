@@ -1,4 +1,4 @@
-@(campaign:Campaign, texts:CampaignText, km:KnessetMember, party:Option[Party], position:Position.Value,
+@(campaign:Campaign, imageOpt:Option[String], texts:CampaignText, km:KnessetMember, party:Option[Party], position:Position.Value,
         imageUrl:String, imageCredit:Option[String],
         actions:Seq[KmAction], contactOptions:Seq[ContactOption]
 )(implicit request: RequestHeader, msgs:MessagesProvider)
@@ -48,7 +48,7 @@
 </div>
 }
 
-@templates.publicCampaign(campaign, campaign.title + ": " + km.name){
+@templates.publicCampaign(campaign, campaign.title + ": " + km.name, imageOpt){
   <div class="container">
     <div class="row my-2">
       <div class="col">

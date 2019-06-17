@@ -19,6 +19,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
   val logger = Logger(this.getClass)
   
   def index( campaignSlug:String ) = Action.async{ implicit req =>
+    val bkgPrefix = conf.get[String]("hearUs.files.campaignImages.url")
     for {
       campOpt <- campaigns.getBySlug(campaignSlug)
       texts <- campOpt.map( c => campaigns.getTextsFor(c.id) ).getOrElse(Future(None))
@@ -26,6 +27,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
       campId = campOpt.map( _.id ).getOrElse(-1l)
       dbPositions <- campaigns.getPositions(campId).map( posSeq => posSeq.map( p => (p.kmId, p.position)).toMap )
       kmImages <- images.getAllKmImages
+      campaignImage <- images.getImageForCampaign(campId).map( opt => opt.map(_=>bkgPrefix + campId) )
       parties <- kms.getAllActiveParties().map( _.sortBy(_.name) )
       committees <- groups.getGroupsForCampaign(campId).map(_.sortBy(_.name))
       memberships <- groups.groupsMemberships( committees.map(_.id).toSet )
@@ -44,7 +46,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
                                            ) ).toMap
           val km2Position = kmsSeq.map( km => (km.id, dbPositions.getOrElse(km.id, Position.Undecided))).toMap
           val km2Cmt = memberships.map( kv => kv._2.map(km =>(km,kv._1)) ).flatten.groupBy(_._1).map( kv => (kv._1, kv._2.map(_._2).toSet))
-          Ok( views.html.campaignPublic.campaignFrontPage(c, texts.get, kmsSeq, parties, committees, km2Party, km2Image, km2Position, km2Cmt) )
+          Ok( views.html.campaignPublic.campaignFrontPage(c, campaignImage, texts.get, kmsSeq, parties, committees, km2Party, km2Image, km2Position, km2Cmt) )
         }
       }
     }
@@ -52,6 +54,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
   
   def kmPage( campaignSlug:String, kmId:Long ) = Action.async{ implicit req =>
     val imagePrefix = conf.get[String]("hearUs.files.mkImages.url")
+    val bkgPrefix = conf.get[String]("hearUs.files.campaignImages.url")
     for {
       campOpt <- campaigns.getBySlug(campaignSlug)
       campId = campOpt.map( _.id ).getOrElse(-1l)
@@ -62,12 +65,13 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
       kmPosition <- campaigns.getPosition(campId, kmId)
       kmContact  <- kms.getContactOptions(kmId)
       kmImageOpt <- images.getImageForKm(kmId)
+      campaignImage <- images.getImageForCampaign(campId).map( opt => opt.map(_=>bkgPrefix + campId) )
       kmImageUrl    = kmImageOpt.map( _ => imagePrefix + kmId ).getOrElse("/assets/images/kmNoImage.jpg")
       kmImageCredit = kmImageOpt.map( _.credit )
     } yield {
       (campOpt, kmOpt) match {
         case (Some(campaign), Some(km)) => {
-          Ok(views.html.campaignPublic.campaignKMPage(campaign, texts.get, km, party, kmPosition.map( _.position).getOrElse(Position.Undecided), kmImageUrl, kmImageCredit, actions, kmContact ))
+          Ok(views.html.campaignPublic.campaignKMPage(campaign, campaignImage, texts.get, km, party, kmPosition.map( _.position).getOrElse(Position.Undecided), kmImageUrl, kmImageCredit, actions, kmContact ))
         }
         case _ => NotFound( views.html.errorPage(404, messagesApi.preferred(req)("errors.campaignNotFound")))
       }

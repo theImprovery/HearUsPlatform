@@ -1,4 +1,4 @@
-@(campaign:Campaign, pageTitle:String, extraHead: Html=Html(""), extraBottom: Html=Html(""))(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
+@(campaign:Campaign, pageTitle:String, campaignImage:Option[String], extraHead: Html=Html(""), extraBottom: Html=Html(""))(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
 
 
 @top = {
@@ -21,7 +21,15 @@
   <link rel="stylesheet" href="@routes.Assets.versioned("vnd/grayscale/grayscale.min.css")">
   <link rel="stylesheet" href="@routes.Assets.versioned("css/publics.min.css")">
   <style type="text/css">
+    @for( campi <- campaignImage ){
+      body {
+        background-image: url("@campi");
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
     @Html(campaign.themeData)
+    }
   </style>
   @extraHead
 }
