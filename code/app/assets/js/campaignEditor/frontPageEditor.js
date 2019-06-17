@@ -3,6 +3,7 @@
 function frontPageEditorSetup(){
     $("#bodyText").summernote({
         height: 500,
+        fontSizes: ['8', '9', '10', '12', '14', '16', '24', '36', '48' , '64', '82', '150'],
         toolbar: [
             // [groupName, [list of button]]
             ['font', ['fontname', 'fontsize', 'forecolor','backcolor']],
