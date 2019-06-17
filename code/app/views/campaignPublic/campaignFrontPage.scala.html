@@ -9,7 +9,6 @@
       @km2Cmt.map( kc => kc._1 + ": " + kc._2.mkString("[",",","]") ).mkString(",\n")
     };
 
-
     @if( campaign.contactEmail.trim.nonEmpty ) {
       @defining(campaign.contactEmail.split("@")){ comps =>
         function contactUs(){
@@ -19,7 +18,6 @@
         }
       }
     }
-
   </script>
   <script src="@routes.Assets.versioned("lib/d3js/d3.min.js")"></script>
 }
@@ -70,6 +68,7 @@
                 <li><a href="mailto:?subject=@Html(encText.replaceAll("\\+","%20"))&body=@url"><i class="fa fa-envelope"></i></a></li>
                 <li><a href="whatsapp://send?text=@Html(encText) + @url" data-action="share/whatsapp/share"><i class="fa fa-whatsapp"></i></a></li>
               }
+              @if(campaign.website.trim.nonEmpty){<li><a href="@campaign.website.trim" title="@Messages("public.mainSite")"><i class="fa fa-globe"></i></a></li>}
             </ul>
             <a href="#sectionMainText" class="btn btn-round js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
           </div>
@@ -134,13 +133,17 @@
 
   <section id="footerSection" class="text-center">
     <div class="container">
-      <div class="row">
+      <div class="row my-2">
         <div class="col-lg-8 mx-auto">
-          @texts.footer
+          @if(campaign.website.trim.nonEmpty){
+            <a href="@campaign.website.trim" title="@Messages("public.mainSite")">@texts.footer</a>
+          } else {
+            @texts.footer
+          }
         </div>
       </div>
       @if( campaign.contactEmail.trim.nonEmpty ) {
-        <div class="row">
+        <div class="row my-2">
           <div class="col-lg-8 mx-auto">
             <button onclick="contactUs()" type="button" class="btn btn-outline-dark btn-sm">@Messages("public.contactUs")</button>
           </div>
