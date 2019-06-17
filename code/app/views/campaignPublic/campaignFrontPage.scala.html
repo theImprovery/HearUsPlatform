@@ -8,6 +8,18 @@
     let mk2cmt = {
       @km2Cmt.map( kc => kc._1 + ": " + kc._2.mkString("[",",","]") ).mkString(",\n")
     };
+
+
+    @if( campaign.contactEmail.trim.nonEmpty ) {
+      @defining(campaign.contactEmail.split("@")){ comps =>
+        function contactUs(){
+          let user="@comps(0)";
+          let domain = "@comps.last";
+          window.location.href="mailto:" + user + "@@" + domain;
+        }
+      }
+    }
+
   </script>
   <script src="@routes.Assets.versioned("lib/d3js/d3.min.js")"></script>
 }
@@ -127,6 +139,13 @@
           @texts.footer
         </div>
       </div>
+      @if( campaign.contactEmail.trim.nonEmpty ) {
+        <div class="row">
+          <div class="col-lg-8 mx-auto">
+            <button onclick="contactUs()" type="button" class="btn btn-outline-dark btn-sm">@Messages("public.contactUs")</button>
+          </div>
+        </div>
+      }
     </div>
   </section>
 }
