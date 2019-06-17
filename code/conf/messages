@@ -327,6 +327,7 @@ public.filter.menu.parties=מפלגות
 public.filter.menu.committees=וועדות
 public.mk.imageCredit=קרדיט תמונה:
 public.kmPage.contactOptions=פרטי קשר
+public.kmPage.noContactOptions=אין פרטי קשר
 public.kmPage.actions=פעולות
 public.contactUs=צרו קשר
 public.mainSite=לעמוד הרשמי

@@ -71,20 +71,26 @@
     <div class="row my-2">
       <div class="col-md">
         <h2>@Messages("public.kmPage.contactOptions")</h2>
-        <ul class="mkItemList">
-          @for( co<-contactOptions  ){
-            <li>@showContactOption(co)</li>
-          }
-        </ul>
+        @if( contactOptions.nonEmpty ){
+          <ul class="mkItemList">
+            @for( co<-contactOptions  ){
+              <li>@showContactOption(co)</li>
+            }
+          </ul>
+        } else {
+          <div class="m-4">@Messages("public.kmPage.noContactOptions")</div>
+        }
       </div>
-      <div class="col-md">
-        <h2>@Messages("public.kmPage.actions")</h2>
-        <ul class="mkItemList">
-          @for( act<-actions  ){
-            <li>@showAction(act)</li>
-          }
-        </ul>
-      </div>
+      @if( actions.nonEmpty ) {
+        <div class="col-md">
+          <h2>@Messages("public.kmPage.actions")</h2>
+          <ul class="mkItemList">
+            @for( act<-actions  ){
+              <li>@showAction(act)</li>
+            }
+          </ul>
+        </div>
+      }
     </div>
   </div>
 }
