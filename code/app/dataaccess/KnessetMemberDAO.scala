@@ -149,7 +149,7 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   }
   
   def countKMs: Future[Int] = db.run(knessetMembers.filter(_.isActive).size.result)
-  def countParties:Future[Int] = db.run(parties.size.result)
+  def countParties:Future[Int] = db.run(parties.filter(_.isActive).size.result)
   private def order( col:Rep[String], isAsc:Boolean ) = if ( isAsc ) col.asc else col.desc
 }
 

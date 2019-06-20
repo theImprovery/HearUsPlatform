@@ -16,7 +16,9 @@ case class ContactOption (id:Long,
                           platform:String,
                           title:String,
                           details:String,
-                          note:String)
+                          note:String) {
+  val platformObj = Platform.tryConvert(platform)
+}
 
 case class KmsParties(km:KnessetMember,
                       party:Party)

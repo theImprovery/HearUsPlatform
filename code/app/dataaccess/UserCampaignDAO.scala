@@ -45,6 +45,17 @@ class UserCampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigPr
     db.run( plan.transactionally ).map( res => res._3==1 )
   }
   
+  def isUserOnCampaign( userId:Long, campaignId:Long ): Future[Boolean] = db.run(
+    userCampaign.filter( r => r.userId===userId && r.campaignId===campaignId).exists.result
+  )
+  
+  def isUserOnCampaign( userName:String, campaignId:Long ): Future[Boolean] = db.run(
+    userCampaign.join(users).on((uc,u)=>uc.userId===u.id)
+      .filter( r => r._2.username===userName && r._1.campaignId===campaignId)
+      .exists.result
+  )
+  
+  
   def removeAdminFromTeam(userId:Long, campaignId:Long ): Future[Boolean] = {
     val plan = for {
       adminCount <- userCampaign.filter( r => r.campaignId===campaignId  && r.admin=== true).size.result

@@ -77,8 +77,8 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     Future.sequence(lts.map(lt => addLabelText(lt)))
   }
 
-  def getMessages( id:Long ):Future[Seq[CannedMessage]] = {
-    db.run (messages.filter( _.camId === id ).result)
+  def getMessages(campaignId:Long):Future[Seq[CannedMessage]] = {
+    db.run (messages.filter( _.camId === campaignId ).result)
   }
 
   def addMessage(msg: CannedMessage ):Future[CannedMessage] = {
@@ -94,6 +94,13 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
         messages ++= msgs.map( m=>m.copy(camId=campaignId) )
       ).transactionally
     )
+  }
+  
+  def getMessage(campaignId:Long, gender:Gender.Value, position:Position.Value):Future[Map[Platform.Value,CannedMessage]] = {
+    import dataaccess.Mappers.positionMapper
+    db.run(
+      messages.filter( r => r.camId===campaignId && r.gender===gender.toString && r.position===position).result
+    ).map( rows => rows.groupBy(_.platform).map( kv => (kv._1, kv._2.head) ) )
   }
   
   def getTextsFor( campaignId:Long ):Future[Option[CampaignText]] = db.run (

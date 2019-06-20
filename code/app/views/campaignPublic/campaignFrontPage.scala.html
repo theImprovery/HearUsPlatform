@@ -3,6 +3,10 @@
 
 )(implicit request: RequestHeader, msgs:MessagesProvider)
 
+@makeTweetText()={
+  texts.tweet(
+}
+
 @scripts={
   <script>
     let mk2cmt = {
@@ -28,12 +32,12 @@
       if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading"){
         cfpCtrl.setup();
       } else {
-        document.addEventListener('DOMContentLoaded', cfpCtrl.setup());
+        document.addEventListener('DOMContentLoaded', cfpCtrl.setup);
       }
   </script>
 }
 
-@templates.publicCampaign(campaign, campaign.title, imageOpt, scripts, bottom){
+@templates.publicCampaign(campaign, campaign.title + ": " + campaign.slogan, imageOpt, scripts, bottom){
   <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
     <div class="container">
       <a class="navbar-brand js-scroll-trigger" href="#page-top">@campaign.title</a>
