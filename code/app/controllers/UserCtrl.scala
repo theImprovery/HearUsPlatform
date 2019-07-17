@@ -115,7 +115,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
             val redirectTo = request.session.get("targetUrl").getOrElse( routes.UserCtrl.userHome().url )
             Redirect(redirectTo).withNewSession.removingFromSession("targetUrl").withSession(("userId",user.id.toString))
           }
-          case None => BadRequest(views.html.users.login(loginForm.fill(loginData).withGlobalError("login.error.badUsernameOrPassword")))
+          case None => BadRequest(views.html.users.login(loginForm.fill(loginData).withGlobalError("login.error.badUsernameEmailOrPassword")))
         })
       }
     )

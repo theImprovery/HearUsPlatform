@@ -77,8 +77,11 @@ class UsersDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider,
 
   def get(userId:Long):Future[Option[User]] = db.run( Users.filter( _.id === userId).result ).map( _.headOption )
 
-  def authenticate(username:String, password:String):Future[Option[User]] = {
-    get(username).map( maybeUser => maybeUser.find(u=>BCrypt.checkpw(password, u.encryptedPassword)) )
+  def getByUsernameOrEmail(usernameOrEmail:String):Future[Option[User]] = db.run( Users.filter
+  ( u => u.username === usernameOrEmail || u.email === usernameOrEmail).result ).map( _.headOption )
+
+  def authenticate(usernameOrEmail:String, password:String):Future[Option[User]] = {
+    getByUsernameOrEmail(usernameOrEmail).map(maybeUser => maybeUser.find(u=>BCrypt.checkpw(password, u.encryptedPassword)) )
   }
 
   def hashPassword( plaintext:String ) = BCrypt.hashpw(plaintext, BCrypt.gensalt())

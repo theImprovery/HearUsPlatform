@@ -44,7 +44,7 @@ inviteEmail.confirmationDetails=לכתובת דוא״ל {0}
 login.title=התחברות למערכת
 login.loginButtonTitle=כניסה
 login.forgotPassword=שכחתם ססמא?
-login.error.badUsernameOrPassword=שם משתמש או ססמא שגויים
+login.error.badUsernameEmailOrPassword=שם משתמש, אימייל או ססמא שגויים
 login.logoutMessage=נותקת מהמערכת. להתראות!
 login.pleaseLogIn=אי אפשר לגשת לדף זה בלי להזדהות קודם.
 
@@ -200,6 +200,7 @@ password=ססמא
 passwordAgain=ססמא (שוב)
 website=אתר אינטרנט
 username=שם משתמש
+usernameOrEmail=שם משתמש/אימייל
 users=משתמשים
 user=משתמש/ת
 admin=מנהל
