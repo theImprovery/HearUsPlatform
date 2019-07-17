@@ -1,5 +1,6 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 application.title=תשמעו אותנו
+application.url=http://hear-us.codeworth.io
 
 navbar.title=תשמעו אותנו
 navbar.logout=התנתקות
@@ -73,6 +74,7 @@ error.password=Passwords must match, and cannot be empty
 error.password.incorrect=Incorrect password
 error.campaignSlug.exists=כבר יש קמפיין עם סלאג כזה
 errors.campaignNotFound=קמפיין לא נמצא.
+errors.userNotAuthorizedToSeeCampaign=אין כרגע הרשאה לצפות בקמפיין זה.
 errors.noUsersFound=לא נמצאו משתמשים בשם זה
 errors.noGroupsFound=לא נמצאו ועדות בשם זה
 
@@ -234,7 +236,7 @@ campaigns.slug.help=התווים האחרונים של כתובת אתר הקמ�
 campaigns.title=שם הקמפיין
 campaigns.title.help=שם הקמפיין, מופיע בכותרת הדף וברשימות
 campaigns.analyticsCode=קוד איסוף סטטיסטיקה
-campaigns.analyticsCode.help=משמש לצורך איסוף סטטיסטיקות על המשתמשים באתר. ניתן לקבל קוד כזה משירותים שאוספים סטטיסטיקה כזו, כדוגמת Google Analytics או matomo.org.
+campaigns.analyticsCode.help=משמש לצורך איסוף סטטיסטיקות על המשתמשים באתר. ניתן לקבל קוד כזה משירותים שאוספים סטטיסטיקה כזו, כדוגמת Google Analytics או matomo.org. יש להכניס את הקוד בשלמותו, כולל תגיות ה-<script>.
 campaigns.noLabels=לא הוכנסו תוויות
 campaigns.noCampaignsInSystem=אין קמפיינים במערכת כרגע
 campaigns.createNew=יצירת קמפיין חדש
@@ -271,7 +273,7 @@ campaignMgmt.frontPage.groupNames.help=שמות קבוצות חברי כנסת, 
 campaignMgmt.frontPage.labels=תוויות
 campaignMgmt.frontPage.labels.help=התוויות המופיעות על תמונות חברי הכנסת. משתנות לפי עמדה ומגדר.
 campaignMgr.frontPage.bodyText=טקסט
-campaignMgr.frontPage.bodyText.help=הטקסט המרכזי בדף הקמפיין. מופיע בין תת-הכותרת לתמונות הח״כים. הוספה של סרגל אופקי (הכפתור שמסומן ב-״-״) תיצור העברת מסך בעמוד הקמפיין.
+campaignMgr.frontPage.bodyText.help=הטקסט המרכזי בדף הקמפיין. מופיע בין תת-הכותרת לתמונות הח״כים.
 campaignMgmt.frontPage.footer=הערת סיום
 campaignMgmt.frontPage.footer.help=מופיעה בתחתית העמוד, מתחת לרשימת חברי הכנסת.
 campaignMgmt.frontPage.saved=השינויים בעמוד הראשי נשמרו בהצלחה
@@ -316,3 +318,23 @@ campaigns.noMessages=לא הוכנסו הודעות
 background=רקע
 
 newCampaigner.noCampainger=נא לבחור מנהל קמפיין
+
+public.navbar.menu=תפריט
+public.navbar.about=אודות
+public.navbar.mks=ללחוץ
+public.sections.mks.title=ללחוץ על ח״כ
+public.filter.all=כולם
+public.filter.menu.all=כל חברי הכנסת
+public.filter.menu.parties=מפלגות
+public.filter.menu.committees=וועדות
+public.mk.imageCredit=קרדיט תמונה:
+public.kmPage.contactOptions=פרטי קשר
+public.kmPage.noContactOptions=אין פרטי קשר
+public.kmPage.writeToKm=כתבו לח״כ
+public.kmPage.tweetOnTwitter=צייצו בטוויטר
+public.kmPage.writeOnFacebook=כיתבו סטטוס בפייסבוק
+public.kmPage.sendEmail=כתובת המייל של ח״כ {0} היא {1}.  להלן נוסח מוצע למכתב - אתם מוזמנים להעתיק אותו לתוכנת הדואר שלכם, לערוך אותו, ולשלוח.
+public.kmPage.openInGMail=לפתיחה ב-GMail
+public.kmPage.actions=פעולות של ח״כ
+public.contactUs=צרו קשר
+public.mainSite=לעמוד הרשמי

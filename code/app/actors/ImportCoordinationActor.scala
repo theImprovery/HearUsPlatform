@@ -9,7 +9,7 @@ import play.api.libs.ws.WSClient
 import play.api.mvc.ControllerComponents
 import akka.util.Timeout
 import dataaccess.{KmGroupDAO, KnessetMemberDAO}
-import models.{ContactOption, KmGroups, KnessetMember, Party}
+import models.{ContactOption, KmGroup, KnessetMember, Party}
 import play.api.Logger
 import play.api.i18n._
 
@@ -234,7 +234,7 @@ class ImportSinglePageActor extends Actor {
             sender ! loadCommNextPage(getNext(links).get)
           }
           val relevantCommittees = properties.filter( node => ( node \ "KnessetNum" text ) == knessetNum.toString )
-          sender ! newCommittees(relevantCommittees.map( node => KmGroups(-1L, (node \ "Name").text, (node \ "CommitteeID").text.toLong, Set())).toSet)
+          sender ! newCommittees(relevantCommittees.map( node => KmGroup(-1L, (node \ "Name").text, (node \ "CommitteeID").text.toLong, Set())).toSet)
           sender ! commIspaFinish(self)
         })
     }
@@ -271,7 +271,7 @@ object ImportCommitteesActor {
   case class loadPtoPNextPage(nextPage:String)
   case class commIspaFinish(finished:ActorRef)
   case class ptpIspaFinish(finished:ActorRef)
-  case class newCommittees(newCommittees:Set[KmGroups])
+  case class newCommittees(newCommittees:Set[KmGroup])
   case class newPtoP(newPtoP:Set[(String, String)])
 }
 
@@ -280,7 +280,7 @@ class ImportCommitteesActor @Inject()(ws:WSClient, cc:ControllerComponents, knes
   private var knessetNum = 0
   private var commCount = 0
   private var ptpCount = 0
-  private var committees:scala.collection.mutable.Set[KmGroups] = scala.collection.mutable.Set()
+  private var committees:scala.collection.mutable.Set[KmGroup] = scala.collection.mutable.Set()
   private var ptp:scala.collection.mutable.Set[(String, String)] = scala.collection.mutable.Set() //(CommitteeID, PersonID)
 
   override def receive: Receive = {
@@ -311,7 +311,7 @@ class ImportCommitteesActor @Inject()(ws:WSClient, cc:ControllerComponents, knes
       val child = context.actorOf(ImportSinglePageActor.props)
       child ! importPtoPSinglePage(nextPage, knessetNum, ws, cc, self)
     }
-    case newCommittees(newCommittees:Set[KmGroups]) => {
+    case newCommittees(newCommittees:Set[KmGroup]) => {
         committees ++= newCommittees
     }
     case newPtoP(newPtoP:Set[(String, String)]) => {
@@ -346,7 +346,7 @@ class ImportCommitteesActor @Inject()(ws:WSClient, cc:ControllerComponents, knes
       committees.foreach( com => if( !comWithPersons.contains(com.knessetKey.toString)) comWithPersons += (com.knessetKey.toString -> mutable.Set()) )
       val updatedGroups = committees.map(group => {
         val setOfKms = comWithPersons(group.knessetKey.toString).map(p => knessetKeyToKmID(p.toLong) )
-        KmGroups(group.id, group.name, group.knessetKey, setOfKms.toSet)
+        KmGroup(group.id, group.name, group.knessetKey, setOfKms.toSet)
       })
       kmGroups.updateGroups(updatedGroups.toSeq)
     }

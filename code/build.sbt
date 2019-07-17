@@ -28,7 +28,8 @@ libraryDependencies ++= Seq(
   "org.scalamock" %% "scalamock" % "4.0.0" % Test,
   "com.typesafe.play" %% "play-mailer" % "6.0.0",
   "com.typesafe.play" %% "play-mailer-guice" % "6.0.0",
-  "org.scala-lang.modules" %% "scala-xml" % "1.1.1"
+  "org.scala-lang.modules" %% "scala-xml" % "1.1.1",
+  "org.webjars" % "d3js" % "5.9.1"
 )
 
 // TODO add sections and table helpers

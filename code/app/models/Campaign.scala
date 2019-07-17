@@ -1,12 +1,11 @@
 package models
 
 import java.sql.Timestamp
-import dataaccess.Platform
 
 object Gender extends Enumeration {
   type Gender = Value
-  val Female = Value("female")
-  val Male = Value("male")
+  val Female:Gender = Value("female")
+  val Male:Gender = Value("male")
 }
 
 
@@ -73,7 +72,14 @@ case class CannedMessage( camId: Long,
                           position: Position.Value,
                           gender: String,
                           platform: Platform.Value,
-                          text: String )
+                          text: String ){
+  
+  def process(km: KnessetMember, twitterHandle:Option[String]) = {
+    val updatedText = text.replaceAll("@name", km.name)
+    
+    copy( text=updatedText.replaceAll("@twitter", twitterHandle.getOrElse(km.name)))
+  }
+}
 
 case class KmPosition(kmId: Long,
                       camId: Long,

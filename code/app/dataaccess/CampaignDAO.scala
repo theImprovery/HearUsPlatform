@@ -77,8 +77,8 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     Future.sequence(lts.map(lt => addLabelText(lt)))
   }
 
-  def getMessages( id:Long ):Future[Seq[CannedMessage]] = {
-    db.run (messages.filter( _.camId === id ).result)
+  def getMessages(campaignId:Long):Future[Seq[CannedMessage]] = {
+    db.run (messages.filter( _.camId === campaignId ).result)
   }
 
   def addMessage(msg: CannedMessage ):Future[CannedMessage] = {
@@ -94,6 +94,13 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
         messages ++= msgs.map( m=>m.copy(camId=campaignId) )
       ).transactionally
     )
+  }
+  
+  def getMessage(campaignId:Long, gender:Gender.Value, position:Position.Value):Future[Map[Platform.Value,CannedMessage]] = {
+    import dataaccess.Mappers.positionMapper
+    db.run(
+      messages.filter( r => r.camId===campaignId && r.gender===gender.toString && r.position===position).result
+    ).map( rows => rows.groupBy(_.platform).map( kv => (kv._1, kv._2.head) ) )
   }
   
   def getTextsFor( campaignId:Long ):Future[Option[CampaignText]] = db.run (
@@ -122,7 +129,11 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   def getPositions( camId:Long ):Future[Seq[KmPosition]] = {
     db.run( positions.filter( _.camId === camId ).result)
   }
-
+  
+  def getPosition( camId:Long, kmId:Long ):Future[Option[KmPosition]] = {
+    db.run( positions.filter( r => (r.camId===camId) && (r.kmId===kmId) ).result).map(_.headOption)
+  }
+  
   def updatePosition( pos: KmPosition ):Future[KmPosition] = {
     db.run(
       (positions returning positions).insertOrUpdate(pos)
@@ -134,7 +145,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   }
 
   def getActions( camId:Long, kmId:Long ):Future[Seq[KmAction]] = {
-    db.run( actions.filter( a => (a.camId === camId) && (a.kmId === kmId)).result)
+    db.run( actions.filter( a => (a.camId === camId) && (a.kmId === kmId)).sortBy(_.date.desc).result)
   }
 
   def getAction( id:Long ):Future[Option[KmAction]] = {
@@ -160,6 +171,10 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     db.run{
       campaigns.map( _.slug ).filter( _.toLowerCase === name.toLowerCase() ).exists.result
     }
+  }
+  
+  def getBySlug( slug:String ):Future[Option[Campaign]] = {
+    db.run( campaigns.filter( _.slug.toLowerCase === slug.toLowerCase).result ).map( _.headOption )
   }
 
   def updatePublish( campId:Long, isPublish:Boolean ):Future[Int] = {

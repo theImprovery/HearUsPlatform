@@ -18,7 +18,7 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
   private val camGroups = TableQuery[RelevantGroupTable]
   private val campaigns = TableQuery[CampaignTable]
 
-  def addGroup( group:KmGroups ):Future[KmGroups] = {
+  def addGroup( group:KmGroup ):Future[KmGroup] = {
     val groupRow = KmGroupDN(group.id, group.name, group.knessetKey)
     if( group.id != 0 || group.id != -1 ) {
       Await.result(db.run {
@@ -41,12 +41,12 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
     }
   }
 
-  def updateGroups( newGroups:Seq[KmGroups] ):Future[Seq[KmGroups]] = {
+  def updateGroups( newGroups:Seq[KmGroup] ):Future[Seq[KmGroup]] = {
     db.run( DBIO.seq(kmsGroups.delete, groups.delete))
     Future.sequence(newGroups.map(gro => addGroup(gro)))
   }
 
-  def getGroup( id:Long ):Future[Option[KmGroups]] = {
+  def getGroup( id:Long ):Future[Option[KmGroup]] = {
     val groupAndKms = for {
       (group, km) <- groups.filter(_.id === id) joinLeft kmsGroups on ( _.id === _.groupId )
     } yield (group, km)
@@ -54,7 +54,7 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
       groupAndKms.result
     } map { resSeq => {
       val tupl = resSeq.headOption
-      tupl.map(_._1).map( gr => KmGroups(gr.id, gr.name, gr.knessetKey, resSeq.map(_._2).map(_.get).map(_.kmId).toSet))
+      tupl.map(_._1).map( gr => KmGroup(gr.id, gr.name, gr.knessetKey, resSeq.map(_._2).map(_.get).map(_.kmId).toSet))
     }}
   }
 
@@ -80,7 +80,7 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
     }
   }
 
-  def allGroups: Future[Seq[KmGroups]] = {
+  def allGroups: Future[Seq[KmGroup]] = {
     val groupsAndKms = for {
       (group, km) <- groups joinLeft kmsGroups on (_.id === _.groupId)
     } yield (group, km)
@@ -90,12 +90,20 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
       val rowsByGroup = grSeq.map( p => (p._1, p._2.get.kmId)).groupBy(_._1)
       rowsByGroup.map( g => {
         val gr:KmGroupDN = g._1
-        KmGroups(gr.id, gr.name, gr.knessetKey, g._2.map(_._2).toSet)
+        KmGroup(gr.id, gr.name, gr.knessetKey, g._2.map(_._2).toSet)
       })
       }.toSeq
     }
   }
-
+  
+  /**
+    * @return A map of (committee_id, Set[KM member ids)
+    */
+  def groupsMemberships( committees:Set[Long]):Future[Map[Long,Set[Long]]] = {
+    db.run( kmsGroups.filter( _.groupId.inSet(committees) ).result ).map{ rows =>
+      rows.groupBy( _.groupId ).map( p => (p._1, p._2.map(_.kmId).toSet) )
+    }
+  }
 
   def deleteGroup( id:Long ):Future[Int] = {
     db.run{

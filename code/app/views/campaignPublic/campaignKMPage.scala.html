@@ -1,0 +1,130 @@
+@(campaign:Campaign, imageOpt:Option[String], texts:CampaignText, km:KnessetMember, party:Option[Party], position:Position.Value,
+        imageUrl:String, imageCredit:Option[String],
+        actions:Seq[KmAction], contactOptions:Map[Platform.Value,ContactOption], messages:Map[Platform.Value,CannedMessage]
+)(implicit request: RequestHeader, msgs:MessagesProvider)
+
+@platformIcon(platformName:Option[Platform.Value])={
+  @platformName match {
+    case None => {<i class="fa fa-asterisk"></i>}
+    case Some(plt) => {@plt match {
+        case Platform.Phone => {<i class="fa fa-phone"></i>}
+        case Platform.Email => {<i class="fa fa-at"></i>}
+        case Platform.Mail => {<i class="fa fa-home"></i>}
+        case Platform.Fax => {<i class="fa fa-fax"></i>}
+        case Platform.Facebook => {<i class="fa fa-facebook"></i>}
+        case Platform.Twitter => {<i class="fa fa-twitter"></i>}
+      }
+    }
+  }
+}
+
+@showContactOption(conOp:ContactOption)={
+  <div class="contactOption contactOption-@conOp.platform">@defining(Platform.tryConvert(conOp.platform)){ platformOpt =>
+    @platformIcon(platformOpt) @conOp.title: @platformOpt match {
+      case Some(Platform.Mail)=>{ <address>@Html(conOp.details.trim.replaceAll("\\n", "<br>"))</address> }
+      case Some(Platform.Fax)=>{ <a href="tel:@conOp.details.trim">@conOp.details.trim</a> }
+      case Some(Platform.Phone)=>{ <a href="tel:@conOp.details.trim">@conOp.details.trim</a> }
+      case Some(Platform.Email)=>{ <a href="mailto:@conOp.details.trim">@conOp.details.trim</a> }
+      case Some(Platform.Twitter)=>{ <a href="https://twitter.com/@conOp.details.trim">@conOp.details.trim@@</a> }
+      case Some(Platform.Facebook)=>{ <a href="https://www.facebook.com/@conOp.details.trim">@conOp.details.trim@@</a> }
+      case other:Option[Platform.Value] => {@conOp.details}
+    }
+    @if( conOp.note.trim.nonEmpty ){<small>@conOp.note</small>}
+  }</div>
+}
+
+@actionIcon( actType:ActionType.Value )={@actType match {
+  case ActionType.Interview =>{<i class="fa fa-newspaper-o"></i>}
+  case ActionType.Vote =>{<i class="fa fa-hand-pointer-o"></i>}
+  case ActionType.OfficialPosition =>{<i class="fa fa-bank"></i>}
+  case ActionType.Post =>{<i class="fa fa-globe"></i>}
+  case ActionType.EMail =>{<i class="fa fa-envelope"></i>}
+  } @Messages("actionType."+actType.toString):
+}
+@showAction(act:KmAction)={
+<div class="kmAction">
+  @actionIcon(act.actionType) @if( act.link.trim.nonEmpty ){ <a href="@act.link">@act.title<a>}else{@act.title}
+  @if( act.details.trim.nonEmpty ){<p class="details">@act.details</p>}
+</div>
+}
+
+@scripts={
+<script>
+function updateFbLink() {
+    let link = document.getElementById("fbLink");
+    let here = document.location.href;
+    link.href = link.href + encodeURI(here);
+}
+
+ if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading"){
+        updateFbLink();
+      } else {
+        document.addEventListener('DOMContentLoaded', updateFbLink);
+      }
+
+</script>
+}
+
+@templates.publicCampaign(campaign, campaign.title + ": " + km.name, imageOpt, Html(""), scripts){
+  <div class="container">
+    <div class="row my-2">
+      <div class="col">
+        <a class="navbar-brand" href="@routes.CampaignPublicCtrl.index(campaign.slug)#sectionKMs"><i class="fa fa-arrow-circle-o-right"></i> @campaign.title</a>
+      </div>
+    </div>
+    <div class="row my-2">
+      <div class="col-sm-3 text-center">
+        <img style="width:100px" alt="picture of @km.name" src="@imageUrl" />
+        @for( credit <- imageCredit ) {
+          <br><small class="text-muted">@Messages("public.mk.imageCredit") @credit</small>
+        }
+      </div>
+      <div class="col-sm-9">
+        <h1><b>@km.name</b> @for(p<-party){<i>@p.name</i>}</h1>
+        <h2 class="@position.toString p-1">@texts.kmLabel(km.genderVal, position)</h2>
+      </div>
+    </div>
+
+    @if( actions.nonEmpty ) {
+      <div class="row my-2">
+        <div class="col">
+          <div class="col-md">
+            <h2>@Messages("public.kmPage.actions") @km.name</h2>
+            <ul class="mkItemList">
+              @for( act<-actions  ){
+                <li>@showAction(act)</li>
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if( contactOptions.nonEmpty ){
+      <div class="row my-2">
+        <div class="col-md">
+          <h2>@Messages("public.kmPage.writeToKm") @km.name</h2>
+            <ul class="mkItemList">
+              @for( co<-contactOptions.get(Platform.Twitter)  ){
+                <li>@platformIcon(co.platformObj) <a href="https://twitter.com/intent/tweet?text=@Html(helper.urlEncode(messages.get(Platform.Twitter).map(_.text).getOrElse("@"+co.details)))">@Messages("public.kmPage.tweetOnTwitter")</a></li>
+              }
+              @for( co<-contactOptions.get(Platform.Facebook)  ){
+                <li>@platformIcon(co.platformObj) <a id="fbLink" href="https://www.facebook.com/sharer.php?u=">@Messages("public.kmPage.writeOnFacebook")</a></li>
+              }
+              @for( co<-contactOptions.get(Platform.Email)  ){
+                <li>@platformIcon(co.platformObj) @Messages("public.kmPage.sendEmail", km.name, co.details)
+                  <br>
+                  <a target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)">
+                          @Messages("public.kmPage.openInGMail")</a>
+                  @for( text <- messages.get(Platform.Email).map( _.text) ){
+                    <textarea class="form-control" style="color: inherit; background-color:rgba(.5,.5,.5,.1); height:14em;" onclick="this.select()" style="cursor:text; height:10em">@text</textarea>
+                  }
+                </li>
+              }
+            </ul>
+        </div>
+      </div>
+    }
+
+  </div>
+}

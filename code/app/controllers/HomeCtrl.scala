@@ -50,20 +50,19 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
     * Routes for the front-end.
     * @return
     */
-  def frontEndRoutes = cached("ACT_frontEndRoutes") {
-    Action { implicit request =>
+  def frontEndRoutes = Action { implicit request =>
       Ok(
         routing.JavaScriptReverseRouter("feRoutes")(
           routes.javascript.HomeCtrl.apiSayHi
         )).as("text/javascript")
-    }
   }
+  
   
   /**
     * Routes for the back-end.
     * @return
     */
-  def backEndRoutes = cached("ACT_backEndRoutes") {
+  def backEndRoutes =
     Action { implicit request =>
       Ok(
         routing.JavaScriptReverseRouter("beRoutes")(
@@ -118,7 +117,6 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.CampaignMgrCtrl.doRemoveGroupFromCampaign,
           routes.javascript.CampaignPublicCtrl.index
       )).as("text/javascript")
-    }
   }
   
   def notImplYet = TODO

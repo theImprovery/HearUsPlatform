@@ -1,13 +1,14 @@
 package dataaccess
 
 import javax.inject.Inject
-import models.{ContactOption, KmsParties, KnessetMember, Party}
+import models.{ContactOption, KmsParties, KnessetMember, Party, Platform}
 import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
 class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
 
@@ -147,15 +148,12 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
     db.run(contactOptions.filter(co => ( co.kmId === kmId ) && ( co.platform === platform.toString )).delete)
   }
   
-  def countKMs: Future[Int] = db.run(knessetMembers.size.result)
-  def countParties:Future[Int] = db.run(parties.size.result)
+  def countKMs: Future[Int] = db.run(knessetMembers.filter(_.isActive).size.result)
+  def countParties:Future[Int] = db.run(parties.filter(_.isActive).size.result)
   private def order( col:Rep[String], isAsc:Boolean ) = if ( isAsc ) col.asc else col.desc
 }
 
-object Platform extends Enumeration {
-  type Platform = Value
-  val Phone, Email, Mail, Fax, Facebook, Twitter, Instagram, Telegram, YouTube = Value
-}
+
 
 object SortBy extends Enumeration {
   val Parties = Value("parties")

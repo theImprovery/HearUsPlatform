@@ -6,7 +6,9 @@ case class KnessetMember (id:Long,
                           isActive:Boolean,
                           webPage:String,
                           partyId:Long,
-                          knessetKey:Long)
+                          knessetKey:Long) {
+  val genderVal = Gender.withName(gender.toLowerCase)
+}
 
 case class ContactOption (id:Long,
                           kmId:Option[Long],
@@ -14,7 +16,9 @@ case class ContactOption (id:Long,
                           platform:String,
                           title:String,
                           details:String,
-                          note:String)
+                          note:String) {
+  val platformObj = Platform.tryConvert(platform)
+}
 
 case class KmsParties(km:KnessetMember,
                       party:Party)
