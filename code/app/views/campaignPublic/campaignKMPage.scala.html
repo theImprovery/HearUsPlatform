@@ -114,7 +114,7 @@ function updateFbLink() {
               @for( co<-contactOptions.get(Platform.Email)  ){
                 <li>@platformIcon(co.platformObj) @Messages("public.kmPage.sendEmail", km.name, co.details)
                   <br>
-                  <a target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)">
+                  <a target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)">
                           @Messages("public.kmPage.openInGMail")</a>
                   @for( text <- messages.get(Platform.Email).map( _.text) ){
                     <textarea class="form-control" style="color: inherit; background-color:rgba(.5,.5,.5,.1); height:14em;" onclick="this.select()" style="cursor:text; height:10em">@text</textarea>
