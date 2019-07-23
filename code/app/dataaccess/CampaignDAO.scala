@@ -30,7 +30,12 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   def store(cam: Campaign ):Future[Campaign] = {
     db.run(
       (campaigns returning campaigns).insertOrUpdate(cam)
-    ).map( insertRes => insertRes.getOrElse(cam) )
+    ).map( insertRes => {
+      val res = insertRes.getOrElse(cam)
+      val ct = CampaignText(insertRes.getOrElse(cam).id, "", "", "", "", "","")
+      updateTexts(ct)
+      res
+    } )
   }
   
   def updateDetails( id:Long, details:CampaignDetails ) = {
