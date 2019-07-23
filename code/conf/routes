@@ -97,7 +97,7 @@ GET     /bkofc/campaigns/:id/action/:actId       controllers.CampaignMgrCtrl.edi
 
 GET     /bkofc/campaigns/lbls/:id         controllers.CampaignMgrCtrl.getLabelText(id:Long)
 GET     /bkofc/campaigns/:id/sm           controllers.CampaignMgrCtrl.getSocialMedia(id:Long)
-DELETE  /bkofc/campaigns/:id              controllers.CampaignAdminCtrl.deleteCampaign(id:Long)
+DELETE  /bkofc/campaigns/:id/              controllers.CampaignAdminCtrl.deleteCampaign(id:Long, from:String)
 POST    /bkofc/campaigns/actions          controllers.CampaignAdminCtrl.updateAction
 GET     /bkofc/campaigns/:camId           controllers.CampaignMgrCtrl.editCampaign(camId:Long)
 

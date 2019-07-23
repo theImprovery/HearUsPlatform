@@ -28,6 +28,7 @@
               <th>@Messages("campaigns.table.title")</th>
               <th>@Messages("campaigns.table.slug")</th>
               <th>@Messages("campaigns.table.isPublished")</th>
+              <th>@Messages("campaigns.table.delete")</th>
           </tr>
           </thead>
           <tbody>
@@ -44,6 +45,9 @@
                   <input type="checkbox" onchange="updatePublish(this, @c.id)" @if(c.isPublished){checked}>
                   <span class="slider round"></span>
                 </label>
+              </td>
+              <td>
+                <button type="button" name="deleteBtn" onclick="deleteCampaign(@c.id, 'admin');" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
               </td>
             </tr>
           }

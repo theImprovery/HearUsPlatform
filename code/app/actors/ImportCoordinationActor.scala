@@ -34,6 +34,8 @@ object ImportCoordinationActor {
 
 class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, knessetMembers: KnessetMemberDAO,
                                         langs:Langs, messagesApi:MessagesApi) extends Actor {
+  private val logger = Logger(classOf[ImportCoordinationActor])
+
   implicit val timeout = Timeout(20 seconds)
   private var kmsCount = 0
   private var partiesCount = 0
@@ -277,6 +279,8 @@ object ImportCommitteesActor {
 
 class ImportCommitteesActor @Inject()(ws:WSClient, cc:ControllerComponents, knessetMembers: KnessetMemberDAO,
                                       kmGroups: KmGroupDAO, langs:Langs, messagesApi:MessagesApi ) extends Actor {
+  private val logger = Logger(classOf[ImportCommitteesActor])
+//    override def preStart(): Unit = logger.info("supervised actor started " + self.path)
   private var knessetNum = 0
   private var commCount = 0
   private var ptpCount = 0

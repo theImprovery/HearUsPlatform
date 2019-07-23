@@ -85,32 +85,18 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     )
   }
   
-  def deleteCampaign(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
+  def deleteCampaign(id:Long, from:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     for {
       deleted <- campaigns.deleteCampaign(id)
       camps <- campaigns.getAllCampaigns
     } yield {
-      Redirect(routes.CampaignAdminCtrl.showCampaigns()).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("campaigns.deleted"))
+      val goTo = from match {
+        case "admin" => views.html.campaignAdmin.allCampaigns(camps)
+        case "campaigner" => views.html.campaignMgmt.index(camps)
+      }
+      Ok(goTo).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("campaigns.deleted"))
     }
   }
-
-//  def editCampaign(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
-//    for{
-//      campaign <- campaigns.getCampaign(id)
-//      rel <- campaigns.ge
-//    }
-//
-//    campaigns.getCampaign(id).map({
-//      case None => NotFound("campaign with id " + id + " does not exist")
-//      case Some(campaign) => Ok(views.html.CampaignAdmin.createCampaign(newCampaignForm.fill(AdminCampaign(1L, "", 1L) )))
-//    })
-//  }
-
-
-
-
-
-
 
   def updateAction = deadbolt.SubjectPresent()()  { implicit req =>
     Future(Ok("gjigjiod"))

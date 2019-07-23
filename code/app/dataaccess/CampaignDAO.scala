@@ -22,6 +22,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   private val actions = TableQuery[KmActionTable]
   private val usersCampaigns = TableQuery[UserCampaignTable]
   private val texts = TableQuery[CampaignTextTable]
+  private val camGroups = TableQuery[RelevantGroupTable]
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
   
@@ -62,6 +63,12 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     db.run(
       DBIO.seq(
         texts.filter( _.campaignId === id ).delete,
+        actions.filter(_.camId === id).delete,
+        positions.filter(_.camId === id).delete,
+        socialMedia.filter(_.camId === id).delete,
+        messages.filter(_.camId === id).delete,
+        camGroups.filter( _ .camId === id ).delete,
+        usersCampaigns.filter( _ .campaignId === id ).delete,
         campaigns.filter( _ .id === id ).delete
       ).transactionally
     )

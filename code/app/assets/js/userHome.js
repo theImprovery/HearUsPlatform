@@ -1,5 +1,5 @@
 function updateKmsAndPartes() {
-    var info = Informationals.showBackgroundProcess("Start import Knesset members");
+    var info = Informationals.showBackgroundProcess("Finish import Knesset members");
     new Playjax(beRoutes)
         .using(function(c){ return c.ParseCtrl.apiKms();}).fetch()
         .then( function(res){
@@ -12,11 +12,12 @@ function updateKmsAndPartes() {
 }
 
 function updateCommittees() {
+    var info = Informationals.showBackgroundProcess("Finish import committees");
     new Playjax(beRoutes)
         .using(function(c){ return c.ParseCtrl.apiUpdateCommittees();}).fetch()
         .then( function(res){
             if (res.ok) {
-                window.location.reload();
+                info.success();
             } else {
                 Informationals.makeDanger("Something went wrong", 1500).show();
             }
