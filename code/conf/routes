@@ -11,7 +11,7 @@ GET     /campaigns/:slug          controllers.CampaignPublicCtrl.index(slug)
 GET     /campaigns/:slug/KnessetMembers/:kmId          controllers.CampaignPublicCtrl.kmPage(slug, kmId:Long)
 GET     /-x-                      controllers.HomeCtrl.notImplYet
 
-GET     /signup                      controllers.UserCtrl.showSignup
+GET     /signup                      controllers.UserCtrl.showSignupPage
 POST    /signup                      controllers.UserCtrl.doSignup
 
 # back office

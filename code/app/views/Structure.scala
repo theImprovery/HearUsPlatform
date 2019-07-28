@@ -24,6 +24,7 @@ case class MultiPageSection[T](title:String, id:T, children:Seq[SectionItem]) ex
 object PublicSections extends Enumeration {
   val Home       = Value("Home")
   val Login      = Value("Login")
+  val SignUp     = Value("Sign-Up")
   val Components = Value("Components")
   val Others     = Value("Others")
 }

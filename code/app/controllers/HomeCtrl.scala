@@ -53,7 +53,8 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
   def frontEndRoutes = Action { implicit request =>
       Ok(
         routing.JavaScriptReverseRouter("feRoutes")(
-          routes.javascript.HomeCtrl.apiSayHi
+          routes.javascript.HomeCtrl.apiSayHi,
+          routes.javascript.UserCtrl.showSignupPage
         )).as("text/javascript")
   }
   

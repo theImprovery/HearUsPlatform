@@ -456,35 +456,6 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     (currentTime - prr.resetPasswordDate.getTime) > oneWeek
   }
 
-  def showSignup() =  Action.async{ implicit req =>
-    Future(
-      if(!conf.getOptional[Boolean]("AllowSignup").getOrElse(true)) {
-        BadRequest(views.html.users.login(loginForm))
-    } else {
-      Ok(views.html.users.signup())
-    })
-  }
-
-
-  def doSignup() = Action.async { implicit req =>
-    emailForm.bindFromRequest().fold(
-      formWithErrors => {
-        Logger.info( formWithErrors.errors.mkString("\n") )
-        Future(BadRequest(views.html.users.login(loginForm)))
-      },
-      fd => {
-        val invitationId = UUID.randomUUID.toString
-        invitations.add(Invitation(fd.email, new Timestamp(System.currentTimeMillis()), invitationId, fd.email)).map( invite =>{
-          sendSignupEmail(invite)
-          val message = Informational(InformationalLevel.Success,
-            Messages("signup.confirmationMessage"),
-            Messages("signup.confirmationDetails",fd.email))
-          Redirect(routes.HomeCtrl.index()).flashing(FlashKeys.MESSAGE->message.encoded)
-        })
-      }
-    )
-  }
-
   def updateRole() = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson) { implicit req =>
     Logger.info("update role")
     val json = req.body.as[JsObject]
@@ -494,6 +465,43 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     Logger.info("id " + json("id").asOpt[Long].getOrElse(-1L))
     Logger.info("roles " + roles.mkString(";"))
     users.updateRole(json("id").asOpt[Long].getOrElse(-1L), roles).map(ans => Ok("updated"))
+  }
+
+  def showSignupPage = Action { implicit req =>
+    Ok( views.html.users.userEditor( userForm, routes.UserCtrl.doSignup,
+      isNew=true, isInvite=true )(new AuthenticatedRequest(req, None), messagesProvider))
+  }
+
+  def doSignup = deadbolt.SubjectPresent()(){ implicit req =>
+    userForm.bindFromRequest().fold(
+      fwe => Future(BadRequest(views.html.users.userEditor(fwe, routes.UserCtrl.doSignup, isNew=true, isInvite=true))),
+      fData => {
+        val res = for {
+          usernameExists <- users.usernameExists(fData.username)
+          emailExists    <- fData.email.map(users.emailExists).getOrElse(Future(false))
+          passwordOK     = fData.pass1.nonEmpty && fData.pass1 == fData.pass2
+          canCreateUser  = !usernameExists && !emailExists && passwordOK
+
+        } yield {
+          if ( canCreateUser ) {
+            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""), Set(UserRole.Campaigner),
+              users.hashPassword(fData.pass1.get))
+            users.addUser(user).map( _ => Redirect(routes.UserCtrl.showLogin) )
+
+          } else {
+            var form = userForm.fill(fData)
+            if ( emailExists ) form = form.withError("email", "Email already exists")
+            if ( usernameExists ) form = form.withError("username", "Username already taken")
+            if ( !passwordOK ) form = form.withError("password1", "Passwords must match, and cannot be empty")
+              .withError("password2", "Passwords must match, and cannot be empty")
+            Future(BadRequest(views.html.users.userEditor(form, routes.UserCtrl.doSignup, isNew = true, isInvite=true)))
+          }
+        }
+
+        scala.concurrent.Await.result(res, Duration(2000, scala.concurrent.duration.MILLISECONDS))
+
+      }
+    )
   }
 
 }

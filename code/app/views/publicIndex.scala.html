@@ -13,14 +13,13 @@
           <div class="alert alert-info" role="alert">
             <strong>@Messages("index.slogan")</strong>
           </div>
+          <div class="col text-center">
+            <a href="@routes.UserCtrl.showLogin" style="margin-left: 2em">@Messages("login") </a>
+            <a href="@routes.UserCtrl.showSignupPage">@Messages("signup")</a>
+          </div>
+            <p class="text-center">@Messages("index.note")</p>
         </div>
       </div>
     </div>
-
-    @*<div class="row my-5">*@
-      @*<div class="col text-center">*@
-        @*<a href="@routes.UserCtrl.showLogin">@Messages("login")</a>*@
-      @*</div>*@
-    @*</div>*@
   </div>
 }

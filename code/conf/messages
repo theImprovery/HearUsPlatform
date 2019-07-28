@@ -52,6 +52,7 @@ login.pleaseLogIn=אי אפשר לגשת לדף זה בלי להזדהות קו�
 index.title.hear=תשמעו
 index.title.us=אותנו
 index.slogan=מבית התנועה לזכויות דיגיטליות. ההשקה בקרוב. הם עוד ישמעו אותנו.
+index.note=בשביל לפתוח קמפיין חדש יש להכנס למערכת או להרשם (ההרשמה חינם!)
 
 forgotPassword.title=איפוס ססמא
 
@@ -93,6 +94,7 @@ users.noPendingInvitations=אין הזמנות ממתינות
 users.pendingInvitations=הזמנות ממתינות
 
 userEditor.title=עריכת פרופיל
+userEditor.new.title=פרטי משתמש
 userEditor.updateDetailsTab=פרטים
 userEditor.changePasswordTab=שינוי ססמא
 userEditor.emailHelpText=כתובת דוא״ל זו משמשת לאיפוס ססמאות ולמשלוח הודעות מהמערכת
@@ -163,6 +165,7 @@ loadingContactDetails=טוען פרטי קשר...
 loadingImage=טוען תמונה...
 logout=יציאה
 login=כניסה
+signup=הרשמה
 note=הערה
 save=שמירה
 send=שליחה
