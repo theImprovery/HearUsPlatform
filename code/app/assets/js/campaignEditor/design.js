@@ -36,7 +36,7 @@ function simpleStringify( obj ) {
 }
 
 function postForm() {
-    Informationals.loader("uploading design data");
+    Informationals.loader(polyglot.t("update.design"));
     var css = collectCss();
     var formData = new FormData();
     formData.append( "css", css );
@@ -79,10 +79,13 @@ function setColor( selector, key, value ) {
 
 function deleteImage() {
     swal({
-        title: "Are you sure?",
-        text: "This operation cannot be undone",
+        title: polyglot.t("are_you_sure"),
+        text: polyglot.t("operation_undo"),
         icon: "warning",
-        buttons: true,
+        buttons: {
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
+        },
         dangerMode: true
     }).then(function(willDelete){
         if (willDelete) {
@@ -91,7 +94,7 @@ function deleteImage() {
                 .fetch()
                 .then( function(res){
                    if ( res.ok ) {
-                       Informationals.makeSuccess("Image Deleted", "", 2000).show();
+                       Informationals.makeSuccess(polyglot.t("image_delete"), "", 2000).show();
                        setHasImage( false );
                    }
                 });
@@ -111,6 +114,5 @@ function setHasImage( hasImage ) {
 }
 
 window.onbeforeunload = function () {
-    console.log("in before unload");
     postForm();
 };

@@ -53,7 +53,7 @@ function searchCampaigners(searchStr) {
                         }
                     });
             } else {
-                Informationals.makeWarning("Something went wrong", "try again", 1500).show();
+                Informationals.makeWarning(polyglot.t("went_wrong"), polyglot.t("try_again"), 1500).show();
             }
         });
     }
@@ -77,17 +77,20 @@ function makeAdmin(userId){
 function removeAdmin(userId) {
     let title, text;
     if ( userId === currentUserId ) {
-        title = "Make yourself a regular user?";
-        text = "You will not be able to undo this action on your own.";
+        title = polyglot.t("team.myself.regular_user.title");
+        text = polyglot.t("team.myself.regular_user.text");
     } else {
-        title = "Make " + teamUsernames[userId] + " a regular user?";
+        title = polyglot.t("team.other_regular_user_title",{name:teamUsernames[userId]});
         text = "";
     }
     swal({
         title: title,
         text: text,
         icon: "warning",
-        buttons: true,
+        buttons: {
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
+        },
         dangerMode: true,
     }).then((willDelete) => {
         if (willDelete) {
@@ -99,17 +102,20 @@ function removeAdmin(userId) {
 function removeFromTeam(userId) {
     let title, text;
     if ( userId === currentUserId ) {
-        title = "Remove yourself from the team?";
-        text = "You will not be able to undo this action on your own.";
+        title = polyglot.t("team.myself.remove.title");
+        text = polyglot.t("team.myself.remove.text");
     } else {
-        title = "Remove user " + teamUsernames[userId] + " from the team?";
+        title = polyglot.t("team.other_remove_title",{name:teamUsernames[userId]});
         text = "";
     }
     swal({
         title: title,
         text: text,
         icon: "warning",
-        buttons: true,
+        buttons: {
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
+        },
         dangerMode: true,
     }).then((willDelete) => {
         if (willDelete) {

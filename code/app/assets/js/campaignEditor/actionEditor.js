@@ -3,11 +3,11 @@ function deleteAction(id, camId, kmId) {
     console.log("camIId", camId);
     console.log("kmId", kmId);
     swal({
-        title:"למחוק פעולה זו?",
+        title:polyglot.t("action.delete"),
         icon:"warning",
         buttons: {
-            cancel:"ביטול",
-            confirm:"אישור"
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
         }
     }).then( function(willDelete){
         if(willDelete) {
@@ -18,7 +18,7 @@ function deleteAction(id, camId, kmId) {
                     if (res.ok) {
                         window.location = beRoutes.controllers.CampaignMgrCtrl.allActions(camId, kmId).url;
                     } else {
-                        Informationals.makeDanger("Deletion of action "+ id +" failed", "See server log for details", 1500).show();
+                        Informationals.makeDanger(polyglot.t("action.failed", {id:id}), polyglot.t("server_logs_details"), 1500).show();
                     }
                 });
         }

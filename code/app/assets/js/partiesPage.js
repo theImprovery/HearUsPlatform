@@ -59,11 +59,11 @@ function cancelEdit(sender) {
 
 function deleteParty(id) {
     swal({
-        title:"Are you sure you want to delete this party?",
+        title:polyglot.t("party.delete"),
         icon:"warning",
         buttons: {
-            cancel:true,
-            confirm:true
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
         }
     }).then( function(willDelete){
         if(willDelete) {
@@ -74,7 +74,7 @@ function deleteParty(id) {
                     if (res.ok) {
                         document.location.reload();
                     } else {
-                        Informationals.makeDanger("Deletion of party "+ id +" failed", "Maybe there is a Knesset member linked to the party", 3000).show();
+                        Informationals.makeDanger(polyglot.t("party.failed"), polyglot.t("party.link"), 3000).show();
                     }
                 });
         }
@@ -144,7 +144,7 @@ function saveParty(sender) {
 }
 
 function patch(data, sender) {
-    var msgDiv = Informationals.showBackgroundProcess("Updating..");
+    var msgDiv = Informationals.showBackgroundProcess(polyglot.t("update.party"));
     var $parent = $(sender.parentNode);
     new Playjax(beRoutes)
         .using(function (c) {
@@ -162,7 +162,7 @@ function patch(data, sender) {
 
             } else {
                 msgDiv.dismiss();
-                Informationals.makeWarning("Update Party " + data.name, "Failed", 1500);
+                Informationals.makeWarning(polyglot.t("update.failed"), "", 1500);
                 setPartyData($parent, prevPartyData[data.id]);
             }
         });

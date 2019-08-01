@@ -5,8 +5,7 @@ function patchBeforeUnload() {
     var data = {};
     var fields = ["id", "title", "slogan", "website", "contactEmail", "analyticsCode"];
     fields.forEach(function (value) { data[value] = document.getElementById(value).value; });
-    var displayStr = "Updating details";
-    var msgDiv = Informationals.showBackgroundProcess(displayStr);
+    var msgDiv = Informationals.showBackgroundProcess(polyglot.t("update.details"));
     var call = beRoutes.controllers.CampaignMgrCtrl.updateDetails(Number(data.id));
     $.ajax({ url: call.url,
         type: call.type,
@@ -39,7 +38,7 @@ function patchDetails() {
     var data = {};
     var fields = ["id", "title", "slogan", "website", "contactEmail", "analyticsCode"];
     fields.forEach(function (value) { data[value] = document.getElementById(value).value; });
-    Informationals.loader("Updating..");
+    Informationals.loader(polyglot.t("update.details"));
     console.log("Informationals ");
 
     let req = Playjax(beRoutes)
@@ -51,10 +50,10 @@ function patchDetails() {
     fetch(req).then( function (res) {
             Informationals.loader.dismiss();
             if (res.ok) {
-                Informationals.makeSuccess("Update Campaign " + data.name, "OK", 1500).show();
+                Informationals.makeSuccess(polyglot.t("update.success"),"", 1500).show();
                 return true;
             } else {
-                Informationals.makeDanger("Update Campaign " + data.name, "Failed", 2500).show();
+                Informationals.makeDanger(polyglot.t("update.failed"), "", 2500).show();
                 res.result().then(function(body){
                     console.log(body);
                 });
@@ -65,11 +64,11 @@ function patchDetails() {
 
 function chooseSlugName() {
     swal({
-        title: 'Choose new Slug for your campaign',
-        text: 'The slug should be match to [A-Za-z1-9_-]',
+        title: polyglot.t("slug.choose"),
+        text: polyglot.t("slug.match"),
         content: "input",
         button: {
-            text: "Ok!",
+            text: polyglot.t("save"),
             closeModal: false,
         },
     }).then(slug => {
@@ -86,20 +85,20 @@ function chooseSlugName() {
     .then(success => {
         if (!success) {
             choosenSlug = null;
-            return swal("This slug already exist").then((val) => chooseSlugName());
+            return swal(polyglot.t("slug.exist"),"","error").then((val) => chooseSlugName());
         } else{
             campUrl = beRoutes.controllers.CampaignPublicCtrl.index(choosenSlug).absoluteURL();
             document.getElementById("hearUsUrl").value=campUrl;
             document.getElementById("hearUsUrlA").href=campUrl;
             swal.stopLoading();
-            Informationals.makeSuccess("Update Slug ", "OK", 1500).show();
+            Informationals.makeSuccess(polyglot.t("slug.update"), "", 1500).show();
             swal.close();
             return choosenSlug;
         }
     })
     .catch(err => {
             if (err) {
-                swal("Oh noes!", "The slug should be match to [A-Za-z1-9_-]", "error").then((val) => chooseSlugName());
+                swal(polyglot.t("oh"), polyglot.t("slug.match"), "error").then((val) => chooseSlugName());
             } else {
                 swal.stopLoading();
                 swal.close();

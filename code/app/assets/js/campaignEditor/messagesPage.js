@@ -91,7 +91,7 @@ function getMessageKey() {
 }
 
 function saveMessages() {
-    Informationals.loader("Saving");
+    Informationals.loader(polyglot.t("saving"));
     messageSelectionChanged(); // save current message;
 
     var arr = [];
@@ -105,10 +105,10 @@ function saveMessages() {
         .then( function (res) {
             Informationals.loader.dismiss();
             if (res.ok) {
-                Informationals.makeSuccess("Messages updated ", "OK", 1500).show();
+                Informationals.makeSuccess(polyglot.t("update.success"), "", 1500).show();
                 return true;
             } else {
-                Informationals.makeDanger("Update Campaign ", "Failed", 2500).show();
+                Informationals.makeDanger(polyglot.t("update.failed"), "", 2500).show();
                 res.json().then(function(body){
                     console.log(body);
                 });
@@ -126,7 +126,7 @@ function parseLoadedData( json ){
 }
 
 function loadMessages(){
-    Informationals.loader("Loading messages");
+    Informationals.loader(polyglot.t("loading.messages"));
     new Playjax(beRoutes).using( function(c){
         return c.CampaignMgrCtrl.getMessages(campaignId);
 
@@ -135,7 +135,7 @@ function loadMessages(){
             return res.json();
         } else {
             console.log( res );
-            throw new Error("Can't load messages: " + res.status);
+            throw new Error(polyglot.t("loading.failed") + ":" + res.status);
         }
 
     }).then( function(json){
@@ -143,7 +143,7 @@ function loadMessages(){
 
     }).catch( function(err){
         console.log( err );
-        Informationals.makeDanger("Can't load messages:" + err, "", 2000).show();
+        Informationals.makeDanger(polyglot.t("loading.failed") + ":" + err, "", 2000).show();
 
     }).finally( function(){
         Informationals.loader.dismiss();
@@ -175,8 +175,7 @@ function saveMessagesBeforeUnload() {
         arr.push( messages[k] );
     }
 
-    var displayStr = "Updating messages";
-    var msgDiv = Informationals.showBackgroundProcess(displayStr);
+    var msgDiv = Informationals.showBackgroundProcess(polyglot.t("update.messages"));
     var call = beRoutes.controllers.CampaignMgrCtrl.updateMessages(campaignId);
     $.ajax({ url: call.url,
         type: call.type,

@@ -23,10 +23,12 @@
         <script src="@routes.Assets.versioned("lib/jquery-ui/jquery-ui.min.js")"></script>
         <script src="@routes.Assets.versioned("lib/popper.js/umd/popper.js")"></script>
         <script src="@routes.Assets.versioned("vnd/bs/js/bootstrap.min.js")"></script>
-        <script src="@routes.Assets.versioned("vnd/swal/sweetalert.min.js")"></script>
         <script src="@routes.Assets.versioned("js/UiUtils.js")"></script>
         <script src="@routes.Assets.versioned("js/Informationals.js")"></script>
         <script src="@routes.Assets.versioned("js/Playjax.js")"></script>
+        <script src="@routes.Assets.versioned("lib/sweetalert/sweetalert.min.js")"></script>
+        <script src="@routes.Assets.versioned("lib/polyglot/build/polyglot.min.js")"></script>
+        <script src="@routes.Assets.versioned("js/polyglot/he.js")"></script>
         @extraBottom
         @for( msg <- request.flash.get(controllers.FlashKeys.MESSAGE) ){
           <script language="JavaScript">

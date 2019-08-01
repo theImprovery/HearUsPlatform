@@ -1,11 +1,11 @@
 function deleteCampaign(id) {
     swal({
-        title:"Are you sure you want to delete this campaign?",
+        title:polyglot.t("campaign.delete.warning"),
         icon:"warning",
         buttons: {
-            cancel:true,
-            confirm:true
-        }
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
+        },
     }).then( function(willDelete){
         if(willDelete) {
             new Playjax(beRoutes)
@@ -15,7 +15,7 @@ function deleteCampaign(id) {
                     if (res.ok) {
                         window.location = beRoutes.controllers.CampaignAdminCtrl.showCampaigns().url;
                     } else {
-                        Informationals.makeDanger("Deletion of campaign "+ id +" failed", "See server log for details", 1500).show();
+                        Informationals.makeDanger(polyglot.t("campaign.delete.failed"), polyglot.t("server_logs_details"), 1500).show();
                     }
                 });
         }

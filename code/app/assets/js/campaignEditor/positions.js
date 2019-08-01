@@ -10,9 +10,9 @@ function changePosition(emt) {
         .fetch(data)
         .then( function (res) {
             if (res.ok) {
-                Informationals.makeSuccess("Updated Position", "", 1000).show();
+                Informationals.makeSuccess(polyglot.t("update.position"), "", 1000).show();
             } else {
-                Informationals.makeWarning("Something went wrong", "try again", 1500).show();
+                Informationals.makeWarning(polyglot.t("went_wrong"), polyglot.t("try_again"), 1500).show();
             }
         });
 }

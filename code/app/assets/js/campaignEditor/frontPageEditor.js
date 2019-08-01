@@ -45,8 +45,7 @@ function submitBeforeUnload() {
     var fields = ["title", "subtitle", "bodyText", "footer", "groupLabels", "kmLabels"];
     data.campaignId = Number(document.getElementById("campaignId").value);
     fields.forEach(function (value) { data[value] = document.getElementById(value).value; });
-    var displayStr = "Updating front page";
-    var msgDiv = Informationals.showBackgroundProcess(displayStr);
+    var msgDiv = Informationals.showBackgroundProcess(polyglot.t("update.front_page"));
     var call = beRoutes.controllers.CampaignMgrCtrl.apiUpdateFrontPage(data.campaignId);
     $.ajax({ url: call.url,
         type: call.type,

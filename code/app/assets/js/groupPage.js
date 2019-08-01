@@ -23,11 +23,11 @@ function getSelectedKms() {
 
 function deleteGroup(id) {
     swal({
-        title:"למחוק קבוצת חברי כנסת זו?",
+        title:polyglot.t("groups.page.delete"),
         icon:"warning",
         buttons: {
-            cancel:"ביטול",
-            confirm:"אישור"
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
         }
     }).then( function(willDelete){
         if(willDelete) {
@@ -38,7 +38,7 @@ function deleteGroup(id) {
                     if (res.ok) {
                         window.location = beRoutes.controllers.KnessetMemberCtrl.showGroups().url;
                     } else {
-                        Informationals.makeDanger("Deletion of group "+ id +" failed", "See server log for details", 1500).show();
+                        Informationals.makeDanger(polyglot.t("groups.page.failed"), polyglot.t("server_logs_details"), 1500).show();
                     }
                 });
         }

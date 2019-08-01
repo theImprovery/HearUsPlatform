@@ -69,7 +69,7 @@
                           @if(curUser.roles.contains(UserRole.Admin)) {
                             <input type="checkbox" id="isAdmin" onchange="updateRole(this, @u.id)" @if(u.roles.contains(UserRole.Admin)) {checked} @if( u.username == curUser.username ) {disabled}>
                           } else {
-                            <input type="checkbox" id="isAdmin" onchange="updateRole(this, @u.id)" @if(u.roles.contains(UserRole.Admin)) {checked} disabled>
+                            <input type="checkbox" id="isAdmin" onchange="updateRole(this, @u.id" @if(u.roles.contains(UserRole.Admin)) {checked} disabled>
                           }
                         </td>
                     </tr>

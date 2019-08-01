@@ -29,7 +29,10 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer" % "6.0.0",
   "com.typesafe.play" %% "play-mailer-guice" % "6.0.0",
   "org.scala-lang.modules" %% "scala-xml" % "1.1.1",
-  "org.webjars" % "d3js" % "5.9.1"
+  "org.webjars" % "d3js" % "5.9.1",
+  "org.webjars.bower" % "polyglot" % "2.2.2",
+  "org.webjars" % "sweetalert" % "2.1.0",
+  "org.webjars" % "requirejs" % "2.3.6"
 )
 
 // TODO add sections and table helpers

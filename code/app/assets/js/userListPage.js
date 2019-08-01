@@ -1,6 +1,6 @@
 function updateRole(cb, userId) {
     var data = {"isAdmin":cb.checked, "id":userId};
-    var msg = (cb.checked) ? "Update to admin" : "remove Admin role";
+    var msg = (cb.checked) ? polyglot.t("admin.upgrade") : polyglot.t("admin.remove");
     new Playjax(beRoutes)
         .using(function (c) {
             return c.UserCtrl.updateRole();
@@ -10,7 +10,7 @@ function updateRole(cb, userId) {
             if (res.ok) {
                 Informationals.makeSuccess(msg, "", 1000).show();
             } else {
-                Informationals.makeWarning("Something went wrong", "try again", 1500).show();
+                Informationals.makeWarning(polyglot.t("went_wrong"), polyglot.t("try_again"), 1500).show();
             }
         });
 }

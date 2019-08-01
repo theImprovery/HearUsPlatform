@@ -49,7 +49,7 @@ function searchGroups(searchStr) {
                         }
                     });
             } else {
-                Informationals.makeWarning("Something went wrong", "try again", 1500).show();
+                Informationals.makeWarning(polyglot.t("went_wrong"), polyglot.t("try_again"), 1500).show();
             }
         });
     }
@@ -69,7 +69,7 @@ function addGroup( element ) {
 function removeFromCampaign(groupId, groupName) {
     var data = {"groupId":groupId};
     swal({
-        title: "Remove group " + groupName + " from campaign?",
+        title: polyglot.t("groups.campaign.remove",{name:groupName}),
         icon: "warning",
         buttons: true,
         dangerMode: true,
@@ -82,7 +82,7 @@ function removeFromCampaign(groupId, groupName) {
                     if (res.ok) {
                         document.location.reload();
                     } else {
-                        Informationals.makeDanger("Deletion of group "+ groupId +" failed","",3000).show();
+                        Informationals.makeDanger(polyglot.t("groups.campaign.failed",{name:groupName}),"",3000).show();
                     }
                 });
         }

@@ -109,11 +109,11 @@ function deleteFile(fileCard) {
     // dialog(fileCard.data("fileId"), fileCard.find("[data-role='credit']").val(), fileCard);
     // $("#fileEditorPanel").slideDown();
     swal({
-        title:"Are you sure you want to delete this knesset member's image?",
+        title:polyglot.t("km.image.delete"),
         icon:"warning",
         buttons: {
-            cancel:true,
-            confirm:true
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
         }
     }).then( function(willDelete){
         if(willDelete) {
@@ -126,7 +126,7 @@ function deleteFile(fileCard) {
                         deleteCard(fileCard);
                         // Informationals.loader.dismiss();
                     } else {
-                        Informationals.makeDanger("Deletion of knesset member's image "+ id +" failed", "See server log for details", 1500).show();
+                        Informationals.makeDanger(polyglot.t("km.image.failed"), polyglot.t("server_logs_details"), 1500).show();
                     }
                 });
         }
@@ -160,11 +160,11 @@ $('#editKMForm').submit(function() {
 
 function deleteKM(id){
     swal({
-        title:"Are you sure you want to delete this knesset member?",
+        title:polyglot.t("km.delete"),
         icon:"warning",
         buttons: {
-            cancel:true,
-            confirm:true
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
         }
     }).then( function(willDelete){
         if(willDelete) {
@@ -175,7 +175,7 @@ function deleteKM(id){
                     if (res.ok) {
                          window.location = beRoutes.controllers.KnessetMemberCtrl.showKms().url;
                     } else {
-                        Informationals.makeDanger("Deletion of knesset member "+ id +" failed", "See server log for details", 1500).show();
+                        Informationals.makeDanger(polyglot.t("km.failed"), polyglot.t("server_logs_details"), 1500).show();
                     }
                 });
         }
@@ -271,9 +271,9 @@ function updateContactOptions(id){
                 .fetch(data)
                 .then( function (res) {
                     if (res.ok) {
-                        Informationals.makeSuccess("Updated Contact Options", "", 1000).show();
+                        Informationals.makeSuccess(polyglot.t("km.contact.updated"), "", 1000).show();
                     } else {
-                        Informationals.makeWarning("Something went wrong", "Each platform can appear once", 1500).show();
+                        Informationals.makeWarning(polyglot.t("went_wrong"), polyglot.t("km.contact.one_platform"), 1500).show();
                     }
                 });
 }
