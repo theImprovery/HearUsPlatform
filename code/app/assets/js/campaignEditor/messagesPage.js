@@ -105,12 +105,14 @@ function saveMessages() {
         .then( function (res) {
             Informationals.loader.dismiss();
             if (res.ok) {
-                Informationals.makeSuccess("Messages updated " + data.name, "OK", 1500).show();
+                Informationals.makeSuccess("Messages updated ", "OK", 1500).show();
+                return true;
             } else {
-                Informationals.makeDanger("Update Campaign " + data.name, "Failed", 2500).show();
+                Informationals.makeDanger("Update Campaign ", "Failed", 2500).show();
                 res.json().then(function(body){
                     console.log(body);
                 });
+                return false;
             }
         });
 }
@@ -165,5 +167,45 @@ function messageSelectionChanged() {
     updateCharacterCount();
 }
 
+function saveMessagesBeforeUnload() {
+    messageSelectionChanged(); // save current message;
+
+    var arr = [];
+    for ( var k in messages ) {
+        arr.push( messages[k] );
+    }
+
+    var displayStr = "Updating messages";
+    var msgDiv = Informationals.showBackgroundProcess(displayStr);
+    var call = beRoutes.controllers.CampaignMgrCtrl.updateMessages(campaignId);
+    $.ajax({ url: call.url,
+        type: call.type,
+        data: JSON.stringify(arr),
+        dataType: "json",
+        async: false,
+        contentType: "application/json; charset=utf-8",
+        headers:{
+            'Csrf-Token': document.getElementById("Playjax_csrfTokenValue").innerText
+        }
+    }).done(function(){
+        msgDiv.success();
+        return true;
+    }).always(function(){
+        msgDiv.dismiss();
+    }).fail( function(req, status, error){
+        if ( req.readyState === 4 ) {
+            // don't fire if we're navigating away from the page.
+            console.log("Error");
+            console.log( req );
+            console.log( status );
+            console.log( error );
+            Informationals.show( Informationals.makeDanger("Error updating campaign", status + "\n" + error));
+        }
+    });
+}
+
+window.onbeforeunload = function() {
+    return saveMessagesBeforeUnload();
+};
 
 

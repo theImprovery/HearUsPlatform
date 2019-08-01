@@ -1,6 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import Helpers._
-@(newCampaignForm:Form[AdminCampaign])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(newCampaignForm:Form[detailsCampaign])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/createCampaignAdminPage.js")"></script>
@@ -18,7 +18,7 @@
   }
   <div class="row">
     <div class="col">
-      <form action="@routes.CampaignAdminCtrl.saveCampaign()" method="POST" id="campaignForm">
+      <form action="@routes.CampaignMgrCtrl.saveCampaign()" method="POST" id="campaignForm">
         @helper.CSRF.formField
         <div class="form-group row @Helpers.fieldStatus(newCampaignForm("name"))">
           <label for="nameInput" class="col-sm-2 control-label">@Messages("name")</label>

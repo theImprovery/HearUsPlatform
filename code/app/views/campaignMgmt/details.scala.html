@@ -12,7 +12,8 @@
   </script>
 }
 
-@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Details, extraBottom = scripts) {
+@templates.campaignNavbar(if(campaign.title == "") {Messages("navbar.campaigns.new")} else {campaign.title},
+  views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Details, extraBottom = scripts) {
   <div class="row my-2">
     <div class="col-10">
       <div class="text-muted">
@@ -44,6 +45,9 @@
         </div>
       </div>
       <small class="form-text text-muted">@Messages("campaigns.hearUsUrl.help")</small>
+      <div>
+        <button class="addButton" type="button" onclick="chooseSlugName()">@Messages("campaigns.slug.new")</button>
+      </div>
     </div>
   </div>
   <div class="form-group row">
@@ -78,4 +82,5 @@
       </small>
     </div>
   </div>
+
 }

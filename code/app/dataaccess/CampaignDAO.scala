@@ -1,7 +1,6 @@
 package dataaccess
 
 import javax.inject.Inject
-
 import models._
 import play.api.Configuration
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -9,6 +8,7 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Success
 
 
 class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
@@ -37,6 +37,15 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
       updateTexts(ct)
       res
     } )
+  }
+
+  def updateSlug(id:Long, slug:String):Future[Boolean] = {
+      db.run(
+        campaigns.filter( _.id === id).map(_.slug).update(Some(slug)).asTry
+      ).map({
+        case _:Success[_] => true
+        case  _ => false
+      })
   }
   
   def updateDetails( id:Long, details:CampaignDetails ) = {

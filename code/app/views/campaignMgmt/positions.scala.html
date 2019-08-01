@@ -6,7 +6,8 @@
   <script src="@routes.Assets.versioned("js/campaignEditor/positions.js")"></script>
 }
 
-@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.KnessetMembers, extraBottom = scripts) {
+@templates.campaignNavbar(if(campaign.title == "") {Messages("navbar.campaigns.new")} else {campaign.title},
+  views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.KnessetMembers, extraBottom = scripts) {
   <div class="row my-2">
     <div class="col">
       <div class="text-muted">

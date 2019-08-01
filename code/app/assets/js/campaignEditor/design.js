@@ -46,7 +46,7 @@ function postForm() {
     var act = beRoutes.controllers.CampaignMgrCtrl.doUpdateCampaignDesign(campaignId);
     var xhr = new XMLHttpRequest();
 
-    xhr.open( act.method, act.url );
+    xhr.open( act.method, act.url, false );
     xhr.setRequestHeader("Csrf-Token", document.getElementById("Playjax_csrfTokenValue").innerText);
 
     xhr.onload = function(oEvent) {
@@ -109,3 +109,8 @@ function setHasImage( hasImage ) {
         $("#deleteImageBtn").hide();
     }
 }
+
+window.onbeforeunload = function () {
+    console.log("in before unload");
+    postForm();
+};

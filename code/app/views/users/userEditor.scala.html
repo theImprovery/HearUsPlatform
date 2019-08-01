@@ -7,7 +7,7 @@
 
 @content = {
   <div class="container">
-    @if(isInvite){
+    @if(isInvite || isNew){
       @comps.pageTitleRow(Messages("userEditor.new.title")) { }
     }else {
       @comps.pageTitleRow(Messages("userEditor.title")){ }
@@ -27,7 +27,7 @@
         <div class="tab-content my-2">
           <div class="tab-pane @if(activeFirst){active}" id="userEditor">
 
-            <form class="form-horizontal" action="@destination.url" method="POST">
+            <form class="form-horizontal" action="@destination.url" method="POST" autocomplete="off">
               @formErrors(form)
               @formErrors(form("uuid"))
 
@@ -132,7 +132,7 @@
   </div>
 }
 
-@if(!isInvite){
+@if(!isNew){
     @templates.backEndBase("Profile Editor", BackOfficeSections.Users )(content)
 } else {
     @templates.bsBase("New User")(content)

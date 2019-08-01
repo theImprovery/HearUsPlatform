@@ -23,7 +23,7 @@ object ActionType extends Enumeration {
 case class Campaign( id:Long,
                      title:  String,
                      slogan: String,
-                     slug:   String,
+                     slug:   Option[String],
                      website:      String,
                      themeData:    String,
                      contactEmail: String,

@@ -10,7 +10,8 @@
   </script>
 }
 
-@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Messages, extraBottom = scripts) {
+@templates.campaignNavbar(if(campaign.title == "") {Messages("navbar.campaigns.new")} else {campaign.title},
+  views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Messages, extraBottom = scripts) {
   <div class="row my-2">
     <div class="col-10">
       <div class="text-muted">

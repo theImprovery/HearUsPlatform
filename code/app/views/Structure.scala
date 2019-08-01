@@ -71,7 +71,7 @@ object Structure {
     )),
     MultiPageSection("navbar.campaigns", BackOfficeSections.ManageSystemCampaigns, Seq(
       PageSectionItem("navbar.campaigns.list", routes.CampaignAdminCtrl.showCampaigns() ),
-      PageSectionItem("navbar.campaigns.new", routes.CampaignAdminCtrl.createCampaign() )
+      PageSectionItem("navbar.campaigns.new", routes.CampaignMgrCtrl.createCampaign() )
     )),
     MultiPageSection("navbar.users.title", BackOfficeSections.Users, Seq(
       PageSectionItem("navbar.users.invite", routes.UserCtrl.showInviteUser()),
@@ -85,13 +85,13 @@ object Structure {
   )
 
   def campaignEditorItems(campaign:Campaign):Seq[TopSiteSection[CampaignEditorSections.Value]] = Seq(
-    PageSection("navbar.campagins.mgmt.details",   CampaignEditorSections.Details, routes.CampaignMgrCtrl.details(campaign.id)),
-    PageSection("navbar.campagins.mgmt.messages",  CampaignEditorSections.Messages, routes.CampaignMgrCtrl.editMessages(campaign.id)),
-    PageSection("navbar.campagins.mgmt.frontPage", CampaignEditorSections.FrontPage, routes.CampaignMgrCtrl.showFrontPageEditor(campaign.id)),
-    PageSection("navbar.campagins.mgmt.design",    CampaignEditorSections.Design, routes.CampaignMgrCtrl.showCampaignDesign(campaign.id)),
-    PageSection("navbar.campagins.mgmt.positions", CampaignEditorSections.KnessetMembers, routes.CampaignMgrCtrl.positions(campaign.id)),
-    PageSection("navbar.campagins.mgmt.CampaignTeam", CampaignEditorSections.CampaignTeam, routes.CampaignMgrCtrl.showCampaignTeam(campaign.id)),
-    PageSection("navbar.campagins.mgmt.CampaignGroups", CampaignEditorSections.CampaignGroups, routes.CampaignMgrCtrl.showCampaignGroups(campaign.id))
+    PageSection("navbar.campaigns.mgmt.details",   CampaignEditorSections.Details, routes.CampaignMgrCtrl.details(campaign.id)),
+    PageSection("navbar.campaigns.mgmt.messages",  CampaignEditorSections.Messages, routes.CampaignMgrCtrl.editMessages(campaign.id)),
+    PageSection("navbar.campaigns.mgmt.frontPage", CampaignEditorSections.FrontPage, routes.CampaignMgrCtrl.showFrontPageEditor(campaign.id)),
+    PageSection("navbar.campaigns.mgmt.design",    CampaignEditorSections.Design, routes.CampaignMgrCtrl.showCampaignDesign(campaign.id)),
+    PageSection("navbar.campaigns.mgmt.positions", CampaignEditorSections.KnessetMembers, routes.CampaignMgrCtrl.positions(campaign.id)),
+    PageSection("navbar.campaigns.mgmt.CampaignTeam", CampaignEditorSections.CampaignTeam, routes.CampaignMgrCtrl.showCampaignTeam(campaign.id)),
+    PageSection("navbar.campaigns.mgmt.CampaignGroups", CampaignEditorSections.CampaignGroups, routes.CampaignMgrCtrl.showCampaignGroups(campaign.id))
   )
 
 

@@ -54,11 +54,12 @@ POST    /bkofc/api/km/update          controllers.ParseCtrl.apiKms
 POST    /bkofc/api/committee/update   controllers.ParseCtrl.apiUpdateCommittees
 
 GET     /bkofc/campainers/:name       controllers.CampaignAdminCtrl.getCampaigners(name:String)
-GET     /bkofc/campaigns/new              controllers.CampaignAdminCtrl.createCampaign
-POST    /bkofc/campaigns/                 controllers.CampaignAdminCtrl.saveCampaign
+GET     /bkofc/campaigns/new              controllers.CampaignMgrCtrl.createCampaign
+POST    /bkofc/campaigns/                 controllers.CampaignMgrCtrl.saveCampaign
 GET     /bkofc/campaigns                  controllers.CampaignAdminCtrl.showCampaigns
 PATCH   /bkofc/campaigns/sm/              controllers.CampaignMgrCtrl.updateSocialMedia
 PATCH   /bkofc/campaigns/position         controllers.CampaignMgrCtrl.updatePosition
+PUT     /bkpfc/campaigns/:id/slug/         controllers.CampaignMgrCtrl.apiCheckAndUpdateSlug(id:Long)
 
 GET     /bkofc/campaigns/:id/messages/     controllers.CampaignMgrCtrl.editMessages(id:Long)
 PUT     /bkofc/api/campaigns/:id/messages  controllers.CampaignMgrCtrl.updateMessages(id:Long)
@@ -66,6 +67,7 @@ GET     /api/campaigns/:id/messages        controllers.CampaignMgrCtrl.getMessag
 
 GET     /bkofc/campaigns/:id/frontPage    controllers.CampaignMgrCtrl.showFrontPageEditor(id:Long)
 POST    /bkofc/campaigns/:id/frontPage    controllers.CampaignMgrCtrl.updateFrontPage(id:Long)
+POST    /bkofc/campaigns/api/:id/frontPage    controllers.CampaignMgrCtrl.apiUpdateFrontPage(id:Long)
 
 GET     /bkofc/campaigns/:id/team           controllers.CampaignMgrCtrl.showCampaignTeam(id:Long)
 POST    /bkofc/campaigns/:id/team           controllers.CampaignMgrCtrl.doAddToTeam(id:Long)

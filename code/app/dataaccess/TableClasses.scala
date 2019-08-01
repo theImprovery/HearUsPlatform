@@ -158,7 +158,7 @@ class CampaignTable( tag:Tag ) extends Table[Campaign](tag, "campaigns") {
   def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
   def title = column[String]("title")
   def slogan = column[String]("slogan")
-  def slug   = column[String]("slug")
+  def slug   = column[Option[String]]("slug")
   def website = column[String]("website")
   def themeData = column[String]("theme_data")
   def contactEmail = column[String]("contact_email")

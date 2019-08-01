@@ -128,7 +128,7 @@
               <em>לא נמצאו חברי כנסת העונים לתאור</em><br>
               שנו את הגדרות הסינון על ידי לחיצה על אחד מכפתורי העמדה או בחירת מפלגה או וועדה אחרת מהתפריט.
             </div>
-            <ul id="kms" class="km-list">@for(km <- kms){<li data-kmId="@km.id" data-kmParty="@km.partyId" class="@km2Pos(km.id).toString">@comps.kmCard(km, km2Party.get(km.id), km2Pos(km.id), km2Image(km.id), texts.kmLabel((models.Gender.withName(km.gender.toLowerCase), km2Pos(km.id))), campaign.slug )</li>}
+            <ul id="kms" class="km-list">@for(km <- kms){<li data-kmId="@km.id" data-kmParty="@km.partyId" class="@km2Pos(km.id).toString">@comps.kmCard(km, km2Party.get(km.id), km2Pos(km.id), km2Image(km.id), texts.kmLabel((models.Gender.withName(km.gender.toLowerCase), km2Pos(km.id))), campaign.slug.getOrElse("No camp slug") )</li>}
             </ul>
         </div>
       </div>

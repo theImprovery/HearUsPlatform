@@ -69,7 +69,7 @@ function updateFbLink() {
   <div class="container">
     <div class="row my-2">
       <div class="col">
-        <a class="navbar-brand" href="@routes.CampaignPublicCtrl.index(campaign.slug)#sectionKMs"><i class="fa fa-arrow-circle-o-right"></i> @campaign.title</a>
+        <a class="navbar-brand" href="@routes.CampaignPublicCtrl.index(campaign.slug.getOrElse("No camp slug"))#sectionKMs"><i class="fa fa-arrow-circle-o-right"></i> @campaign.title</a>
       </div>
     </div>
     <div class="row my-2">

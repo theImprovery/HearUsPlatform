@@ -13,6 +13,9 @@
   }
   <div class="row">
     <div class="col">
+      @comps.pageTitleRow(""){
+        <a class="btn btn-outline-primary" href="@routes.CampaignMgrCtrl.createCampaign()"><i class="fa fa-plus-circle"></i> @Messages("campaigns.createNew")</a>
+      }
       @if(campaigns.nonEmpty) {
         <ul>
         @for(c <- campaigns) {
@@ -28,6 +31,7 @@
       } else {
         <div class="noData">
           @Messages("campaignMgmt.myCampaigns.noCampaigns")
+          <a href="@routes.CampaignMgrCtrl.createCampaign()">@Messages("campaigns.createNew")</a>
         </div>
       }
     </div>

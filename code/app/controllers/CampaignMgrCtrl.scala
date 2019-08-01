@@ -20,16 +20,19 @@ import org.joda.time.DateTime
 import play.api.data.{Form, _}
 import play.api.data.Forms._
 import play.api.data.format.Formatter
+import play.mvc.BodyParser.AnyContent
 
 import scala.collection.mutable
 import scala.concurrent.Future
+
+case class detailsCampaign(name:String, slug:String, campaigner:Long)
 
 class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                 campaigns:CampaignDAO, users:UsersDAO, usersCampaigns:UserCampaignDAO,
                                 groups:KmGroupDAO,
                                 langs:Langs, messagesApi:MessagesApi, images: ImagesDAO,
                                 conf:Configuration, ws:WSClient) extends InjectedController {
-  
+
   implicit private val ec = cc.executionContext
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
@@ -50,10 +53,55 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     )(KmAction.apply)(KmAction.unapply)
   )
 
+  val newCampaignForm = Form(mapping(
+    "name" -> text,
+    "slug" -> text,
+    "campaigner" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int])
+  )(detailsCampaign.apply)(detailsCampaign.unapply))
+
   def index() = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     val userId = req.asInstanceOf[AuthenticatedRequest[_]].subject.get.asInstanceOf[HearUsSubject].user.id
     usersCampaigns.getCampaginsForUser( userId ).map( cmps =>
       Ok( views.html.campaignMgmt.index(cmps.sortBy(_.title)) )
+    )
+  }
+
+  def createCampaign = deadbolt.SubjectPresent()() { implicit req =>
+    val userId = req.subject.asInstanceOf[Option[HearUsSubject]].map(hus => hus.user.id).getOrElse(-1L)
+    for {
+      campaign <- campaigns.store(Campaign(-1l, "", "", null, "", conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""),
+                "", "", false))
+      rel <- usersCampaigns.connectUserToCampaign(UserCampaign(userId, campaign.id, isAdmin=true))
+      camps <- usersCampaigns.getCampaginsForUser( userId )
+    } yield {
+      Ok(views.html.campaignMgmt.details(campaign))
+
+    }
+  }
+
+  def saveCampaign = deadbolt.SubjectPresent()() { implicit req =>
+    newCampaignForm.bindFromRequest().fold(
+      fwe => {
+        Logger.info("errors " + fwe.errors.map(e => fwe.errors(e.key).mkString(", ")).mkString("\n"))
+        Future(BadRequest(views.html.campaignMgmt.createCampaign(fwe)))
+      },
+      adminCampaign => {
+        for {
+          slugExists <- campaigns.campaignSlugExists(adminCampaign.slug)
+          camOpt:Option[Campaign] <- {
+            if (!slugExists) campaigns.store(Campaign(-1l, adminCampaign.name, "", Some(adminCampaign.slug), "",
+              conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""), "", "", false)).map(Some(_))
+            else Future(None)
+          }
+          rel:Option[UserCampaign] <- camOpt.map( cam => usersCampaigns.connectUserToCampaign(UserCampaign(adminCampaign.campaigner, cam.id, isAdmin=true)
+          ).map(Some(_)) ).getOrElse(Future(None))
+        } yield {
+          var form = newCampaignForm.fill(adminCampaign)
+          form = form.withError("slug", "error.campaignSlug.exists")
+          rel.map(_=> Redirect(routes.CampaignAdminCtrl.showCampaigns()) )
+            .getOrElse( BadRequest(views.html.campaignMgmt.createCampaign(form)) )
+        }
+      }
     )
   }
 
@@ -77,6 +125,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
 
   }
 
+
   def details(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     campaignEditorAction(id){
       for {
@@ -84,7 +133,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
     }
   }
-  
+
   def updateDetails(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.tolerantJson) { implicit req =>
     campaignEditorAction(id){
       req.body.validate[CampaignDetails].fold(
@@ -121,18 +170,36 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       "groupLabels" -> text,
       "kmLabels" -> text
   )(CampaignText.apply)(CampaignText.unapply))
-  
+
+  def apiUpdateFrontPage( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.tolerantJson) { implicit req =>
+    campaignEditorAction(id) {
+      req.body.validate[CampaignText].fold(
+        errors => {
+          logger.info(errors.mkString(","))
+          Future(BadRequest(Json.obj("message" -> "can't parse campaign", "details"->errors.mkString(","))))
+        },
+        texts => {
+          campaigns.updateTexts(texts.copy(campaignId=id)).map( i =>
+              Ok( Json.toJson(i)))
+        }
+      )
+    }
+  }
+
   def updateFrontPage( id:Long )  = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     campaignEditorAction(id) {
       frontPageForm.bindFromRequest().fold(
-        fwe => Future(BadRequest(fwe.errors.mkString("\n"))),
+        fwe => {
+          logger.info("err" + fwe.errors.mkString("\n"))
+          Future(BadRequest(fwe.errors.mkString("\n")))
+        },
         texts => {
           campaigns.updateTexts(texts.copy(campaignId=id)).map( i =>
             Redirect( routes.CampaignMgrCtrl.showFrontPageEditor(id))
               .flashing(FlashKeys.MESSAGE ->
                           Informational(InformationalLevel.Success, Messages("campaignMgmt.frontPage.saved")).encoded)
           )
-          
+
         }
       )
     }
@@ -548,6 +615,16 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         Ok("Deleted")
       }
     }
+  }
+
+  def apiCheckAndUpdateSlug(id:Long) = deadbolt.SubjectPresent()(cc.parsers.text) { implicit req =>
+    val slug = req.body
+    if("^[A-Za-z0-9_-]+$".r.findFirstIn(slug).nonEmpty) {
+      campaigns.updateSlug(id, slug).map(ans => Ok(Json.toJson(ans)))
+    }else{
+      Future(BadRequest("Slug should match to A-Za-z1-9_-"))
+    }
+    //      })
   }
   
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {

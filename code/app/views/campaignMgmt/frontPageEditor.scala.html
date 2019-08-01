@@ -15,10 +15,12 @@
   </script>
 }
 
-@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.FrontPage, extraBottom = scripts, extraHead=head) {
-  <form action="@routes.CampaignMgrCtrl.updateFrontPage(campaign.id)" method="POST" onsubmit="prepareForm()">
+@templates.campaignNavbar(if(campaign.title == "") {Messages("navbar.campaigns.new")} else {campaign.title},
+  views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.FrontPage, extraBottom = scripts, extraHead=head) {
+  <form id="frontPageForm"action="@routes.CampaignMgrCtrl.updateFrontPage(campaign.id)" method="POST" onsubmit="prepareForm()" enctype=multipart/form-data>
     <input type="hidden" name="groupLabels" id="groupLabels" >
     <input type="hidden" name="kmLabels" id="kmLabels">
+    <input type="hidden" name="campaignId" id="campaignId" value="@campaign.id">
     @helper.CSRF.formField
     <div class="row my-2">
       <div class="col-10">

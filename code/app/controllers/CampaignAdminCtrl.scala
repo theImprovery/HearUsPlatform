@@ -21,8 +21,6 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
-case class AdminCampaign(name:String, slug:String, campaigner:Long)
-
 class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                   users:UsersDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
                                   userCampaigns:UserCampaignDAO,
@@ -33,11 +31,7 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     MessagesImpl(langs.availables.head, messagesApi)
   }
 
-  val newCampaignForm = Form(mapping(
-    "name" -> text,
-    "slug" -> text,
-    "campaigner" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int])
-  )(AdminCampaign.apply)(AdminCampaign.unapply))
+
 
   def showCampaigns = deadbolt.SubjectPresent()() { implicit req =>
     for {
@@ -45,11 +39,7 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     } yield Ok(views.html.campaignAdmin.allCampaigns(camps))
   }
 
-  def createCampaign = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
-    Future(Ok(views.html.campaignAdmin.createCampaign(newCampaignForm)))
-  }
-
-  def getCampaigners(searchStr:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
+  def getCampaigners(searchStr:String) = deadbolt.SubjectPresent()() { implicit req =>
     val sqlSearch = "%"+searchStr.trim+"%"
     users.allCampaigners(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans.map(_.dn))))
   }
@@ -57,32 +47,6 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def updatePublish = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson) { implicit req =>
     val json = req.body.as[JsObject]
     campaigns.updatePublish(json("id").asOpt[Long].getOrElse(-1L), json("isPublish").asOpt[Boolean].getOrElse(false)).map(ans => Ok("updated"))
-  }
-
-  def saveCampaign = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
-    newCampaignForm.bindFromRequest().fold(
-      fwe => {
-        Logger.info("errors " + fwe.errors.map(e => fwe.errors(e.key).mkString(", ")).mkString("\n"))
-        Future(BadRequest(views.html.campaignAdmin.createCampaign(fwe)))
-      },
-      adminCampaign => {
-        for {
-          slugExists <- campaigns.campaignSlugExists(adminCampaign.slug)
-          camOpt:Option[Campaign] <- {
-            if (!slugExists) campaigns.store(Campaign(-1l, adminCampaign.name, "", adminCampaign.slug, "",
-                                               conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""), "", "", false)).map(Some(_))
-            else Future(None)
-          }
-          rel:Option[UserCampaign] <- camOpt.map( cam => userCampaigns.connectUserToCampaign(UserCampaign(adminCampaign.campaigner, cam.id, isAdmin=true)
-          ).map(Some(_)) ).getOrElse(Future(None))
-        } yield {
-          var form = newCampaignForm.fill(adminCampaign)
-          form = form.withError("slug", "error.campaignSlug.exists")
-          rel.map(_=> Redirect(routes.CampaignAdminCtrl.showCampaigns()) )
-            .getOrElse( BadRequest(views.html.campaignAdmin.createCampaign(form)) )
-        }
-      }
-    )
   }
   
   def deleteCampaign(id:Long, from:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>

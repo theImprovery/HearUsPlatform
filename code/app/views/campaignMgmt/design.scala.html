@@ -16,7 +16,8 @@
   </script>
 }
 
-@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Design, extraBottom = scripts) {
+@templates.campaignNavbar(if(campaign.title == "") {Messages("navbar.campaigns.new")} else {campaign.title},
+  views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.Design, extraBottom = scripts) {
   <form action="@routes.FilesCtrl.doAddImage(campaign.id, "camps")" method="POST" enctype="multipart/form-data">
     <div class="row my-2">
       <div class="col-sm-10">
