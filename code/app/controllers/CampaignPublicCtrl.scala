@@ -4,7 +4,7 @@ import be.objectify.deadbolt.scala.DeadboltActions
 import be.objectify.deadbolt.scala.models.Subject
 import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UsersDAO}
 import javax.inject.Inject
-import models.{Campaign, CannedMessage, Platform, Position, UserRole}
+import models.{Campaign, CampaignStatus, CannedMessage, Platform, Position, UserRole}
 import play.api.{Configuration, Logger}
 import play.api.i18n.{I18nSupport, Langs, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.libs.ws.WSClient
@@ -93,7 +93,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
   def canView( subject:Option[Subject], campaign:Campaign ):Future[Boolean] = {
     
     // easy: campaign is published.
-    if ( campaign.isPublished ) return Future(true)
+    if ( campaign.status == CampaignStatus.Published ) return Future(true)
     
     subject match {
       case None => Future(false) // not logged in -> can't see

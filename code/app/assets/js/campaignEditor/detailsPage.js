@@ -39,7 +39,6 @@ function patchDetails() {
     var fields = ["id", "title", "slogan", "website", "contactEmail", "analyticsCode"];
     fields.forEach(function (value) { data[value] = document.getElementById(value).value; });
     Informationals.loader(polyglot.t("update.details"));
-    console.log("Informationals ");
 
     let req = Playjax(beRoutes)
         .using(function (c) {

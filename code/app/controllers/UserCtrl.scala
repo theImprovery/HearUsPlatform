@@ -461,9 +461,6 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     val json = req.body.as[JsObject]
     val roles = if(json("isAdmin").asOpt[Boolean].getOrElse(true)) { Set(UserRole.Admin, UserRole.Campaigner) }
             else { Set(UserRole.Campaigner) }
-    Logger.info("is admion " + json("isAdmin").asOpt[Boolean].getOrElse(true))
-    Logger.info("id " + json("id").asOpt[Long].getOrElse(-1L))
-    Logger.info("roles " + roles.mkString(";"))
     users.updateRole(json("id").asOpt[Long].getOrElse(-1L), roles).map(ans => Ok("updated"))
   }
 

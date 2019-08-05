@@ -4,7 +4,24 @@
 @(campaigns:Seq[Campaign])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @bottom = {
-  <script src="@routes.Assets.versioned("js/campaignsAdmin.js")"></script>
+  <script src="@routes.Assets.versioned("js/campaignMgmt.js")"></script>
+}
+
+@createSpan(status:CampaignStatus.Value) = {
+  @status match {
+    case CampaignStatus.Rejected => {
+      <span class="badge badge-danger">@Messages("rejected")</span>
+    }
+    case CampaignStatus.Published => {
+      <span class="badge badge-success">@Messages("published")</span>
+    }
+    case CampaignStatus.WorkInProgress => {
+      <span class="badge badge-secondary">@Messages("editing")</span>
+    }
+    case CampaignStatus.PublicationRequested => {
+      <span class="badge badge-primary">@Messages("waiting")</span>
+    }
+  }
 }
 
 @templates.backEndBase("campaignMgmt.index.title", BackOfficeSections.MyCampaigns, Html(""), bottom) {
@@ -17,17 +34,29 @@
         <a class="btn btn-outline-primary" href="@routes.CampaignMgrCtrl.createCampaign()"><i class="fa fa-plus-circle"></i> @Messages("campaigns.createNew")</a>
       }
       @if(campaigns.nonEmpty) {
-        <ul>
-        @for(c <- campaigns) {
-          <li>
-            <strong>@c.title</strong>
-            @if(c.slogan.trim.nonEmpty) {@c.slogan}
-            <a class="btn btn-sm btn-outline-primary" href="@routes.CampaignMgrCtrl.details(c.id)"><i class="fa fa-edit"></i>
-              @Messages("edit")</a>
-            <button type="button" name="deleteBtn" onclick="deleteCampaign(@c.id, 'campaigner');" class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i> @Messages("delete")</button>
-          </li>
-        }
-        </ul>
+        <table>
+          @for(c <- campaigns) {
+            <tr>
+              <td>@createSpan(c.status)</td>
+              <td><strong>@c.title</strong>
+                @if(c.slogan.trim.nonEmpty) {c.slogan}</td>
+              <td>
+                <a class="btn btn-sm btn-outline-primary" href="@routes.CampaignMgrCtrl.details(c.id)"><i class="fa fa-edit"></i>
+                  @Messages("edit")</a>
+              </td>
+              <td>
+                <button type="button" name="deleteBtn" onclick="deleteCampaign(@c.id, 'campaigner');" class="btn btn-sm btn-outline-danger">
+                  <i class="fa fa-trash"></i> @Messages("delete")</button>
+              </td>
+              @if(c.status == CampaignStatus.WorkInProgress || c.status == CampaignStatus.Rejected) {
+                <td>
+                  <button type="button" name="publishBtn" onclick="askForPublish(@c.id);" class="btn btn-sm btn-outline-success">
+                    <i class="fa fa-check"></i> @Messages("askForPublish")</button>
+                </td>
+              }
+            </tr>
+          }
+        </table>
       } else {
         <div class="noData">
           @Messages("campaignMgmt.myCampaigns.noCampaigns")

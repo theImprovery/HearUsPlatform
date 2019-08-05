@@ -70,7 +70,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     val userId = req.subject.asInstanceOf[Option[HearUsSubject]].map(hus => hus.user.id).getOrElse(-1L)
     for {
       campaign <- campaigns.store(Campaign(-1l, "", "", null, "", conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""),
-                "", "", false))
+                "", "", CampaignStatus.WorkInProgress))
       rel <- usersCampaigns.connectUserToCampaign(UserCampaign(userId, campaign.id, isAdmin=true))
       camps <- usersCampaigns.getCampaginsForUser( userId )
     } yield {
@@ -90,7 +90,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           slugExists <- campaigns.campaignSlugExists(adminCampaign.slug)
           camOpt:Option[Campaign] <- {
             if (!slugExists) campaigns.store(Campaign(-1l, adminCampaign.name, "", Some(adminCampaign.slug), "",
-              conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""), "", "", false)).map(Some(_))
+              conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""), "", "", CampaignStatus.WorkInProgress)).map(Some(_))
             else Future(None)
           }
           rel:Option[UserCampaign] <- camOpt.map( cam => usersCampaigns.connectUserToCampaign(UserCampaign(adminCampaign.campaigner, cam.id, isAdmin=true)
@@ -624,7 +624,15 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     }else{
       Future(BadRequest("Slug should match to A-Za-z1-9_-"))
     }
-    //      })
+  }
+
+  def sendToApprove(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(id) {
+      campaigns.updateStatus(id, CampaignStatus.PublicationRequested).flatMap(c =>
+        index()(req).map(a => a.flashing(FlashKeys.MESSAGE ->
+          Informational(InformationalLevel.Success, Messages("campaignMgmt.sendToApprove")).encoded)
+        ))
+    }
   }
   
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {

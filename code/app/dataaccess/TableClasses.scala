@@ -24,6 +24,10 @@ object Mappers {
     (a:Set[UserRole.Value]) => a.map(r => Math.pow(2,r.id).toInt ).sum,
     (i:Int) => UserRole.values.map(r => (r, (i>>r.id) & 1) ).filter(_._2==1).map(_._1)
   )
+  implicit val campaignStatus = MappedColumnType.base[CampaignStatus.Value, Int](
+    (s:CampaignStatus.Value) => s.id,
+    (i:Int) => CampaignStatus(i)
+  )
 }
 
 class UserTable(tag:Tag) extends Table[User](tag,"users") {
@@ -155,6 +159,7 @@ class KmsPartiesView( tag:Tag ) extends Table[KmsParties](tag, "kms_parties") {
 }
 
 class CampaignTable( tag:Tag ) extends Table[Campaign](tag, "campaigns") {
+  import Mappers.campaignStatus
   def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
   def title = column[String]("title")
   def slogan = column[String]("slogan")
@@ -163,9 +168,9 @@ class CampaignTable( tag:Tag ) extends Table[Campaign](tag, "campaigns") {
   def themeData = column[String]("theme_data")
   def contactEmail = column[String]("contact_email")
   def analytics = column[String]("analytics_code")
-  def isPublished = column[Boolean]("is_published")
+  def status = column[CampaignStatus.Value]("status")
 
-  def * = (id, title, slogan, slug, website, themeData, contactEmail, analytics, isPublished
+  def * = (id, title, slogan, slug, website, themeData, contactEmail, analytics, status
             ) <> (Campaign.tupled, Campaign.unapply)
 }
 

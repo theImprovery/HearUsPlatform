@@ -198,9 +198,10 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     db.run( campaigns.filter( _.slug.toLowerCase === slug.toLowerCase).result ).map( _.headOption )
   }
 
-  def updatePublish( campId:Long, isPublish:Boolean ):Future[Int] = {
+  def updateStatus(campId:Long, status: CampaignStatus.Value ):Future[Int] = {
+    import Mappers.campaignStatus
     db.run(
-      campaigns.filter( _.id === campId ).map( _.isPublished ).update(isPublish)
+      campaigns.filter( _.id === campId ).map( _.status ).update(status)
     )
   }
 

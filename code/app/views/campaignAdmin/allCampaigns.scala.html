@@ -27,7 +27,7 @@
             <tr>
               <th>@Messages("campaigns.table.title")</th>
               <th>@Messages("campaigns.table.slug")</th>
-              <th>@Messages("campaigns.table.isPublished")</th>
+              <th>@Messages("campaigns.table.actions")</th>
               <th>@Messages("campaigns.table.delete")</th>
           </tr>
           </thead>
@@ -38,13 +38,32 @@
                 <strong>@c.title</strong> @if(c.slogan.trim.nonEmpty){@c.slogan}
               </td>
               <td>
-                 <pre>@c.slug</pre>
+                @if(c.slug.nonEmpty) {
+                  <a href="@routes.CampaignPublicCtrl.index(c.slug.get)">@c.slug.get</a>
+                }
               </td>
               <td>
-                <label class="switch">
-                  <input type="checkbox" onchange="updatePublish(this, @c.id)" @if(c.isPublished){checked}>
-                  <span class="slider round"></span>
-                </label>
+                <div class="actions">
+                  @c.status match {
+                    case CampaignStatus.WorkInProgress => {
+                      <div class="alert alert-info">@Messages("campaigns.table.inWorking")</div>
+                    }
+                    case CampaignStatus.PublicationRequested => {
+                      <button class="btn btn-outline-success btn-sm" onclick="updateStatus(2, @c.id)">@Messages("campaigns.table.publish")</button>
+                      <button class="btn btn-outline-danger btn-sm" onclick="updateStatus(3, @c.id)">@Messages("campaigns.table.reject")</button>
+                    }
+                    case CampaignStatus.Published => {
+                      <div class="alert alert-success">@Messages("campaigns.table.isPublish")
+                        <button class="btn btn-outline-danger btn-sm" onclick="updateStatus(3, @c.id)">@Messages("campaigns.table.reject")</button>
+                      </div>
+                    }
+                    case CampaignStatus.Rejected => {
+                      <div class="alert alert-danger">@Messages("campaigns.table.rejected.warning")
+                        <button class="btn btn-outline-success btn-sm" onclick="updateStatus(2, @c.id)">@Messages("campaigns.table.publish")</button>
+                      </div>
+                    }
+                  }
+                </div>
               </td>
               <td>
                 <button type="button" name="deleteBtn" onclick="deleteCampaign(@c.id, 'admin');" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>

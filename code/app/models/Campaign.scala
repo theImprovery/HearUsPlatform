@@ -28,7 +28,7 @@ case class Campaign( id:Long,
                      themeData:    String,
                      contactEmail: String,
                      analytics:    String,
-                     isPublished:  Boolean)
+                     status:  CampaignStatus.Value)
 
 
 /** Subset of `Campaign`, when there's no need to transfer
@@ -109,4 +109,9 @@ class CampaignTeam(val users:Set[User], campaignRelation:Iterable[UserCampaign] 
   private val adminIds = campaignRelation.filter(_.isAdmin).map(_.userId).toSet
   
   def isAdmin( aUser:User ) = adminIds(aUser.id)
+}
+
+object CampaignStatus extends Enumeration {
+  type CampaignStatus = Value
+  val WorkInProgress, PublicationRequested, Published, Rejected = Value
 }

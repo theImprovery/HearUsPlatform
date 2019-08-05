@@ -27,6 +27,7 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
                                   langs:Langs, messagesApi:MessagesApi, conf:Configuration, ws:WSClient) extends InjectedController {
 
   implicit private val ec = cc.executionContext
+  implicit private val logger = Logger(classOf[CampaignAdminCtrl])
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }
@@ -44,9 +45,9 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     users.allCampaigners(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans.map(_.dn))))
   }
 
-  def updatePublish = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson) { implicit req =>
+  def updateStatus = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson) { implicit req =>
     val json = req.body.as[JsObject]
-    campaigns.updatePublish(json("id").asOpt[Long].getOrElse(-1L), json("isPublish").asOpt[Boolean].getOrElse(false)).map(ans => Ok("updated"))
+    campaigns.updateStatus(json("id").asOpt[Long].getOrElse(-1L), CampaignStatus(json("status").asOpt[Int].getOrElse(0))).map(ans => Ok("updated"))
   }
   
   def deleteCampaign(id:Long, from:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>

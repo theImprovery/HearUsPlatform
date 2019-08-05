@@ -48,6 +48,13 @@ object JSONFormats {
     override def reads(json: JsValue): JsResult[UserRole.Value] = readFmt.reads(json)
   }
 
+  implicit val campaignStatusFormat:Format[CampaignStatus.Value ] = new Format[CampaignStatus.Value ] {
+    val writeFmt = Writes.enumNameWrites[CampaignStatus.type]
+    val readFmt = Reads.enumNameReads(CampaignStatus)
+    override def writes(o: CampaignStatus.Value): JsValue = writeFmt.writes(o)
+    override def reads(json: JsValue): JsResult[CampaignStatus.Value] = readFmt.reads(json)
+  }
+
   implicit val fileFormat:Format[KMImage] = Json.format[KMImage]
   implicit val contactOptionFormat:Format[ContactOption] = Json.format[ContactOption]
   implicit val partyFormat:Format[Party] = Json.format[Party]
