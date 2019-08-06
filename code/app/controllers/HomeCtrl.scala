@@ -93,7 +93,8 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.CampaignAdminCtrl.showCampaigns,
           routes.javascript.CampaignMgrCtrl.createCampaign,
           routes.javascript.CampaignAdminCtrl.getCampaigners,
-          routes.javascript.CampaignAdminCtrl.updateStatus,
+          routes.javascript.CampaignStatusCtrl.updateStatus,
+          routes.javascript.CampaignStatusCtrl.changeRequestStatus,
           routes.javascript.CampaignMgrCtrl.saveCampaign,
           routes.javascript.CampaignAdminCtrl.deleteCampaign,
           routes.javascript.CampaignMgrCtrl.getLabelText,
@@ -119,7 +120,6 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
           routes.javascript.CampaignPublicCtrl.index,
           routes.javascript.CampaignMgrCtrl.apiCheckAndUpdateSlug,
           routes.javascript.CampaignMgrCtrl.apiUpdateFrontPage,
-          routes.javascript.CampaignMgrCtrl.sendToApprove,
           routes.javascript.CampaignMgrCtrl.index
       )).as("text/javascript")
   }

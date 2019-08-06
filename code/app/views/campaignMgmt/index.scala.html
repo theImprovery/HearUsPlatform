@@ -7,19 +7,25 @@
   <script src="@routes.Assets.versioned("js/campaignMgmt.js")"></script>
 }
 
-@createSpan(status:CampaignStatus.Value) = {
+@createSpan(status:CampaignStatus.Value, id:Long) = {
   @status match {
     case CampaignStatus.Rejected => {
-      <span class="badge badge-danger">@Messages("rejected")</span>
+      <span name="lblRej_@id" class="badge badge-danger">@Messages("rejected")</span>
+      <span name="lblPr_@id" class="badge badge-primary" style="display: none">@Messages("waiting")</span>
+      <span name="lblWp_@id" class="badge badge-secondary" style="display: none;">@Messages("editing")</span>
     }
     case CampaignStatus.Published => {
-      <span class="badge badge-success">@Messages("published")</span>
+      <span name="lblPub_@id" class="badge badge-success">@Messages("published")</span>
     }
     case CampaignStatus.WorkInProgress => {
-      <span class="badge badge-secondary">@Messages("editing")</span>
+      <span name="lblWp_@id" class="badge badge-secondary">@Messages("editing")</span>
+      <span name="lblPr_@id" class="badge badge-primary" style="display: none">@Messages("waiting")</span>
+      <span name="lblRej_@id" class="badge badge-danger" style="display: none">@Messages("rejected")</span>
     }
     case CampaignStatus.PublicationRequested => {
-      <span class="badge badge-primary">@Messages("waiting")</span>
+      <span name="lblPr_@id" class="badge badge-primary">@Messages("waiting")</span>
+      <span name="lblWp_@id" class="badge badge-secondary" style="display: none">@Messages("editing")</span>
+      <span name="lblRej_@id" class="badge badge-danger" style="display: none">@Messages("rejected")</span>
     }
   }
 }
@@ -34,24 +40,24 @@
         <a class="btn btn-outline-primary" href="@routes.CampaignMgrCtrl.createCampaign()"><i class="fa fa-plus-circle"></i> @Messages("campaigns.createNew")</a>
       }
       @if(campaigns.nonEmpty) {
-        <table>
+        <table class="table table-striped">
           @for(c <- campaigns) {
             <tr>
-              <td>@createSpan(c.status)</td>
-              <td><strong>@c.title</strong>
+              <td>@createSpan(c.status, c.id)
+              <strong>@c.title</strong>
                 @if(c.slogan.trim.nonEmpty) {c.slogan}</td>
               <td>
                 <a class="btn btn-sm btn-outline-primary" href="@routes.CampaignMgrCtrl.details(c.id)"><i class="fa fa-edit"></i>
                   @Messages("edit")</a>
-              </td>
-              <td>
                 <button type="button" name="deleteBtn" onclick="deleteCampaign(@c.id, 'campaigner');" class="btn btn-sm btn-outline-danger">
                   <i class="fa fa-trash"></i> @Messages("delete")</button>
-              </td>
-              @if(c.status == CampaignStatus.WorkInProgress || c.status == CampaignStatus.Rejected) {
-                <td>
-                  <button type="button" name="publishBtn" onclick="askForPublish(@c.id);" class="btn btn-sm btn-outline-success">
+              @if(c.status != CampaignStatus.Published) {
+                  <button type="button" name="publishBtn_@c.id" onclick="changeRequestStatus(1, @c.id, this);" class="btn btn-sm btn-outline-success"
+                    @if(c.status == CampaignStatus.Published || c.status == CampaignStatus.PublicationRequested) {style="display: none"}>
                     <i class="fa fa-check"></i> @Messages("askForPublish")</button>
+                  <button type="button" name="cancelPublishBtn_@c.id" onclick="changeRequestStatus(0, @c.id, this);" class="btn btn-sm btn-outline-secondary"
+                    @if(c.status != CampaignStatus.PublicationRequested) {style="display: none"}>
+                    <i class="fa fa-check"></i> @Messages("cancelRequest")</button>
                 </td>
               }
             </tr>

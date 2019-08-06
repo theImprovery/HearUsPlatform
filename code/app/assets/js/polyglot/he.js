@@ -52,6 +52,8 @@ polyglot.extend({
     "save":"שמירה",
     "saving":"שומר",
     "confirm":"אישור",
+    "cancelRequest":"הבקשה בוטלה",
+    "sendToRequest":"הבקשה נשלחה",
     "went_wrong":"משהו השתבש",
     "try_again":"נסה/י שוב",
     "oh":"אוי לא",

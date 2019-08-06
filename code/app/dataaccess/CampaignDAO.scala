@@ -6,6 +6,7 @@ import play.api.Configuration
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Success
@@ -23,6 +24,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   private val usersCampaigns = TableQuery[UserCampaignTable]
   private val texts = TableQuery[CampaignTextTable]
   private val camGroups = TableQuery[RelevantGroupTable]
+  private val users = TableQuery[UserTable]
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
   
@@ -205,4 +207,28 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     )
   }
 
+//  def getCampaignContact:Future[Map[Long, List[(String, String)]]] = {
+//      val contactData = usersCampaigns.filter( _.admin ).join( users ).on(_.userId === _.id )
+//      val qry = contactData.join(campaigns).on( (u,c) => u._1.campaignId === c.id )
+//      db.run {
+//        qry.result
+//      } map(r => {
+//        val userList = r.map(tpl => {
+//          (tpl._1._2.name, tpl._1._2.email)
+//        }).toList
+//      })
+//
+//    //        (tpl._2.id, (tpl._1._2.name, tpl._1._2.email))
+//  }
+
+  def getCampaignContact:Future[Map[Long, Seq[(String, String)]]] = {
+    val contactData = usersCampaigns.filter( _.admin ).join( users ).on(_.userId === _.id )
+    val qry = contactData.join(campaigns).on( (u,c) => u._1.campaignId === c.id )
+    db.run {
+      qry.result
+    } map( rows => rows.map(tpl =>(tpl._2.id, tpl._1._2.name, tpl._1._2.email)) // (camp.id, admin.name, admin.email)
+               .groupBy( _._1 ) // camp.id=>Seq[(camp.id, admin.name, admin.email)]
+               .map( kv => (kv._1, kv._2.map(t=>(t._2, t._3))))
+    )
+  }
 }

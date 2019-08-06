@@ -37,7 +37,8 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def showCampaigns = deadbolt.SubjectPresent()() { implicit req =>
     for {
       camps <- campaigns.getAllCampaigns
-    } yield Ok(views.html.campaignAdmin.allCampaigns(camps))
+      contacts <- campaigns.getCampaignContact
+    } yield Ok(views.html.campaignAdmin.allCampaigns(camps, contacts))
   }
 
   def getCampaigners(searchStr:String) = deadbolt.SubjectPresent()() { implicit req =>
@@ -45,18 +46,16 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     users.allCampaigners(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans.map(_.dn))))
   }
 
-  def updateStatus = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson) { implicit req =>
-    val json = req.body.as[JsObject]
-    campaigns.updateStatus(json("id").asOpt[Long].getOrElse(-1L), CampaignStatus(json("status").asOpt[Int].getOrElse(0))).map(ans => Ok("updated"))
-  }
+
   
   def deleteCampaign(id:Long, from:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     for {
       deleted <- campaigns.deleteCampaign(id)
       camps <- campaigns.getAllCampaigns
+      contacts <- campaigns.getCampaignContact
     } yield {
       val goTo = from match {
-        case "admin" => views.html.campaignAdmin.allCampaigns(camps)
+        case "admin" => views.html.campaignAdmin.allCampaigns(camps, contacts)
         case "campaigner" => views.html.campaignMgmt.index(camps)
       }
       Ok(goTo).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("campaigns.deleted"))

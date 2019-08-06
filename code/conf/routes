@@ -82,8 +82,8 @@ GET     /bkofc/groups/                    controllers.CampaignMgrCtrl.getGroups(
 
 PATCH   /bkofc/campaigns/:id/details/     controllers.CampaignMgrCtrl.updateDetails(id:Long)
 PATCH   /bkofc/campaigns/labels/          controllers.CampaignMgrCtrl.updateLabels
-PATCH   /bkofc/campaigns/approve/:id      controllers.CampaignMgrCtrl.sendToApprove(id:Long)
-PATCH   /bkofc/campaigns/updatePublish    controllers.CampaignAdminCtrl.updateStatus
+PATCH   /bkofc/campaigns/updatePublish    controllers.CampaignStatusCtrl.updateStatus
+PATCH   /bkofc/campaigns/changeRequestStatus/:id/:status    controllers.CampaignStatusCtrl.changeRequestStatus(id:Long, status:Int)
 
 GET     /bkofc/campaigns/:id/details/      controllers.CampaignMgrCtrl.details(id:Long)
 GET     /bkofc/campaigns/:id/positions/    controllers.CampaignMgrCtrl.positions(id:Long)

@@ -23,13 +23,32 @@ function deleteCampaign(id, from) {
     });
 }
 
-function askForPublish(id) {
+function changeRequestStatus(status, camId) {
+    var msg = (status===1) ? polyglot.t("sendToRequest") : polyglot.t("cancelRequest");
     new Playjax(beRoutes)
         .using(function(c){
-            return c.CampaignMgrCtrl.sendToApprove(id);}).fetch()
+            return c.CampaignStatusCtrl.changeRequestStatus(camId, status);}).fetch()
         .then( function(res){
             if (res.ok) {
-                window.location = beRoutes.controllers.CampaignMgrCtrl.index().url;
+                Informationals.makeInfo(msg,"", 1500).show();
+                if(status === 1){
+                    document.getElementsByName("publishBtn_"+camId)[0].style.display = "none";
+                    document.getElementsByName("cancelPublishBtn_"+camId)[0].style.display = "inline";
+                    if(document.getElementsByName("lblWp_"+camId)[0]){
+                        document.getElementsByName("lblWp_"+camId)[0].style.display = "none";
+                    }
+                    document.getElementsByName("lblPr_"+camId)[0].style.display = "inline";
+                    if(document.getElementsByName("lblRej_"+camId)){
+                        document.getElementsByName("lblRej_"+camId)[0].style.display = "none";
+                    }
+                } else{
+                    document.getElementsByName("cancelPublishBtn_"+camId)[0].style.display = "none";
+                    document.getElementsByName("publishBtn_"+camId)[0].style.display = "inline";
+                    if(document.getElementsByName("lblWp_"+camId)[0]){
+                        document.getElementsByName("lblWp_"+camId)[0].style.display = "inline";
+                    }
+                    document.getElementsByName("lblPr_"+camId)[0].style.display = "none";
+                }
             } else {
                 Informationals.makeDanger(polyglot.t("km.failed"), polyglot.t("server_logs_details"), 1500).show();
             }

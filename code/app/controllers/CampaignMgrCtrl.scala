@@ -625,15 +625,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       Future(BadRequest("Slug should match to A-Za-z1-9_-"))
     }
   }
-
-  def sendToApprove(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
-    campaignEditorAction(id) {
-      campaigns.updateStatus(id, CampaignStatus.PublicationRequested).flatMap(c =>
-        index()(req).map(a => a.flashing(FlashKeys.MESSAGE ->
-          Informational(InformationalLevel.Success, Messages("campaignMgmt.sendToApprove")).encoded)
-        ))
-    }
-  }
   
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {
     val userId = req.subject.get.asInstanceOf[HearUsSubject].user.id

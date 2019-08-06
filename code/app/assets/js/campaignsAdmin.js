@@ -38,7 +38,7 @@ function ajaxUpdateStatus(status, id) {
     var msg = (status === 2) ? polyglot.t("campaign.publish") : polyglot.t("campaign.reject");
     new Playjax(beRoutes)
         .using(function (c) {
-            return c.CampaignAdminCtrl.updateStatus();
+            return c.CampaignStatusCtrl.updateStatus();
         })
         .fetch(data)
         .then( function (res) {

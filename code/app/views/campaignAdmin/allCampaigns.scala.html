@@ -1,6 +1,6 @@
 @import views.BackOfficeSections
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaigns:Seq[Campaign])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(campaigns:Seq[Campaign],contacts:Map[Long, Seq[(String, String)]])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @head = {
   <link rel="stylesheet" href="@routes.Assets.versioned("css/toggleSwitch.min.css")">
@@ -14,6 +14,7 @@
   @comps.pageTitleRow(Messages("campaigns.title")){
     <a class="btn btn-outline-primary" href="@routes.CampaignMgrCtrl.createCampaign()"><i class="fa fa-plus-circle"></i> @Messages("campaigns.createNew")</a>
   }
+
   <div class="row">
     <div class="col">
       @if( campaigns.isEmpty ) {
@@ -26,6 +27,7 @@
           <thead>
             <tr>
               <th>@Messages("campaigns.table.title")</th>
+              <th>@Messages("campaigns.table.admins")</th>
               <th>@Messages("campaigns.table.slug")</th>
               <th>@Messages("campaigns.table.actions")</th>
               <th>@Messages("campaigns.table.delete")</th>
@@ -37,6 +39,11 @@
               <td>
                 <strong>@c.title</strong> @if(c.slogan.trim.nonEmpty){@c.slogan}
               </td>
+            <td>
+              @for(admin <- contacts(c.id)){
+                  <div><a target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@admin._2">@admin._1</a></div>
+              }
+            </td>
               <td>
                 @if(c.slug.nonEmpty) {
                   <a href="@routes.CampaignPublicCtrl.index(c.slug.get)">@c.slug.get</a>
