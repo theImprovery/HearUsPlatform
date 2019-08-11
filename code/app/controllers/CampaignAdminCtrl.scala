@@ -63,7 +63,7 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   }
 
   def updateAction = deadbolt.SubjectPresent()()  { implicit req =>
-    Future(Ok("gjigjiod"))
+    Future(Ok("IMPL"))
   }
 
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {

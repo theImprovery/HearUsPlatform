@@ -47,8 +47,8 @@ object CampaignEditorSections extends Enumeration {
   val Design          = Value("Design")
   val FrontPage       = Value("FrontPage")
   val KnessetMembers  = Value("KnessetMembers")
-  val CampaignTeam    = Value
   val CampaignGroups  = Value("CampaignGroups")
+  val CampaignTeam    = Value
 }
 
 

@@ -32,22 +32,22 @@ function changeRequestStatus(status, camId) {
             if (res.ok) {
                 Informationals.makeInfo(msg,"", 1500).show();
                 if(status === 1){
-                    document.getElementsByName("publishBtn_"+camId)[0].style.display = "none";
-                    document.getElementsByName("cancelPublishBtn_"+camId)[0].style.display = "inline";
-                    if(document.getElementsByName("lblWp_"+camId)[0]){
-                        document.getElementsByName("lblWp_"+camId)[0].style.display = "none";
+                    document.getElementById("publishBtn_"+camId).style.display = "none";
+                    document.getElementById("cancelPublishBtn_"+camId).style.display = "inline";
+                    if(document.getElementById("lblWp_"+camId)){
+                        document.getElementById("lblWp_"+camId).style.display = "none";
                     }
-                    document.getElementsByName("lblPr_"+camId)[0].style.display = "inline";
-                    if(document.getElementsByName("lblRej_"+camId)){
-                        document.getElementsByName("lblRej_"+camId)[0].style.display = "none";
+                    document.getElementById("lblPr_"+camId).style.display = "inline";
+                    if(document.getElementById("lblRej_"+camId)){
+                        document.getElementById("lblRej_"+camId).style.display = "none";
                     }
                 } else{
-                    document.getElementsByName("cancelPublishBtn_"+camId)[0].style.display = "none";
-                    document.getElementsByName("publishBtn_"+camId)[0].style.display = "inline";
-                    if(document.getElementsByName("lblWp_"+camId)[0]){
-                        document.getElementsByName("lblWp_"+camId)[0].style.display = "inline";
+                    document.getElementById("cancelPublishBtn_"+camId).style.display = "none";
+                    document.getElementById("publishBtn_"+camId).style.display = "inline";
+                    if(document.getElementById("lblWp_"+camId)){
+                        document.getElementById("lblWp_"+camId).style.display = "inline";
                     }
-                    document.getElementsByName("lblPr_"+camId)[0].style.display = "none";
+                    document.getElementById("lblPr_"+camId).style.display = "none";
                 }
             } else {
                 Informationals.makeDanger(polyglot.t("km.failed"), polyglot.t("server_logs_details"), 1500).show();
