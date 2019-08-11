@@ -1,7 +1,7 @@
 package controllers
 
 import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
-import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UsersDAO}
+import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UserDAO}
 import javax.inject.Inject
 import models.{CampaignStatus, UserRole}
 import play.api.{Configuration, Logger}
@@ -14,7 +14,7 @@ import security.HearUsSubject
 import scala.concurrent.Future
 
 class CampaignStatusCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
-                                   users:UsersDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
+                                   users:UserDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
                                    userCampaigns:UserCampaignDAO,
                                    langs:Langs, messagesApi:MessagesApi, conf:Configuration, ws:WSClient) extends InjectedController {
 

@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
 class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
-                                  users:UsersDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
+                                  users:UserDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
                                   userCampaigns:UserCampaignDAO,
                                   langs:Langs, messagesApi:MessagesApi, conf:Configuration, ws:WSClient) extends InjectedController {
 

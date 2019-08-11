@@ -2,7 +2,7 @@ package controllers
 
 import be.objectify.deadbolt.scala.DeadboltActions
 import be.objectify.deadbolt.scala.models.Subject
-import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UsersDAO}
+import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UserDAO}
 import javax.inject.Inject
 import models.{Campaign, CampaignStatus, CannedMessage, Platform, Position, UserRole}
 import play.api.{Configuration, Logger}
@@ -15,7 +15,7 @@ import scala.concurrent.Future
 
 class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO,
                                    images: ImagesDAO, groups:KmGroupDAO,
-                                   campaigns:CampaignDAO, userCampaigns:UserCampaignDAO, users:UsersDAO,
+                                   campaigns:CampaignDAO, userCampaigns:UserCampaignDAO, users:UserDAO,
                                    langs:Langs, messagesApi:MessagesApi, deadbolt:DeadboltActions,
                                    conf:Configuration, ws:WSClient) extends AbstractController(cc) with I18nSupport {
   

@@ -10,14 +10,15 @@
             @Messages("index.title.hear")<strong> @Messages("index.title.us")</strong>
           </h1>
           <hr class="my-4">
-          <div class="alert alert-info" role="alert">
+          <div class="alert alert-success" role="alert">
             <strong>@Messages("index.slogan")</strong>
           </div>
-          <div class="col text-center">
-            <a href="@routes.UserCtrl.showLogin" style="margin-left: 2em">@Messages("login") </a>
-            <a href="@routes.UserCtrl.showSignupPage">@Messages("signup")</a>
+          <div class="text-center">
+            <a class="btn btn-outline-info" href="@routes.UserCtrl.showLogin" style="margin-left: 2em">@Messages("login") </a>
+            <a class="btn btn-outline-info" href="@routes.UserCtrl.showSignupPage">@Messages("signup")</a>
           </div>
-            <p class="text-center">@Messages("index.note")</p>
+
+          <p class="my-4 text-center">@Messages("index.note")</p>
         </div>
       </div>
     </div>

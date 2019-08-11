@@ -28,7 +28,7 @@ import scala.concurrent.Future
 case class detailsCampaign(name:String, slug:String, campaigner:Long)
 
 class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
-                                campaigns:CampaignDAO, users:UsersDAO, usersCampaigns:UserCampaignDAO,
+                                campaigns:CampaignDAO, users:UserDAO, usersCampaigns:UserCampaignDAO,
                                 groups:KmGroupDAO,
                                 langs:Langs, messagesApi:MessagesApi, images: ImagesDAO,
                                 conf:Configuration, ws:WSClient) extends InjectedController {

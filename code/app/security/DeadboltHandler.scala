@@ -3,7 +3,7 @@ package security
 import be.objectify.deadbolt.scala.AuthenticatedRequest
 import be.objectify.deadbolt.scala.models.{Permission, Role, Subject}
 import controllers.{FlashKeys, Informational, InformationalLevel, routes}
-import dataaccess.UsersDAO
+import dataaccess.UserDAO
 import models.User
 import play.api.i18n._
 import play.api.mvc.{Request, Result, Results}
@@ -20,7 +20,7 @@ case class HearUsSubject(user:User) extends Subject {
 }
 
 
-class DeadboltHandler(users:UsersDAO, langs:Langs, messagesApi:MessagesApi) extends be.objectify.deadbolt.scala.DeadboltHandler {
+class DeadboltHandler(users:UserDAO, langs:Langs, messagesApi:MessagesApi) extends be.objectify.deadbolt.scala.DeadboltHandler {
   
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)

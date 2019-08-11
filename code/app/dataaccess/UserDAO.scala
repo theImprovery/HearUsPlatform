@@ -2,7 +2,6 @@ package dataaccess
 
 import dataaccess.SortBy.Value
 import javax.inject.Inject
-
 import models.{User, UserRole}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.{Configuration, Logger}
@@ -11,8 +10,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 
-class UsersDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
+class UserDAO @Inject()(protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
   private val Users = TableQuery[UserTable]
@@ -29,7 +29,12 @@ class UsersDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider,
       db.run( Users.filter(_.id===u.id).update(u) ).map( _ => u )
     }
   }
-
+  
+  def tryAddUser( u:User ): Future[Try[User]] = {
+    db.run( (Users.returning(Users.map(_.id))
+      .into((user,newId)=>user.copy(id=newId)) += u.copy(id=0)).asTry )
+  }
+  
   def usernameExists( u:String):Future[Boolean] = {
     db.run{
       Users.map( _.username ).filter( _.toLowerCase === u.toLowerCase() ).exists.result
