@@ -52,4 +52,7 @@
     </div>
     <!-- Created by Nirshman (https://www.nirshman.com/) and codeworth.io (http://codeworth.io). Layout based on Grayscale (https://startbootstrap.com/themes/grayscale) -->
   </footer>
+  @if(campaign.status!=CampaignStatus.Published){
+    <div class="notPublishedBadge">@Messages("campaigns.notPublished")</div>
+  }
 }

@@ -252,6 +252,7 @@ campaigns.noCampaignsInSystem=אין קמפיינים במערכת כרגע
 campaigns.createNew=יצירת קמפיין חדש
 campaigns.hearUsUrl=כתובת הקמפיין באתר זה
 campaigns.hearUsUrl.help=כתובת העמוד הראשי של הקמפיין באתר זה.
+campaigns.notPublished=קמפיין זה עדיין לא פורסם
 campaignMgmt.index.title=הקמפיינים שלי
 campaignMgmt.myCampaigns.noCampaigns=אין כרגע קמפיינים בהשתתפותך
 campaignMgmt.details.help=עריכת פרטים כלליים של הקמפיין

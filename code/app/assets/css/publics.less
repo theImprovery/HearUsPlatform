@@ -250,7 +250,6 @@ ul.km-list {
 }
 @media( max-width:576px ) {
   .filter-btns {
-    grid-template-rows: 3;
     grid-template-columns: auto auto;
     grid-row-gap: 5px;
     grid-column-gap: 5px;
@@ -270,6 +269,10 @@ ul.km-list {
       }
 
     }
+  }
+
+  .filter-btns {
+    grid-template-rows: 3;
   }
 }
 
@@ -314,4 +317,22 @@ a.poweredBy {
   .details {
     margin-right: 2em;
   }
+}
+
+.notPublishedBadge {
+  position: fixed;
+  top: 0;
+  height: auto;
+  left: 0;
+  width: 400px;
+  text-align: center;
+
+  padding: 5px;
+  background-color: #AA4444;
+  color: #FFFF00;
+  pointer-events: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,.6);
+  transform: rotate(-45deg) translate(-125px, -25px);
+  z-index: 999999;
+  opacity: .8;
 }
