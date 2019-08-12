@@ -25,10 +25,6 @@ function patchBeforeUnload() {
         console.log( req);
         if ( req.readyState === 4 ) {
             // don't fire if we're navigating away from the page.
-            console.log("Error");
-            console.log( req );
-            console.log( status );
-            console.log( error );
             Informationals.show( Informationals.makeDanger("Error updating campaign", status + "\n" + error));
         }
     });
@@ -86,7 +82,7 @@ function chooseSlugName() {
             choosenSlug = null;
             return swal(polyglot.t("slug.exist"),"","error").then((val) => chooseSlugName());
         } else{
-            campUrl = beRoutes.controllers.CampaignPublicCtrl.index(choosenSlug).absoluteURL();
+            const campUrl = beRoutes.controllers.CampaignPublicCtrl.index(choosenSlug).absoluteURL();
             document.getElementById("hearUsUrl").value=campUrl;
             document.getElementById("hearUsUrlA").href=campUrl;
             swal.stopLoading();

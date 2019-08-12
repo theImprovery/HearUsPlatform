@@ -1,0 +1,2 @@
+@(cs:CampaignStatus.Value)(implicit msgs:MessagesProvider)
+<span class="badge badge-pill badge-@Helpers.campaignStatusColor(cs)">@Messages("campaign.status." + cs.toString)</span>

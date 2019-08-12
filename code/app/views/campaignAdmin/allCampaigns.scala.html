@@ -11,7 +11,7 @@
 }
 
 @templates.backEndBase("campaigns", BackOfficeSections.ManageSystemCampaigns, head, bottom) {
-  @comps.pageTitleRow(Messages("campaigns.title")){
+  @comps.pageTitleRow(Messages("admin.campaign-table.title")){
     <a class="btn btn-outline-primary" href="@routes.CampaignMgrCtrl.createCampaign()"><i class="fa fa-plus-circle"></i> @Messages("campaigns.createNew")</a>
   }
 
@@ -29,7 +29,7 @@
               <th>@Messages("campaigns.table.title")</th>
               <th>@Messages("campaigns.table.admins")</th>
               <th>@Messages("campaigns.table.slug")</th>
-              <th>@Messages("campaigns.table.actions")</th>
+              <th>@Messages("campaigns.table.status-actions")</th>
               <th>@Messages("campaigns.table.delete")</th>
           </tr>
           </thead>
@@ -40,37 +40,28 @@
                 <strong>@c.title</strong> @if(c.slogan.trim.nonEmpty){@c.slogan}
               </td>
             <td>
-              @for(admin <- contacts(c.id)){
-                  <div><a target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@admin._2">@admin._1</a></div>
+              @for(admin <- contacts.get(c.id).flatMap( _.headOption )){
+                  <a href="mailto:@admin._2">@admin._1</a>
               }
             </td>
               <td>
-                @if(c.slug.nonEmpty) {
-                  <a href="@routes.CampaignPublicCtrl.index(c.slug.get)">@c.slug.get</a>
-                }
+                @for( slug <- c.slug ){<a href="@routes.CampaignPublicCtrl.index(slug)">@slug</a>}
               </td>
               <td>
-                <div class="actions">
-                  @c.status match {
-                    case CampaignStatus.WorkInProgress => {
-                      <div class="alert alert-info">@Messages("campaigns.table.inWorking")</div>
-                    }
-                    case CampaignStatus.PublicationRequested => {
-                      <button class="btn btn-outline-success btn-sm" onclick="updateStatus(2, @c.id)">@Messages("campaigns.table.publish")</button>
-                      <button class="btn btn-outline-danger btn-sm" onclick="updateStatus(3, @c.id)">@Messages("campaigns.table.reject")</button>
-                    }
-                    case CampaignStatus.Published => {
-                      <div class="alert alert-success">@Messages("campaigns.table.isPublish")
-                        <button class="btn btn-outline-danger btn-sm" onclick="updateStatus(3, @c.id)">@Messages("campaigns.table.reject")</button>
-                      </div>
-                    }
-                    case CampaignStatus.Rejected => {
-                      <div class="alert alert-danger">@Messages("campaigns.table.rejected.warning")
-                        <button class="btn btn-outline-success btn-sm" onclick="updateStatus(2, @c.id)">@Messages("campaigns.table.publish")</button>
-                      </div>
-                    }
+                @comps.campaignStatusBadge(c.status)
+                @c.status match {
+                  case CampaignStatus.PublicationRequested => {
+                    <button class="btn btn-outline-success btn-sm" onclick="updateStatus(2, @c.id)">@Messages("campaigns.table.publish")</button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="updateStatus(3, @c.id)">@Messages("campaigns.table.reject")</button>
                   }
-                </div>
+                  case CampaignStatus.Published => {
+                    <button class="btn btn-outline-danger btn-sm" onclick="updateStatus(3, @c.id)">@Messages("campaigns.table.reject")</button>
+                  }
+                  case CampaignStatus.Rejected => {
+                    <button class="btn btn-outline-success btn-sm" onclick="updateStatus(2, @c.id)">@Messages("campaigns.table.publish")</button>
+                  }
+                  case _ =>{}
+                }
               </td>
               <td>
                 <button type="button" name="deleteBtn" onclick="deleteCampaign(@c.id, 'admin');" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>

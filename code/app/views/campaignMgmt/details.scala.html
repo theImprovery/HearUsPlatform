@@ -5,7 +5,7 @@
   <script src="@routes.Assets.versioned("js/campaignEditor/detailsPage.js")"></script>
   <script>
     $(document).ready(function(){
-        var campUrl = beRoutes.controllers.CampaignPublicCtrl.index("@campaign.slug").absoluteURL();
+        const campUrl = beRoutes.controllers.CampaignPublicCtrl.index("@campaign.slug").absoluteURL();
         document.getElementById("hearUsUrl").value=campUrl;
         document.getElementById("hearUsUrlA").href=campUrl;
     });

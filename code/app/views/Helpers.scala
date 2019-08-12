@@ -11,7 +11,7 @@ import play.api.data.{Field, Form, FormError}
 import play.api.mvc.Request
 import play.api.mvc.Call
 import controllers.routes
-import models.UserRole
+import models.{CampaignStatus, UserRole}
 import play.api.i18n.{Messages, MessagesProvider}
 import play.twirl.api.Html
 import play.utils.UriEncoding
@@ -83,6 +83,11 @@ object Helpers {
     def sortClass(isActive:Boolean, isAsc:Boolean):String = "fa-sort"+( if(isActive){if (isAsc) "-asc" else "-desc"} else "")
   }
 
-
+  val campaignStatusColor = Map(
+    CampaignStatus.WorkInProgress       -> "secondary",
+    CampaignStatus.PublicationRequested -> "warning",
+    CampaignStatus.Published            -> "success",
+    CampaignStatus.Rejected             -> "danger"
+  )
 
 }

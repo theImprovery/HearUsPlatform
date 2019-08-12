@@ -36,6 +36,8 @@ navbar.campaigns.mgmt.positions=עמדות הח״כים
 navbar.campaigns.mgmt.CampaignTeam=צוות הקמפיין
 navbar.campaigns.mgmt.CampaignGroups=ועדות רלוונטיות
 
+admin.campaign-table.title=קמפיינים במערכת
+
 forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
 forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
 
@@ -232,6 +234,10 @@ KMsearch.placeholder=שם ח״כ או מפלגה
 km.api.update=ייבוא חברי כנסת
 committee.api.update=ייבוא ועדות
 
+campaign.status.WorkInProgress=בהכנה
+campaign.status.PublicationRequested=הוגש לפרסום
+campaign.status.Published=מפורסם
+campaign.status.Rejected=נדחה
 
 campaigns.delete=מחיקת קמפיין
 campaigns.deleted=הקמפיין נמחק בהצלחה
@@ -315,7 +321,7 @@ campaignMgmt.sendToApprove=נשלח לאישור מנהל
 campaignMgmt.sendToApprove.failed=נסה שוב
 campaigns.table.title=שם הקמפיין
 campaigns.table.admins=מנהלי הקמפיין
-campaigns.table.actions=פעולות
+campaigns.table.status-actions=מצב ופעולות
 campaigns.table.inWorking=הקמפיין עדיין בהכנה
 campaigns.table.isPublish=הקמפיין מפורסם
 campaigns.table.publish=פרסום

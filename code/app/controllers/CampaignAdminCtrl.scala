@@ -38,7 +38,7 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for {
       camps <- campaigns.getAllCampaigns
       contacts <- campaigns.getCampaignContact
-    } yield Ok(views.html.campaignAdmin.allCampaigns(camps, contacts))
+    } yield Ok(views.html.campaignAdmin.allCampaigns(camps.sortBy(_.title), contacts))
   }
 
   def getCampaigners(searchStr:String) = deadbolt.SubjectPresent()() { implicit req =>
