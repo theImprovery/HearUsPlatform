@@ -1,7 +1,12 @@
 package controllers
 
+import java.awt
+import java.awt.RenderingHints
+import java.awt.geom.AffineTransform
+import java.awt.image.{BufferedImage, ByteLookupTable, LookupOp}
+import java.io.{ByteArrayOutputStream, IOException}
 import java.nio.file.attribute.PosixFilePermission._
-import java.nio.file.{CopyOption, Files, Paths, StandardCopyOption}
+import java.nio.file.{CopyOption, Files, Path, Paths, StandardCopyOption}
 import java.sql.Timestamp
 import java.util.Calendar
 
@@ -9,24 +14,26 @@ import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
 import javax.inject.Inject
 import models._
 import dataaccess._
-import play.api.{Configuration, Logger}
+import play.api.{Configuration, Environment, Logger}
 import play.api.data.{Form, _}
 import play.api.data.Forms._
 import play.api.i18n._
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{ControllerComponents, InjectedController}
 import dataaccess.JSONFormats._
+import javax.imageio.ImageIO
 import play.api.libs.ws.WSClient
 
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 case class GroupData(id:Long, name:String, knessetKey:Long, kmsIds:String)
 
 class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                   images: ImagesDAO, groups: KmGroupDAO, langs:Langs, messagesApi:MessagesApi,
-                                  conf:Configuration, ws:WSClient) extends InjectedController {
+                                  conf:Configuration, env:Environment, ws:WSClient) extends InjectedController {
 
   implicit private val ec = cc.executionContext
   implicit val messagesProvider: MessagesProvider = {
@@ -177,7 +184,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     val imageCredit = req.body.dataParts.getOrElse("imageCredit", Seq[String]()).headOption.getOrElse("")
 
     if (file.isEmpty || file.get.filename.isEmpty) {
-      // no file, but we might be able to update the image credit.
+      // no file, but we may need to update the image credit.
       images.getImageForKm(kmId).flatMap({
         case Some(imageRec) => {
           val updated = imageRec.copy(credit = imageCredit)
@@ -193,24 +200,25 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       })
 
     } else {
-      // We have a file. Update all.
+      // We have a file. Update image + credit.
       val filePart = file.get
       val folderPath = Paths.get(conf.get[String]("hearUs.files.mkImages.folder"))
       if (!Files.exists(folderPath)) {
         Files.createDirectories(folderPath)
-        Files.setPosixFilePermissions(folderPath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
+        Utils.ensureImageServerReadPermissions(folderPath)
       }
-      val i = filePart.filename.lastIndexOf('.')
-      val suffix = if (i >= 0) filePart.filename.substring(i + 1) else ""
-      val filePathTemp = folderPath.resolve(kmId.toString + ".-temp-." + suffix)
-      val filePath = folderPath.resolve(kmId.toString + "." + suffix)
-      filePart.ref.moveTo(filePathTemp, replace = true)
-      Files.copy(filePathTemp, filePath, StandardCopyOption.REPLACE_EXISTING)
-      Files.delete(filePathTemp)
-      Files.setPosixFilePermissions(filePath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
-
-      val imageRec = KMImage(-1L, Some(kmId), None, suffix,
-        filePart.contentType.getOrElse(""),
+      val readyImagePath = folderPath.resolve(kmId.toString + ".png")
+      processKmImageFile( filePart.ref.path, readyImagePath )
+//      val i = filePart.filename.lastIndexOf('.')
+//      val suffix = if (i >= 0) filePart.filename.substring(i + 1) else ""
+//      val filePathTemp = folderPath.resolve(kmId.toString + ".-temp-." + suffix)
+//      filePart.ref.moveTo(filePathTemp, replace = true)
+//      Files.copy(filePathTemp, filePath, StandardCopyOption.REPLACE_EXISTING)
+//      Files.delete(filePathTemp)
+      Utils.ensureImageServerReadPermissions(readyImagePath)
+      
+      val imageRec = KMImage(-1L, Some(kmId), None, "png",
+        "image/png",
         new Timestamp(Calendar.getInstance().getTime.getTime),
         imageCredit)
       images.storeImage(imageRec).map(_ => {
@@ -291,5 +299,68 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     } yield {
       Ok(views.html.knesset.groups(groups))
     }
+  }
+  
+  def sampleImageTest = Action{
+    val imgFile = env.getExistingFile("public/images/sample-img.jpg").get
+    val inImg = ImageIO.read(imgFile)
+    
+    val outImg = processKmImage(inImg)
+    
+    val byteStream = new ByteArrayOutputStream()
+    ImageIO.write(outImg, "png", byteStream)
+    byteStream.close()
+    Ok( byteStream.toByteArray ).as("image/png")
+  }
+  
+  def processKmImageFile ( imagePath:Path, destination:Path ):Try[Path] = {
+    try {
+      val inImage = ImageIO.read(imagePath.toFile)
+      val otImage = processKmImage(inImage)
+      ImageIO.write( otImage, "png", destination.toFile )
+      Success(destination)
+    } catch {
+      case iox:IOException => Failure(iox)
+    }
+  }
+  
+  val KM_IMAGE_SIDE = 100
+  def processKmImage( inImage:BufferedImage ):BufferedImage = {
+    
+    // Scale
+    val resized = new BufferedImage(KM_IMAGE_SIDE, KM_IMAGE_SIDE, BufferedImage.TYPE_BYTE_GRAY)
+    val g2 =  resized.createGraphics()
+    g2.setRenderingHints(Map(
+      RenderingHints.KEY_INTERPOLATION -> RenderingHints.VALUE_INTERPOLATION_BICUBIC,
+      RenderingHints.KEY_RENDERING -> RenderingHints.VALUE_RENDER_QUALITY,
+      RenderingHints.KEY_FRACTIONALMETRICS -> RenderingHints.VALUE_FRACTIONALMETRICS_ON
+    ))
+    val scaler = AffineTransform.getScaleInstance(KM_IMAGE_SIDE/inImage.getWidth.toDouble, KM_IMAGE_SIDE/inImage.getHeight.toDouble)
+    g2.drawImage(inImage, scaler, null)
+    g2.dispose()
+    
+    // Stretch Histogram
+    var min = 255
+    var max = 0
+    Range(0,KM_IMAGE_SIDE).flatMap(x=>Range(0,KM_IMAGE_SIDE).map(y=>(x,y)))
+                          .map( crd=>resized.getRGB(crd._1, crd._2) )
+                          .map( _ & 0xFF ) // take just one component, we're grayscale anyway
+                          .foreach( v => {
+                            if ( v > max ){max = v}
+                            if ( v < min ){min = v}
+                          })
+    Logger(classOf[KnessetMemberCtrl]).info(s"min:$min max:$max")
+    
+    val lookupBytes = Range(0,256).map( i => ((i-min).toDouble/(max-min)*255).toByte ).toArray
+    val lookupTable = new ByteLookupTable(0, lookupBytes)
+    val stretchOp = new LookupOp( lookupTable, new RenderingHints(Map(
+      RenderingHints.KEY_COLOR_RENDERING->RenderingHints.VALUE_COLOR_RENDER_QUALITY
+    )))
+    
+    val histStretched = new BufferedImage(KM_IMAGE_SIDE, KM_IMAGE_SIDE, BufferedImage.TYPE_BYTE_GRAY)
+    val g2s = histStretched.createGraphics()
+    g2s.drawImage(resized, stretchOp, 0, 0)
+    g2s.dispose()
+    histStretched
   }
 }

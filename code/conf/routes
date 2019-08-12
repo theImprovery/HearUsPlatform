@@ -135,3 +135,6 @@ GET     /routes/be     controllers.HomeCtrl.backEndRoutes
 GET     /files/*file   controllers.ExternalFilesCtrl.getFile(file)
 GET     /images/kms/:id  controllers.FilesCtrl.getKmImage(id:Long)
 GET     /images/campaigns/:id controllers.FilesCtrl.getCampaignImage(id:Long)
+
+### Tests
+GET    /tests/kmImg controllers.KnessetMemberCtrl.sampleImageTest
