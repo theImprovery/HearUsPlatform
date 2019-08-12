@@ -60,23 +60,23 @@ index.note=בשביל לפתוח קמפיין חדש יש להכנס למערכ�
 
 forgotPassword.title=איפוס ססמא
 
-passwordReset.requestNotFound=Password reset request not found.
-passwordReset.requestExpired=Password reset request expired.
-passwordReset.validationFailed=Passwords must match, and cannot be empty
-passwordReset.success=Password updated successfully
-password.changed=Password changed successfully
+passwordReset.requestNotFound=בקשת איפוס ססמא לא נמצאה
+passwordReset.requestExpired=בקשת איפוס ססמא פגת תוקף
+passwordReset.validationFailed=על הססמאות להיות זהות, ולהכיל כמה תווים
+passwordReset.success=הססמא עודכנה בהצלחה
+password.changed=הססמא עודכנה בהצלחה
 
 signup.title=Sign up for an account at a PSPS Server
 signup.body=A sign up process at a PSPS server was started for this email address (hopefully by you). To continue, please click the link below.\n{0}
 signup.confirmationMessage=Invitation email sent
 signup.confirmationDetails=To email address {0}
 
-error.email=Invalid Email Address.
-error.email.exists=A user with this email has already registered.
-#error.username.exists=שם משתמש תפוס
-error.invitation.doesNotExist=Invitation does not exist
-error.password=Passwords must match, and cannot be empty
-error.password.incorrect=Incorrect password
+error.email=כתובת אימייל לא תקינה
+error.email.exists=משתמש עם כתובת אימייל זו כבר רשום במערכת
+error.username.exists=שם משתמש תפוס
+error.invitation.doesNotExist=הזמנה לא קיימת
+error.password=על הססמאות להיות זהות, ולהכיל כמה תווים
+error.password.incorrect=ססמא שגויה
 error.campaignSlug.exists=כבר יש קמפיין עם סלאג כזה
 errors.campaignNotFound=קמפיין לא נמצא.
 errors.userNotAuthorizedToSeeCampaign=אין כרגע הרשאה לצפות בקמפיין זה.

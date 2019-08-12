@@ -228,10 +228,10 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       res <- if (canCreateUser) attemptUserCreation(fData, onSuccess, onFailure)
       else {
         var form = userForm.fill(fData)
-        if (emailExists) form = form.withError("email", "Email already exists")
-        if (usernameExists) form = form.withError("username", "Username already taken")
-        if (!passwordOK) form = form.withError("password1", "Passwords must match, and cannot be empty")
-          .withError("password2", "Passwords must match, and cannot be empty")
+        if (emailExists) form = form.withError("email", "error.email.exists")
+        if (usernameExists) form = form.withError("username", "error.username.exists")
+        if (!passwordOK) form = form.withError("password1", "error.password")
+          .withError("password2", "error.password")
         Future(BadRequest(views.html.users.userEditor(form, onFailure, isNew = true)))
       }
     } yield res
@@ -461,7 +461,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
             })
           } else {
             val form = userForm.fill(UserFormData of user).withError("password1", "error.password")
-              .withError("password2", "Passwords must match, and cannot be empty")
+              .withError("password2", "error.password")
             Future(BadRequest(views.html.users.userEditor(form, routes.UserCtrl.doSaveNewUser, isNew = false, activeFirst=false)))
           }
         } else{
