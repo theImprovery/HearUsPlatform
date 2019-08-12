@@ -26,7 +26,9 @@ function updateStatus(status, id) {
                 confirm:polyglot.t("confirm")
             },
         }).then( function(willReject){
-            ajaxUpdateStatus(status, id);
+            if ( willReject ) {
+                ajaxUpdateStatus(status, id);
+            }
         });
     } else {
         ajaxUpdateStatus(status, id);
