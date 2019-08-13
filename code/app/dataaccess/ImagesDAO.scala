@@ -1,6 +1,10 @@
 package dataaccess
 
 
+import java.awt.RenderingHints
+import java.awt.geom.AffineTransform
+import java.awt.image.BufferedImage
+
 import javax.inject.Inject
 import models.KMImage
 import play.api.{Configuration, Logger}
@@ -10,11 +14,13 @@ import slick.jdbc.JdbcProfile
 import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{CopyOption, Files, Paths, StandardCopyOption}
 
+import javax.imageio.ImageIO
 import play.api.mvc.MultipartFormData
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Success
 
 class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
 
@@ -69,12 +75,20 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
     previousImage.foreach( deleteCampaignImageFile )
     
     val suffix = filePart.filename.split("\\.").last
-    val filePathTemp = folderPath.resolve(campaignId.toString + ".-temp-." + suffix)
     val filePath = folderPath.resolve(campaignId.toString + "." + suffix)
-    filePart.ref.moveTo(filePathTemp.toFile, replace = true)
-    Files.copy(filePathTemp, filePath, StandardCopyOption.REPLACE_EXISTING)
-    Files.delete(filePathTemp)
-    Files.setPosixFilePermissions(filePath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
+  
+    val inImage = ImageIO.read(filePart.ref.path.toFile)
+    if ( inImage.getWidth() > 1000 ) {
+      // resize
+      val ratio = 1000.0/ddinImage.getWidth
+      val newImage = resizeImage(inImage, 1000, (inImage.getHeight*ratio).toInt)
+      ImageIO.write( newImage, suffix, filePath.toFile )
+    } else {
+      // direct copy
+      filePart.ref.moveTo(filePath.toFile, replace = true)
+    }
+    
+    controllers.Utils.ensureImageServerReadPermissions(filePath)
   }
   
   def deleteCampaignImageFile( image:KMImage ): Unit = {
@@ -85,6 +99,20 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
         Files.delete(path)
       }
     }
+  }
+  
+  private def resizeImage(inImage:BufferedImage, destWidth:Int, destHeight:Int):BufferedImage = {
+    val resized = new BufferedImage(destWidth, destHeight, BufferedImage.TYPE_INT_RGB)
+      val scaler = AffineTransform.getScaleInstance(destWidth/inImage.getWidth.toDouble, destHeight/inImage.getHeight.toDouble)
+      val g2 = resized.createGraphics()
+      g2.setRenderingHints(Map(
+        RenderingHints.KEY_RENDERING -> RenderingHints.VALUE_RENDER_QUALITY,
+        RenderingHints.KEY_INTERPOLATION -> RenderingHints.VALUE_INTERPOLATION_BICUBIC,
+        RenderingHints.KEY_FRACTIONALMETRICS -> RenderingHints.VALUE_FRACTIONALMETRICS_ON
+      ))
+      g2.drawImage(inImage, scaler, null)
+      g2.dispose()
+      resized
   }
   
 }

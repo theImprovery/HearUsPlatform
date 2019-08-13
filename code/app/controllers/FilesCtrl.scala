@@ -145,7 +145,9 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
       
       var suffix:String=""
       var contentType = filePart.contentType.getOrElse("")
+      
       if ( subjectType == "kms" ) {
+        // KM Images
         val dest = folderPath.resolve(id.toString + ".png")
         processKmImageFile(filePart.ref.path, dest ) match {
           case Success(p) => {
@@ -155,15 +157,18 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
           }
           case Failure(e) => logger.warn("Error while saving KM image: " + e.getMessage, e)
         }
+        
       } else {
+        // Campaign Images
         val i = filePart.filename.lastIndexOf('.')
-        suffix = if (i >= 0) filePart.filename.substring(i + 1) else ""
-        val filePathTemp = folderPath.resolve(id.toString + ".-temp-." + suffix)
+        suffix = if (i >= 0) filePart.filename.substring(i + 1) else "jpg"
         val filePath = folderPath.resolve(id.toString + "." + suffix)
-        filePart.ref.moveTo(filePathTemp, replace = true)
-        Files.copy(filePathTemp, filePath, StandardCopyOption.REPLACE_EXISTING)
-        Files.delete(filePathTemp)
-        Utils.ensureImageServerReadPermissions(filePath)
+        processCampaignImageFile(filePart.ref.path, filePath, suffix) match {
+          case Success(p) => {
+            Utils.ensureImageServerReadPermissions(p)
+          }
+          case Failure(iox) => logger.warn("Error while saving KM image: " + iox.getMessage, iox)
+        }
       }
       
       // update database
@@ -192,6 +197,26 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
     ImageIO.write(outImg, "png", byteStream)
     byteStream.close()
     Ok( byteStream.toByteArray ).as("image/png")
+  }
+  
+  def processCampaignImageFile(imagePath:Path, destination:Path, format:String):Try[Path] = {
+    try {
+      val inImage = ImageIO.read(imagePath.toFile)
+      logger.info(s"campaign image width: ${inImage.getWidth}")
+      if ( inImage.getWidth() > 1000 ) {
+        // resize
+        val ratio = inImage.getWidth/1000.0
+        val newImage = resizeImage(inImage, 1000, (inImage.getHeight*ratio).toInt, toGrayScale = false)
+        logger.info("Resizing")
+        ImageIO.write( newImage, format, destination.toFile )
+      } else {
+        // direct copy
+        Files.copy(imagePath, destination, StandardCopyOption.REPLACE_EXISTING)
+      }
+      Success(destination)
+    } catch {
+      case iox:IOException => Failure(iox)
+    }
   }
   
   def processKmImageFile ( imagePath:Path, destination:Path ):Try[Path] = {
@@ -240,8 +265,6 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
     val stretchOp = new LookupOp( lookupTable, new RenderingHints(Map(
       RenderingHints.KEY_COLOR_RENDERING->RenderingHints.VALUE_COLOR_RENDER_QUALITY
     )))
-    logger.info(s"min:$min max:$max")
-    logger.info(s"lmin:${lookupTable.getTable()(0)(min)} ${lookupTable.getTable()(0)((max+min)/2)} lmax:${lookupTable.getTable()(0)(max)}")
     
     stretchOp.filter(inImage, null)
   }
