@@ -137,4 +137,4 @@ GET     /images/kms/:id  controllers.FilesCtrl.getKmImage(id:Long)
 GET     /images/campaigns/:id controllers.FilesCtrl.getCampaignImage(id:Long)
 
 ### Tests
-GET    /tests/kmImg controllers.KnessetMemberCtrl.sampleImageTest
+GET    /tests/kmImg controllers.FilesCtrl.sampleImageTest

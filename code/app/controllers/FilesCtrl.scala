@@ -1,7 +1,11 @@
 package controllers
 
+import java.awt.RenderingHints
+import java.awt.geom.AffineTransform
+import java.awt.image.{BufferedImage, ByteLookupTable, LookupOp, ShortLookupTable}
+import java.io.{ByteArrayOutputStream, IOException}
 import java.nio.file.attribute.PosixFilePermission._
-import java.nio.file.{Files, Paths, StandardCopyOption}
+import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import java.sql.Timestamp
 import java.util.Calendar
 
@@ -9,29 +13,32 @@ import javax.inject.Inject
 import be.objectify.deadbolt.scala.DeadboltActions
 import dataaccess.ImagesDAO
 import dataaccess.JSONFormats._
+import javax.imageio.ImageIO
 import models.KMImage
 import play.api.i18n._
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{ControllerComponents, InjectedController, PlayBodyParsers}
-import play.api.{Configuration, Logger}
+import play.api.{Configuration, Environment, Logger}
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
-class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:PlayBodyParsers,
+class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:PlayBodyParsers, env:Environment,
                            config:Configuration, deadbolt:DeadboltActions, langs:Langs, messagesApi:MessagesApi) extends InjectedController {
 
   implicit private val ec: ExecutionContext = cc.executionContext
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }
+  val logger = Logger(classOf[FilesCtrl])
 
-  def apiAddFile(subjectId: String, subjectType:String) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData ){ req =>
+  def apiAddFile(subjectId: String, subjectType:String) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData){ req =>
     val uploadedFile = req.body.files.head
     val filePath = Paths.get(config.get[String]("hearUs.files.mkImages.folder"))
     if ( ! Files.exists(filePath) ) {
-      Files.createDirectories( filePath )
-      Files.setPosixFilePermissions(filePath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ) )
+      Files.createDirectories(filePath)
+      Utils.ensureImageServerReadPermissions(filePath)
     }
     val filename = req.body.dataParts("qqfilename").head
     val suffix = getFileSuffix(filename)
@@ -54,7 +61,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
         val res = uploadedFile.ref.atomicMoveWithFallback(localPath)
         Logger.info( "res: " + res.toString)
         
-        Files.setPosixFilePermissions(localPath, Set(OWNER_READ, OWNER_WRITE, GROUP_READ, OTHERS_READ) )
+        Utils.ensureImageServerReadPermissions(localPath)
         // top object must contain a "success:true" field, for fineUploader to know the upload went well.
         Ok(Json.obj( "success"->true, "record"->Json.toJson(fileDbRecord)) )
       })
@@ -100,7 +107,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
   }
 
   def doAddImage(id: Long, subjectType:String) = deadbolt.SubjectPresent()(cc.parsers.multipartFormData) { implicit req =>
-    Logger.info("do Add image " + subjectType)
+    logger.info(s"do Add image '$subjectType'")
     val file = req.body.file("imageFile")
     val imageCredit = req.body.dataParts.getOrElse("imageCredit", Seq[String]()).headOption.getOrElse("")
     val goTo = subjectType match {
@@ -125,6 +132,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
 
     } else {
       // We have a file. Update all.
+      logger.info("Updating file")
       val filePart = file.get
       val folderPath = subjectType match {
         case "kms" => Paths.get(config.get[String]("hearUs.files.mkImages.folder"))
@@ -132,22 +140,39 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
       }
       if (!Files.exists(folderPath)) {
         Files.createDirectories(folderPath)
-        Files.setPosixFilePermissions(folderPath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
+        Utils.ensureImageServerReadPermissions(folderPath)
       }
-      val i = filePart.filename.lastIndexOf('.')
-      val suffix = if (i >= 0) filePart.filename.substring(i + 1) else ""
-      val filePathTemp = folderPath.resolve(id.toString + ".-temp-." + suffix)
-      val filePath = folderPath.resolve(id.toString + "." + suffix)
-      filePart.ref.moveTo(filePathTemp, replace = true)
-      Files.copy(filePathTemp, filePath, StandardCopyOption.REPLACE_EXISTING)
-      Files.delete(filePathTemp)
-      Files.setPosixFilePermissions(filePath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
-      val mapped = subjectType match {
+      
+      var suffix:String=""
+      var contentType = filePart.contentType.getOrElse("")
+      if ( subjectType == "kms" ) {
+        val dest = folderPath.resolve(id.toString + ".png")
+        processKmImageFile(filePart.ref.path, dest ) match {
+          case Success(p) => {
+            Utils.ensureImageServerReadPermissions(p)
+            suffix = "png"
+            contentType = "image/png"
+          }
+          case Failure(e) => logger.warn("Error while saving KM image: " + e.getMessage, e)
+        }
+      } else {
+        val i = filePart.filename.lastIndexOf('.')
+        suffix = if (i >= 0) filePart.filename.substring(i + 1) else ""
+        val filePathTemp = folderPath.resolve(id.toString + ".-temp-." + suffix)
+        val filePath = folderPath.resolve(id.toString + "." + suffix)
+        filePart.ref.moveTo(filePathTemp, replace = true)
+        Files.copy(filePathTemp, filePath, StandardCopyOption.REPLACE_EXISTING)
+        Files.delete(filePathTemp)
+        Utils.ensureImageServerReadPermissions(filePath)
+      }
+      
+      // update database
+      val imageId = subjectType match {
         case "camps" => (None, Some(id))
         case "kms" => (Some(id), None)
       }
-      val imageRec = KMImage(-1L, mapped._1, mapped._2, suffix,
-        filePart.contentType.getOrElse(""),
+      val imageRec = KMImage(-1L, imageId._1, imageId._2, suffix,
+        contentType,
         new Timestamp(Calendar.getInstance().getTime.getTime),
         imageCredit)
       images.storeImage(imageRec).map(_ => {
@@ -155,5 +180,69 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
         Redirect(goTo).flashing(FlashKeys.MESSAGE -> message.encoded)
       })
     }
+  }
+  
+  def sampleImageTest = Action{
+    val imgFile = env.getExistingFile("public/images/sample-img.jpg").get
+    val inImg = ImageIO.read(imgFile)
+    
+    val outImg = processKmImage(inImg)
+    
+    val byteStream = new ByteArrayOutputStream()
+    ImageIO.write(outImg, "png", byteStream)
+    byteStream.close()
+    Ok( byteStream.toByteArray ).as("image/png")
+  }
+  
+  def processKmImageFile ( imagePath:Path, destination:Path ):Try[Path] = {
+    try {
+      val inImage = ImageIO.read(imagePath.toFile)
+      val otImage = processKmImage(inImage)
+      ImageIO.write( otImage, "png", destination.toFile )
+      Success(destination)
+    } catch {
+      case iox:IOException => Failure(iox)
+    }
+  }
+  
+  val KM_IMAGE_SIDE = 100
+  def processKmImage( inImage:BufferedImage ):BufferedImage = {
+    stretchHistogram(resizeImage(inImage, KM_IMAGE_SIDE, KM_IMAGE_SIDE, toGrayScale = true))
+  }
+  
+  def resizeImage( inImage:BufferedImage, destWidth:Int, destHeight:Int, toGrayScale:Boolean):BufferedImage = {
+    val resized = new BufferedImage(destWidth, destHeight,
+                                        if ( toGrayScale ) BufferedImage.TYPE_BYTE_GRAY else  BufferedImage.TYPE_INT_RGB)
+    val g2 =  resized.createGraphics()
+    g2.setRenderingHints(Map(
+      RenderingHints.KEY_INTERPOLATION -> RenderingHints.VALUE_INTERPOLATION_BICUBIC,
+      RenderingHints.KEY_RENDERING -> RenderingHints.VALUE_RENDER_QUALITY,
+      RenderingHints.KEY_FRACTIONALMETRICS -> RenderingHints.VALUE_FRACTIONALMETRICS_ON
+    ))
+    val scaler = AffineTransform.getScaleInstance(destWidth/inImage.getWidth.toDouble, destHeight/inImage.getHeight.toDouble)
+    g2.drawImage(inImage, scaler, null)
+    g2.dispose()
+    
+    resized
+  }
+  
+  def stretchHistogram(inImage:BufferedImage):BufferedImage = {
+    val minMax = Range(0,inImage.getWidth).flatMap(x=>Range(0,inImage.getHeight).map(y=>(x,y)))
+      .map( crd=>inImage.getRGB(crd._1, crd._2) )
+      .map( _ & 0xFF ) // take just one component, we're grayscale anyway
+      .foldLeft((255,0)) { case ((min, max), e) => (math.min(min, e), math.max(max, e))}
+  
+    val min = minMax._1
+    val max = minMax._2
+    val factor = 255.0/(max-min).toDouble
+    val lookupBytes = Range(0,256).map( i => (i-min)*factor ).map(x=>math.max(0,math.min(255,x))).map(_.toByte).toArray
+    val lookupTable = new ByteLookupTable(0, lookupBytes)
+    val stretchOp = new LookupOp( lookupTable, new RenderingHints(Map(
+      RenderingHints.KEY_COLOR_RENDERING->RenderingHints.VALUE_COLOR_RENDER_QUALITY
+    )))
+    logger.info(s"min:$min max:$max")
+    logger.info(s"lmin:${lookupTable.getTable()(0)(min)} ${lookupTable.getTable()(0)((max+min)/2)} lmax:${lookupTable.getTable()(0)(max)}")
+    
+    stretchOp.filter(inImage, null)
   }
 }
