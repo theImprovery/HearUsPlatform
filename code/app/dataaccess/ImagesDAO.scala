@@ -80,7 +80,7 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
     val inImage = ImageIO.read(filePart.ref.path.toFile)
     if ( inImage.getWidth() > 1000 ) {
       // resize
-      val ratio = 1000.0/ddinImage.getWidth
+      val ratio = 1000.0/inImage.getWidth
       val newImage = resizeImage(inImage, 1000, (inImage.getHeight*ratio).toInt)
       ImageIO.write( newImage, suffix, filePath.toFile )
     } else {
