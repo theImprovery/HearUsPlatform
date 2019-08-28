@@ -136,18 +136,27 @@ class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, kn
         updatedParties <- knessetMembers.updateParties(parties.toSeq)
         activeParties  <- knessetMembers.getAllActiveParties()
         partyNameToID  = activeParties.map(party => (party.name, party.id)).toMap
+        allContactOptions <- knessetMembers.getAllContactOptions()
+        kmToCo         = allContactOptions.groupBy(_.kmId.get)
         mappedKms = kms.map(km => {
           val partyId = partyNameToID(personToFaction(km.knessetKey.toString))
           KnessetMember(km.id, km.name, km.gender, km.isActive, km.webPage, partyId, km.knessetKey)
         })
-        updatedKm  <- knessetMembers.updateKms(mappedKms.toSeq)
+        _  <- knessetMembers.updateKms(mappedKms.toSeq)
         currentKms <- knessetMembers.getAllActiveKms()
     } yield {
       val knessetKeyToPerson = currentKms.map( ck => ( ck.knessetKey, ck.id )).toMap
       personToMail = personToMail.filter( p => knessetKeyToPerson.contains(p._1.toLong) )
-      val newContacts = personToMail.map( ptm => ContactOption( 0, Some(knessetKeyToPerson(ptm._1.toLong)), None, "Email",
-                                                                Messages("platform.email.title"), ptm._2, Messages("platform.email.note") )).toSeq
-      knessetMembers.addContactOption(newContacts.toSet)
+
+      //Check for duplicate ContactOption from KnessetApi and add if non exists
+      val newContacts:Set[ContactOption] = personToMail.filter( ptm => {
+        !kmToCo.getOrElse(knessetKeyToPerson(ptm._1.toLong), Seq())
+          .exists(co => (co.platform == "Email" && co.title == Messages("platform.email.title")
+            && co.details == ptm._2 && co.note == Messages("platform.email.note")))
+      }).map(ptm => ContactOption( 0, Some(knessetKeyToPerson(ptm._1.toLong)), None, "Email",
+          Messages("platform.email.title"), ptm._2, Messages("platform.email.note"))).toSet
+
+      knessetMembers.addContactOption(newContacts)
     }
   }
 }

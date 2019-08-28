@@ -5,13 +5,14 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link rel="stylesheet" href="@routes.Assets.versioned("vnd/bs/css/bootstrap.min.css")">
+        <link rel="stylesheet" href="@routes.Assets.versioned("/lib/bootstrap/css/bootstrap.min.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("lib/jquery-ui/jquery-ui.min.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("lib/fontawesome/css/font-awesome.min.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/Informationals.min.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/main.min.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/styledInputs.min.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("vnd/alef/stylesheet.css")">
+        <link rel="stylesheet" href="@routes.Assets.versioned("vnd/hopscotch/hopscotch.min.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("css/rtl.min.css")">
         <title>@msgs.messages(title)</title>
         @extraHead
@@ -22,13 +23,15 @@
         <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
         <script src="@routes.Assets.versioned("lib/jquery-ui/jquery-ui.min.js")"></script>
         <script src="@routes.Assets.versioned("lib/popper.js/umd/popper.js")"></script>
-        <script src="@routes.Assets.versioned("vnd/bs/js/bootstrap.min.js")"></script>
+        <script src="@routes.Assets.versioned("lib/bootstrap/js/bootstrap.min.js")"></script>
         <script src="@routes.Assets.versioned("js/UiUtils.js")"></script>
         <script src="@routes.Assets.versioned("js/Informationals.js")"></script>
+        <script src="@routes.Assets.versioned("js/main.js")"></script>
         <script src="@routes.Assets.versioned("js/Playjax.js")"></script>
         <script src="@routes.Assets.versioned("lib/sweetalert/sweetalert.min.js")"></script>
         <script src="@routes.Assets.versioned("lib/polyglot/build/polyglot.min.js")"></script>
         <script src="@routes.Assets.versioned("js/polyglot/he.js")"></script>
+        <script src="@routes.Assets.versioned("vnd/hopscotch/hopscotch.min.js")"></script>
         @extraBottom
         @for( msg <- request.flash.get(controllers.FlashKeys.MESSAGE) ){
           <script language="JavaScript">

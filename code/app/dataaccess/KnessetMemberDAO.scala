@@ -1,7 +1,10 @@
 package dataaccess
 
+import java.util.Date
+
 import javax.inject.Inject
 import models.{ContactOption, KmsParties, KnessetMember, Party, Platform}
+import org.joda.time.DateTime
 import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
@@ -56,12 +59,6 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
     )
   }
   
-//  def getKmsPage( sortBy:pageSize:Int, pageNum:Int ):Future[Seq[KnessetMember]] = {
-//    db.run(
-//      knessetMembers.sortBy( _.name )
-//    )
-//  }
-  
   def deleteKM( id: Long ):Future[Unit] = {
     db.run{
       DBIO.seq(
@@ -98,13 +95,29 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   }
 
   def updateKms(currentKms:Seq[KnessetMember]) = {
-    val markAsNotActive = knessetMembers.filter(km => !km.knessetKey.inSet(currentKms.map(_.knessetKey))).map(_.isActive).update(false)
-    val markAsActive = knessetMembers.filter(km => km.knessetKey.inSet(currentKms.map(_.knessetKey))).map(_.isActive).update(true)
+    // Mark KMs as active/inactive.
+    val kmKeysForCurrentKnesset = currentKms.map(_.knessetKey)
+    val markAsNotActive = knessetMembers.filter(km => !km.knessetKey.inSet(kmKeysForCurrentKnesset)).map(_.isActive).update(false)
+    val markAsActive = knessetMembers.filter(km => km.knessetKey.inSet(kmKeysForCurrentKnesset)).map(_.isActive).update(true)
     val insertNewKms = for {
       existingKmsKeys <- knessetMembers.map( _.knessetKey ).result
-      addKms          <- knessetMembers ++= currentKms.filter( k => !existingKmsKeys.contains(k.knessetKey) )
+      addKms          <- knessetMembers ++= currentKms.filter( k => !existingKmsKeys.contains(k.knessetKey))
     } yield addKms
-    db.run( DBIO.seq(markAsNotActive, markAsActive, insertNewKms).transactionally )
+
+    db.run(
+      DBIO.seq(
+        markAsNotActive,
+        markAsActive,
+        insertNewKms).transactionally )
+    // update kms that appear in the Knesset OpenAPI, with data from that site.
+    for {
+      kmsSeq <- getAllKms
+      kmsMap = kmsSeq.map( km =>km.knessetKey->km ).toMap
+    } yield {
+      val kmsToUpdate = currentKms.filter(_.knessetKey != -1L).map(km =>km.copy(id=kmsMap(km.knessetKey).id))
+      val updateCommands = kmsToUpdate.map(km => knessetMembers.insertOrUpdate(km))
+      db.run( DBIO.sequence(updateCommands))
+    }
   }
 
   def getAllActiveParties():Future[Seq[Party]] = {
@@ -120,14 +133,14 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   }
 
   def addContactOption( co: ContactOption ):Future[ContactOption] = {
-    db.run{
-      (contactOptions returning contactOptions).insertOrUpdate(co)
-    }.map( insertRes => insertRes.getOrElse(co) )
+    db.run(contactOptions += co).map(_ => co)
   }
 
   def addContactOption( cos: Traversable[ContactOption] ):Future[Seq[ContactOption]] = {
     Future.sequence(cos.map(co => addContactOption(co)).toSeq)
   }
+
+  def getAllContactOptions():Future[Seq[ContactOption]] = db.run(contactOptions.result)
   
   def setContactOptions( kmId:Long, conOps: Traversable[ContactOption] ):Future[Unit] = {
     val connectedConOps = conOps.map( c => c.copy(kmId=Some(kmId)) )
