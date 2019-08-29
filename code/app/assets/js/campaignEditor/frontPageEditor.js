@@ -75,3 +75,20 @@ function submitBeforeUnload() {
         }
     });
 }
+
+// var tour = {
+//     id:"tour",
+//     steps:[
+//         {
+//             "title":polyglot.t("tour.frontPage.element.title"),
+//             "content":polyglot.t("tour.frontPage.element.content"),
+//             "target":"element",
+//             placement:"bottom"
+//         }
+//     ],
+//     showPrevButton: true,
+//     i18n:{
+//         nextBtn: polyglot.t("next"),
+//         prevBtn: polyglot.t("prev")
+//     }
+// };

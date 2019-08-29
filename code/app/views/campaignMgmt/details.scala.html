@@ -1,5 +1,5 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaign:Campaign)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+@(campaign:Campaign, tour:Boolean)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/campaignEditor/detailsPage.js")"></script>
@@ -9,6 +9,7 @@
         document.getElementById("hearUsUrl").value=campUrl;
         document.getElementById("hearUsUrlA").href=campUrl;
     });
+        @if(tour) {hopscotch.startTour(tourOptions);}
   </script>
 }
 

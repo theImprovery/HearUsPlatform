@@ -28,3 +28,20 @@ function filterKmsList(searchStr) {
         } else emt.style.display = "none";
     });
 }
+
+// var tour = {
+//     id:"tour",
+//     steps:[
+//         {
+//             "title":polyglot.t("tour.positionsPage.element.title"),
+//             "content":polyglot.t("tour.positionsPage.element.content"),
+//             "target":"element",
+//             placement:"bottom"
+//         }
+//     ],
+//     showPrevButton: true,
+//     i18n:{
+//         nextBtn: polyglot.t("next"),
+//         prevBtn: polyglot.t("prev")
+//     }
+// };

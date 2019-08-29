@@ -109,3 +109,20 @@ function post( action, groupId ) {
     document.body.appendChild(form);
     form.submit();
 }
+
+// var tour = {
+//     id:"tour",
+//     steps:[
+//         {
+//             "title":polyglot.t("tour.groupsPage.element.title"),
+//             "content":polyglot.t("tour.groupsPage.element.content"),
+//             "target":"element",
+//             placement:"bottom"
+//         }
+//     ],
+//     showPrevButton: true,
+//     i18n:{
+//         nextBtn: polyglot.t("next"),
+//         prevBtn: polyglot.t("prev")
+//     }
+// };

@@ -74,7 +74,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       rel <- usersCampaigns.connectUserToCampaign(UserCampaign(userId, campaign.id, isAdmin=true))
       camps <- usersCampaigns.getCampaginsForUser( userId )
     } yield {
-      Ok(views.html.campaignMgmt.details(campaign))
+      Ok(views.html.campaignMgmt.details(campaign, true))
 
     }
   }
@@ -130,7 +130,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id){
       for {
         campaignOpt <- campaigns.getCampaign(id)
-      } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
+      } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c, false))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
     }
   }
 

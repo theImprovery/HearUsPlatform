@@ -57,6 +57,8 @@ polyglot.extend({
     "went_wrong":"משהו השתבש",
     "try_again":"נסה/י שוב",
     "oh":"אוי לא",
+    "next":"הבא",
+    "prev":"הקודם",
     "team":{
         "myself":{
             "regular_user":{
@@ -101,5 +103,85 @@ polyglot.extend({
     "admin":{
         "upgrade":"עודכן למנהל",
         "remove":"הורד תפקיד המנהל"
+    },
+    "metaTourSteps":{
+        "details": {
+            "title":"פרטי הקמפיין",
+            "content":"עריכת פרטים כלליים של הקמפיין"
+        },
+        "messages": {
+            "title":"מסרים לחברי הכנסת",
+            "content":"עריכת המסרים בקמפיין, לפי מדיה (אימייל/טוויטר), עמדה, ומגדר הח״כ"
+        },
+        "frontPage": {
+            "title":"עמוד ראשי",
+            "content":"עריכת הטקסטים בעמוד הראשי של הקמפיין"
+        },
+        "design": {
+            "title":"עיצוב",
+            "content":"עיצוב אתר הקמפיין: פונטים, צבעים, ורקעים"
+        },
+        "knessetMembers": {
+            "title":"עמדות הח\"כים",
+            "content":"עדכון עמדות חברי הכנסת ביחס לקמפיין"
+        },
+        "groups": {
+            "title":"ועדות",
+            "content":"ועדות רלוונטיות לקמפיין"
+        },
+        "team": {
+            "title":"צוות הקמפיין",
+            "content":"צוות הקמפיין. מנהלי קמפיין יכולים גם לקבוע את הרכב הצוות"
+        }
     }
+    // "tour": {
+    //     "detailsPage":{
+    //         "element":{
+    //             "title":"title",
+    //             "content":"content"
+    //         }
+    //     },
+    //     "messagesPage":{
+    //         "element":{
+    //             "title":"title",
+    //             "content":"content"
+    //         }
+    //     },
+    //     "frontPage":{
+    //         "element":{
+    //             "title":"title",
+    //             "content":"content"
+    //         }
+    //     },
+    //     "designPage":{
+    //         "element":{
+    //             "title":"title",
+    //             "content":"content"
+    //         }
+    //     },
+    //     "positionsPage":{
+    //         "element":{
+    //             "title":"title",
+    //             "content":"content"
+    //         }
+    //     },
+    //     "groupsPage":{
+    //         "element":{
+    //             "title":"title",
+    //             "content":"content"
+    //         }
+    //     },
+    //     "teamPage":{
+    //         "element":{
+    //             "title":"title",
+    //             "content":"content"
+    //         }
+    //     },
+    //     "actionsPage":{
+    //         "element":{
+    //             "title":"title",
+    //             "content":"content"
+    //         }
+    //     }
+    // }
 });

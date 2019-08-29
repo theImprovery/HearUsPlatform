@@ -13,11 +13,11 @@ libraryDependencies ++= Seq(
   ws,
   guice,
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
-  "org.webjars" % "jquery" % "3.2.1",
+  "org.webjars" % "jquery" % "3.4.1",
   "org.webjars" % "jquery-ui" % "1.12.1",
 //  "org.webjars" % "tether" % "1.4.0",
   "org.webjars" % "summernote" % "0.8.10",
-  "org.webjars" % "popper.js" % "1.14.6",
+  "org.webjars" % "popper.js" % "1.15.0",
   "org.webjars.bower" % "fontawesome" % "4.7.0",
   "be.objectify" %% "deadbolt-scala" % "2.6.1",
   "org.mindrot" % "jbcrypt" % "0.3m",
@@ -32,7 +32,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "d3js" % "5.9.1",
   "org.webjars.bower" % "polyglot" % "2.2.2",
   "org.webjars" % "sweetalert" % "2.1.0",
-  "org.webjars" % "requirejs" % "2.3.6"
+  "org.webjars" % "requirejs" % "2.3.6",
+  "org.webjars" % "bootstrap" % "4.3.1"
 )
 
 // TODO add sections and table helpers

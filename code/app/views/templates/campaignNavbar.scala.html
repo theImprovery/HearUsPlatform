@@ -6,7 +6,7 @@
 @showSection(mi:TopSiteSection[_], isSelected:Boolean) = {
   @mi match {
     case PageSection(title, id, call) => {
-      <li class="nav-item @if(isSelected){active}">
+      <li id="pageSection_@id" class="nav-item @if(isSelected){active}">
         <a class="nav-link" href="@call">@Messages(title) @if(isSelected){<span class="sr-only">(current)</span>}</a>
       </li>
     }
@@ -39,6 +39,7 @@
         @for( sec <- sections ){
           @showSection(sec, currentSection==sec.id)
         }
+@*          <button type="button" onclick="hopscotch.startTour(tour)" class="btn-info"><i class="fa fa-info"></i></button>*@
           <li style="flex: 1"></li>
         </ul>
         @for( navBarExt <-navbarExtras ) {

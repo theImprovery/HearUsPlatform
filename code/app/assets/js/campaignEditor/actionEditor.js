@@ -24,3 +24,20 @@ function deleteAction(id, camId, kmId) {
         }
     });
 }
+
+// var tour = {
+//     id:"tour",
+//     steps:[
+//         {
+//             "title":polyglot.t("tour.actionsPage.element.title"),
+//             "content":polyglot.t("tour.actionsPage.element.content"),
+//             "target":"element",
+//             placement:"bottom"
+//         }
+//     ],
+//     showPrevButton: true,
+//     i18n:{
+//         nextBtn: polyglot.t("next"),
+//         prevBtn: polyglot.t("prev")
+//     }
+// };

@@ -102,5 +102,79 @@ function chooseSlugName() {
 }
 
 window.onbeforeunload = function() {
+    hopscotch.endTour(true);
     return patchBeforeUnload();
 };
+
+const metaTourSteps = [
+    {
+        title:polyglot.t("metaTourSteps.details.title"),
+        content: polyglot.t("metaTourSteps.details.content"),
+        target: "pageSection_Details",
+        placement: "bottom"
+    },
+    {
+        title:polyglot.t("metaTourSteps.messages.title"),
+        content: polyglot.t("metaTourSteps.messages.content"),
+        target: "pageSection_Messages",
+        placement: "bottom"
+    },
+    {
+        title:polyglot.t("metaTourSteps.frontPage.title"),
+        content: polyglot.t("metaTourSteps.frontPage.content"),
+        target: "pageSection_FrontPage",
+        placement: "bottom"
+    },
+    {
+        title:polyglot.t("metaTourSteps.design.title"),
+        content: polyglot.t("metaTourSteps.design.content"),
+        target: "pageSection_Design",
+        placement: "bottom"
+    },
+    {
+        title:polyglot.t("metaTourSteps.knessetMembers.title"),
+        content: polyglot.t("metaTourSteps.knessetMembers.content"),
+        target: "pageSection_KnessetMembers",
+        placement: "bottom"
+    },
+    {
+        title:polyglot.t("metaTourSteps.groups.title"),
+        content: polyglot.t("metaTourSteps.groups.content"),
+        target: "pageSection_CampaignGroups",
+        placement: "bottom"
+    },
+    {
+        title:polyglot.t("metaTourSteps.team.title"),
+        content: polyglot.t("metaTourSteps.team.content"),
+        target: "pageSection_CampaignTeam",
+        placement: "bottom"
+    },
+];
+
+const tourOptions = {
+    id:"metaTour",
+    steps:metaTourSteps,
+    showPrevButton: true,
+    showCloseButton:true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev")
+    }
+};
+
+// var tour = {
+//     id:"tour",
+//     steps:[
+//         {
+//             "title":polyglot.t("tour.detailsPage.element.title"),
+//             "content":polyglot.t("tour.detailsPage.element.content"),
+//             "target":"element",
+//             placement:"bottom"
+//         }
+//     ],
+//     showPrevButton: true,
+//     i18n:{
+//         nextBtn: polyglot.t("next"),
+//         prevBtn: polyglot.t("prev")
+//     }
+// };
