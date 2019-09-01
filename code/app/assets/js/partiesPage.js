@@ -1,3 +1,4 @@
+/* jshint esversion:6 */
 var partiesList;
 
 var prevPartyData = {};
@@ -21,7 +22,7 @@ function setPartyData( $li, data ){
 }
 
 function setEditable( $li, shouldBeEditable ) {
-    $li.find("a").attr("contentEditable", shouldBeEditable);
+    $li.find("div.partyWebPage").attr("contentEditable", shouldBeEditable);
     $li.find("div.partyName").attr("contentEditable", shouldBeEditable);
 
     if ( shouldBeEditable ) {
@@ -41,6 +42,27 @@ function editParty(sender) {
     var partyData = getPartyData($parent);
     prevPartyData[partyData.id] = partyData;
     setEditable( $parent, true );
+}
+
+function visitPartyWebsite(sender) {
+    const $parent = $(sender.parentNode);
+    const partyData = getPartyData($parent);
+    if ( partyData.webPage && partyData.webPage.trim().length > 0  ) {
+        window.open( partyData.webPage.trim() );
+    } else {
+        swal({
+            title:polyglot.t("party.noWebsite"),
+            icon:"warning",
+            buttons: {
+                cancel: polyglot.t("cancel"),
+                confirm: polyglot.t("party.editData")
+            }
+        }).then(function(shouldEdit){
+            if ( shouldEdit ) {
+                editParty(sender);
+            }
+        });
+    }
 }
 
 function cancelEdit(sender) {

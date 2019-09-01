@@ -22,8 +22,9 @@
                 <input type="hidden" name="id" value="@party.id">
                 <input type="hidden" name="isActive" value="@party.isActive">
                 <div class="partyName">@party.name</div>
-                <a class="partyWebPage" href="@party.webPage" target="_blank">@party.webPage</a>
-                <button type="button" name="editBtn" onclick="editParty(this);" class="btn btn-sm btn-default"><i class="fa fa-edit"></i></button>
+                <div class="partyWebPage" href="@party.webPage" target="_blank">@party.webPage</div>
+                <button type="button" name="goBtn" onclick="visitPartyWebsite(this);" class="btn btn-sm btn-success"><i class="fa fa-external-link"></i></button>
+                <button type="button" name="editBtn" onclick="editParty(this);" class="btn btn-sm btn-secondary"><i class="fa fa-edit"></i></button>
                 <button type="button" name="cancelEditBtn" onclick="cancelEdit(this);" class="btn btn-sm btn-secondary hidden"><i class="fa fa-close"></i></button>
                 <button type="button" name="saveBtn" onclick="saveParty(this);" class="btn btn-sm btn-primary hidden"><i class="fa fa-save"></i></button>
                 <button type="button" name="deleteBtn" onclick="deleteParty(@party.id);" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
