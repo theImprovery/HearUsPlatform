@@ -219,20 +219,39 @@ window.onload = function() {
         }
     }.finally;
 };
-//
-// var tour = {
-//     id:"tour",
-//     steps:[
-//         {
-//             "title":polyglot.t("tour.messagesPage.element.title"),
-//             "content":polyglot.t("tour.messagesPage.element.content"),
-//             "target":"element",
-//             placement:"bottom"
-//         }
-//     ],
-//     showPrevButton: true,
-//     i18n:{
-//         nextBtn: polyglot.t("next"),
-//         prevBtn: polyglot.t("prev")
-//     }
-// };
+
+const tour = {
+    id:"tour",
+    steps:[
+        {
+            "title":polyglot.t("tour.messagesPage.section.title"),
+            "content":polyglot.t("tour.messagesPage.section.content"),
+            "target":"pageSection_Messages",
+            placement:"bottom"
+        },
+        {
+            "title":polyglot.t("tour.messagesPage.messageDestinationSelectors.title"),
+            "content":polyglot.t("tour.messagesPage.messageDestinationSelectors.content"),
+            "target":"messageDestinationSelectors",
+            placement:"left"
+        },
+        {
+            "title":polyglot.t("tour.messagesPage.messageTable.title"),
+            "content":polyglot.t("tour.messagesPage.messageTable.content"),
+            "target":"messageTable",
+            placement:"right"
+        },
+        {
+            "title":polyglot.t("tour.messagesPage.content.title"),
+            "content":polyglot.t("tour.messagesPage.content.content"),
+            "target":"content",
+            placement:"top"
+        }
+    ],
+    showPrevButton: true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
+    }
+};

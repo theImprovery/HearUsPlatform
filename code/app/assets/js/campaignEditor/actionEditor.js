@@ -1,3 +1,4 @@
+/* jshint esversion:6 */
 function deleteAction(id, camId, kmId) {
     console.log("id", id);
     console.log("camIId", camId);
@@ -25,19 +26,35 @@ function deleteAction(id, camId, kmId) {
     });
 }
 
-// var tour = {
-//     id:"tour",
-//     steps:[
-//         {
-//             "title":polyglot.t("tour.actionsPage.element.title"),
-//             "content":polyglot.t("tour.actionsPage.element.content"),
-//             "target":"element",
-//             placement:"bottom"
-//         }
-//     ],
-//     showPrevButton: true,
-//     i18n:{
-//         nextBtn: polyglot.t("next"),
-//         prevBtn: polyglot.t("prev")
-//     }
-// };
+const tour = {
+    id:"tour",
+    steps:[
+        {
+            title:polyglot.t("tour.actionsPage.kmName.title"),
+            content:polyglot.t("tour.actionsPage.kmName.content"),
+            target:"kmName",
+            placement:"left"
+        },{
+            title:polyglot.t("tour.actionsPage.actionTable.title"),
+            content:polyglot.t("tour.actionsPage.actionTable.content"),
+            target:"actionTable",
+            placement:"top"
+        },{
+            title:polyglot.t("tour.actionsPage.actionTableNoData.title"),
+            content:polyglot.t("tour.actionsPage.actionTableNoData.content"),
+            target:"actionTableNoData",
+            placement:"top"
+        },{
+            title:polyglot.t("tour.actionsPage.addAction.title"),
+            content:polyglot.t("tour.actionsPage.addAction.content"),
+            target:"addAction",
+            placement:"right"
+        }
+    ],
+    showPrevButton: true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
+    }
+};

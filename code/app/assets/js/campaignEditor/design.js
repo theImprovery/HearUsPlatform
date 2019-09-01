@@ -1,3 +1,4 @@
+/* jshint esversion:6 */
 function collectCss() {
     var $colors = $("input[type='color']");
     var valueTriplets = $colors.map( function(i,c){
@@ -117,19 +118,38 @@ window.onbeforeunload = function () {
     postForm();
 };
 
-// var tour = {
-//     id:"tour",
-//     steps:[
-//         {
-//             "title":polyglot.t("tour.designPage.element.title"),
-//             "content":polyglot.t("tour.designPage.element.content"),
-//             "target":"element",
-//             placement:"bottom"
-//         }
-//     ],
-//     showPrevButton: true,
-//     i18n:{
-//         nextBtn: polyglot.t("next"),
-//         prevBtn: polyglot.t("prev")
-//     }
-// };
+const tour = {
+    id:"tour",
+    steps:[
+        {
+            title:polyglot.t("tour.designPage.section.title"),
+            content:polyglot.t("tour.designPage.section.content"),
+            target:"pageSection_Design",
+            placement:"bottom"
+        },
+        {
+            title:polyglot.t("tour.designPage.colors.title"),
+            content:polyglot.t("tour.designPage.colors.content"),
+            target:"colorsRow",
+            placement:"left"
+        },
+        {
+            title:polyglot.t("tour.designPage.imageRow.title"),
+            content:polyglot.t("tour.designPage.imageRow.content"),
+            target:"imageRow",
+            placement:"left"
+        },
+        {
+            title:polyglot.t("tour.designPage.cssRow.title"),
+            content:polyglot.t("tour.designPage.cssRow.content"),
+            target:"cssRow",
+            placement:"left"
+        }
+    ],
+    showPrevButton: true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
+    }
+};

@@ -168,23 +168,43 @@ const tourOptions = {
     showCloseButton:true,
     i18n:{
         nextBtn: polyglot.t("next"),
-        prevBtn: polyglot.t("prev")
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
     }
 };
 
-// var tour = {
-//     id:"tour",
-//     steps:[
-//         {
-//             "title":polyglot.t("tour.detailsPage.element.title"),
-//             "content":polyglot.t("tour.detailsPage.element.content"),
-//             "target":"element",
-//             placement:"bottom"
-//         }
-//     ],
-//     showPrevButton: true,
-//     i18n:{
-//         nextBtn: polyglot.t("next"),
-//         prevBtn: polyglot.t("prev")
-//     }
-// };
+const tour = {
+    id:"tour",
+    steps:[
+        {
+            title:polyglot.t("tour.detailsPage.currentSection.title"),
+            content:polyglot.t("tour.detailsPage.currentSection.content"),
+            target:"pageSection_Details",
+            placement:"bottom"
+        },
+        {
+            title:polyglot.t("tour.detailsPage.sampleFieldTitle.title"),
+            content:polyglot.t("tour.detailsPage.sampleFieldTitle.content"),
+            target:"sampleFieldTitle",
+            placement:"bottom"
+        },
+        {
+            title:polyglot.t("tour.detailsPage.sampleFieldHelp.title"),
+            content:polyglot.t("tour.detailsPage.sampleFieldHelp.content"),
+            target:"sampleFieldHelp",
+            placement:"bottom"
+        },
+        {
+            title:polyglot.t("tour.detailsPage.title.title"),
+            content:polyglot.t("tour.detailsPage.title.content"),
+            target:"title",
+            placement:"bottom"
+        }
+    ],
+    showPrevButton: true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
+    }
+};

@@ -345,7 +345,8 @@ campaigns.updateLabels=עדכון תוויות
 campaigns.updateMessages=עדכן הודעות
 campaigns.noMessages=לא הוכנסו הודעות
 background=רקע
-
+selectFile=בחירת קובץ
+campaignColors=צבעי הקמפיין
 newCampaigner.noCampainger=נא לבחור מנהל קמפיין
 
 public.navbar.menu=תפריט

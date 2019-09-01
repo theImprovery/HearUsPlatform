@@ -1,3 +1,4 @@
+/* jshint esversion:6 */
 function changePosition(emt) {
     var data = {};
     data.camId = Number($("#id").val());
@@ -17,7 +18,7 @@ function changePosition(emt) {
         });
 }
 
-var allKms = $("#kmsPositionList");
+const allKms = $("#kmsPositionList");
 function filterKmsList(searchStr) {
     searchStr = searchStr.replace(/'/g, "%");
     searchStr = searchStr.replace(/\"/g, "@");
@@ -29,19 +30,30 @@ function filterKmsList(searchStr) {
     });
 }
 
-// var tour = {
-//     id:"tour",
-//     steps:[
-//         {
-//             "title":polyglot.t("tour.positionsPage.element.title"),
-//             "content":polyglot.t("tour.positionsPage.element.content"),
-//             "target":"element",
-//             placement:"bottom"
-//         }
-//     ],
-//     showPrevButton: true,
-//     i18n:{
-//         nextBtn: polyglot.t("next"),
-//         prevBtn: polyglot.t("prev")
-//     }
-// };
+const tour = {
+    id:"tour",
+    steps:[
+        {
+            title:polyglot.t("tour.positionsPage.section.title"),
+            content:polyglot.t("tour.positionsPage.section.content"),
+            target:"pageSection_KnessetMembers",
+            placement:"bottom"
+        },{
+            title:polyglot.t("tour.positionsPage.kmsPositionList.title"),
+            content:polyglot.t("tour.positionsPage.kmsPositionList.content"),
+            target:"kmListCenter",
+            placement:"top"
+        },{
+            title:polyglot.t("tour.positionsPage.searchStr.title"),
+            content:polyglot.t("tour.positionsPage.searchStr.content"),
+            target:"searchStr",
+            placement:"left"
+        }
+    ],
+    showPrevButton: true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
+    }
+};

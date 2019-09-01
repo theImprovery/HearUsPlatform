@@ -110,19 +110,30 @@ function post( action, groupId ) {
     form.submit();
 }
 
-// var tour = {
-//     id:"tour",
-//     steps:[
-//         {
-//             "title":polyglot.t("tour.groupsPage.element.title"),
-//             "content":polyglot.t("tour.groupsPage.element.content"),
-//             "target":"element",
-//             placement:"bottom"
-//         }
-//     ],
-//     showPrevButton: true,
-//     i18n:{
-//         nextBtn: polyglot.t("next"),
-//         prevBtn: polyglot.t("prev")
-//     }
-// };
+const tour = {
+    id:"tour",
+    steps:[
+        {
+            title:polyglot.t("tour.groupsPage.section.title"),
+            content:polyglot.t("tour.groupsPage.section.content"),
+            target:"pageSection_CampaignGroups",
+            placement:"bottom"
+        },{
+            title:polyglot.t("tour.groupsPage.groupTable.title"),
+            content:polyglot.t("tour.groupsPage.groupTable.content"),
+            target:"groupTable",
+            placement:"left"
+        },{
+            title:polyglot.t("tour.groupsPage.groupSearchField.title"),
+            content:polyglot.t("tour.groupsPage.groupSearchField.content"),
+            target:"groupSearchField",
+            placement:"right"
+        }
+    ],
+    showPrevButton: true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
+    }
+};

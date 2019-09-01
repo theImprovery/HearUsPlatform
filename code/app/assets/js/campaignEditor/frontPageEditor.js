@@ -21,18 +21,17 @@ function frontPageEditorSetup(){
 }
 
 function prepareForm() {
-    var groupValue = positionStrings.map( (pos)=> document.getElementById("group"+pos).value ).join("\t");
+    var groupValue = positionStrings.map((pos) => document.getElementById("group" + pos).value).join("\t");
     document.getElementById("groupLabels").value = groupValue;
     var mkValues = [];
-    for ( var g in genderStrings ) {
-        for ( var p in positionStrings ) {
-            var key = genderStrings[g]+positionStrings[p]+"Label";
-            mkValues.push( document.getElementById(key).value );
+    for (var g in genderStrings) {
+        for (var p in positionStrings) {
+            var key = genderStrings[g] + positionStrings[p] + "Label";
+            mkValues.push(document.getElementById(key).value);
         }
     }
     document.getElementById("kmLabels").value = mkValues.join("\t");
 
-    console.log( document.getElementById("kmLabels").value );
 }
 
 window.onbeforeunload = function() {
@@ -76,19 +75,25 @@ function submitBeforeUnload() {
     });
 }
 
-// var tour = {
-//     id:"tour",
-//     steps:[
-//         {
-//             "title":polyglot.t("tour.frontPage.element.title"),
-//             "content":polyglot.t("tour.frontPage.element.content"),
-//             "target":"element",
-//             placement:"bottom"
-//         }
-//     ],
-//     showPrevButton: true,
-//     i18n:{
-//         nextBtn: polyglot.t("next"),
-//         prevBtn: polyglot.t("prev")
-//     }
-// };
+const tour = {
+    id:"tour",
+    steps:[
+        {
+            title:polyglot.t("tour.frontPage.section.title"),
+            content:polyglot.t("tour.frontPage.section.content"),
+            target:"pageSection_FrontPage",
+            placement:"bottom"
+        },
+        {
+            title:polyglot.t("tour.frontPage.sampleHelp.title"),
+            target:"sampleHelp",
+            placement:"top"
+        }
+    ],
+    showPrevButton: true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
+    }
+};

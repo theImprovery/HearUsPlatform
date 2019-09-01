@@ -3,32 +3,32 @@
 @(campaign:Campaign, km:KnessetMember, party:Option[Party], actions: Seq[KmAction])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @scripts = {
-
+  <script src="@routes.Assets.versioned("/js/campaignEditor/actionEditor.js")"></script>
 }
 
-@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.KnessetMembers, scripts) {
+@templates.campaignNavbar(campaign.title, views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.KnessetMembers, Html(""), scripts) {
   <div class="row my-2">
     <div class="col">
-      <h3>@km.name @for(p<-party){<span class="text-info">@p.name</span>}</h3>
+      <h3 id="kmName">@km.name @for(p<-party){<span class="text-info">@p.name</span>}</h3>
       <div class="text-muted">
       @Messages("campaignMgmt.actions.help")
       </div>
     </div>
     <div class="col text-left">
-      <a href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+      <a id="addAction" href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
     </div>
   </div>
 
   <div class="row">
     <div class="col-12">
     @if(actions.isEmpty) {
-      <div class="noData">
+      <div class="noData" id="actionTableNoData">
         @Messages("actions.empty")<br>
-        <a href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+        <a  href="@routes.CampaignMgrCtrl.showNewAction(campaign.id, km.id)" class="btn btn-large btn-outline-success"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
       </div>
     } else {
       <div class="table-responsive">
-        <table class="table table-sm table-striped">
+        <table class="table table-sm table-striped" id="actionTable">
           <thead>
             <tr>
               <th>@Messages("title")</th>

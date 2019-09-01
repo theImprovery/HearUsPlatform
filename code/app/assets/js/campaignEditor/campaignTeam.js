@@ -145,19 +145,30 @@ function post( action, userId ) {
     form.submit();
 }
 
-// var tour = {
-//     id:"tour",
-//     steps:[
-//         {
-//             "title":polyglot.t("tour.teamPage.element.title"),
-//             "content":polyglot.t("tour.teamPage.element.content"),
-//             "target":"element",
-//             placement:"bottom"
-//         }
-//     ],
-//     showPrevButton: true,
-//     i18n:{
-//         nextBtn: polyglot.t("next"),
-//         prevBtn: polyglot.t("prev")
-//     }
-// };
+const tour = {
+    id:"tour",
+    steps:[
+        {
+            title:polyglot.t("tour.teamPage.section.title"),
+            content:polyglot.t("tour.teamPage.section.content"),
+            target:"pageSection_CampaignTeam",
+            placement:"bottom"
+        },{
+            title:polyglot.t("tour.teamPage.teamTable.title"),
+            content:polyglot.t("tour.teamPage.teamTable.content"),
+            target:"teamTable",
+            placement:"left"
+        },{
+            title:polyglot.t("tour.teamPage.userSearchField.title"),
+            content:polyglot.t("tour.teamPage.userSearchField.content"),
+            target:"userSearchField",
+            placement:"right"
+        }
+    ],
+    showPrevButton: true,
+    i18n:{
+        nextBtn: polyglot.t("next"),
+        prevBtn: polyglot.t("prev"),
+        doneBtn: polyglot.t("done")
+    }
+};

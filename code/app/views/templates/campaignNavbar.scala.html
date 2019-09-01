@@ -31,16 +31,19 @@
 @backEndBase(title, views.BackOfficeSections.MyCampaigns, extraHead, extraBottom){
     <div class="row">
       <div class="col">
-        <ul class="nav justify-content-center styledNav">
+        <ul class="nav justify-content-center styledNav" id="campaignNavBar">
           <li class="styledNavTitle">
             <a class="nav-link " href="#">@Messages(title)</a>
           </li>
           <li style="flex: 1" ></li>
-        @for( sec <- sections ){
-          @showSection(sec, currentSection==sec.id)
-        }
-@*          <button type="button" onclick="hopscotch.startTour(tour)" class="btn-info"><i class="fa fa-info"></i></button>*@
+          @for( sec <- sections ){
+            @showSection(sec, currentSection==sec.id)
+          }
           <li style="flex: 1"></li>
+          <li>
+            <button id="navbarHelpButton" type="button" onclick="hopscotch.startTour(tour)" class="btn btn-outline-info"><i class="fa fa-info-circle"></i></button>
+            &nbsp;
+          </li>
         </ul>
         @for( navBarExt <-navbarExtras ) {
           @navBarExt
