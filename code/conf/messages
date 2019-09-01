@@ -364,6 +364,7 @@ public.kmPage.tweetOnTwitter=צייצו בטוויטר
 public.kmPage.writeOnFacebook=כיתבו סטטוס בפייסבוק
 public.kmPage.sendEmail=כתובת המייל של ח״כ {0} היא {1}.  להלן נוסח מוצע למכתב - אתם מוזמנים להעתיק אותו לתוכנת הדואר שלכם, לערוך אותו, ולשלוח.
 public.kmPage.openInGMail=לפתיחה ב-GMail
+public.kmPage.openInLocalMail=לפתיחה בתוכנת אימייל
 public.kmPage.actions=פעולות של ח״כ
 public.contactUs=צרו קשר
 public.mainSite=לעמוד הרשמי

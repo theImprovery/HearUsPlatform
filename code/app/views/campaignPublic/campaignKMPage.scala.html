@@ -114,10 +114,12 @@ function updateFbLink() {
               @for( co<-contactOptions.get(Platform.Email)  ){
                 <li>@platformIcon(co.platformObj) @Messages("public.kmPage.sendEmail", km.name, co.details)
                   <br>
-                  <a target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)&body=@helper.urlEncode(messages.get(Platform.Email).map( _.text).getOrElse(""))">
-                          @Messages("public.kmPage.openInGMail")</a>
+                  <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)&body=@helper.urlEncode(messages.get(Platform.Email).map( _.text).getOrElse(""))">
+                      <i class="fa fa-send"></i> @Messages("public.kmPage.openInGMail")</a>
+                  <a class="btn btn-outline-secondary btn-sm" target="_blank" href="mailto:@co.details?subject=@helper.urlEncode(campaign.title + ": " + campaign.slogan).replaceAll("\\+","%20")&body=@helper.urlEncode(messages.get(Platform.Email).map( _.text).getOrElse("")).replaceAll("\\+","%20")">
+                      <i class="fa fa-send-o"></i> @Messages("public.kmPage.openInLocalMail")</a>
                   @for( text <- messages.get(Platform.Email).map( _.text) ){
-                    <textarea class="form-control" style="color: inherit; background-color:rgba(.5,.5,.5,.1); height:14em;" onclick="this.select()" style="cursor:text; height:10em">@text</textarea>
+                    <textarea class="form-control" style="color: inherit; background-color:rgba(.5,.5,.5,.1); height:14em;" onclick="this.select()" style="cursor:text; height:10em" readonly autocomplete="off">@text</textarea>
                   }
                 </li>
               }

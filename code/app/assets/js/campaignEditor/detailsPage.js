@@ -62,10 +62,20 @@ function chooseSlugName() {
         title: polyglot.t("slug.choose"),
         text: polyglot.t("slug.match"),
         content: "input",
-        button: {
-            text: polyglot.t("save"),
-            closeModal: false,
-        },
+        buttons: {
+            cancel: {
+            text: polyglot.t("cancel"),
+                value: null,
+                visible: true,
+                className: "",
+                closeModal: true,
+            },
+            confirm: {
+                text:  polyglot.t("save"),
+                    visible: true,
+                    className: "",
+                    closeModal: true
+            }},
     }).then(slug => {
         if (!slug) throw null;
         else choosenSlug = slug;
