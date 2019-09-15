@@ -73,6 +73,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
                 "", "", CampaignStatus.WorkInProgress))
       rel <- usersCampaigns.connectUserToCampaign(UserCampaign(userId, campaign.id, isAdmin=true))
       camps <- usersCampaigns.getCampaginsForUser( userId )
+      _ <- campaigns.initialCampaignPositions(campaign.id)
     } yield {
       Ok(views.html.campaignMgmt.details(campaign, true))
 

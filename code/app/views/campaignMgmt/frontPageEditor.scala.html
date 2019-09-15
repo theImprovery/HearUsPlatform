@@ -59,7 +59,7 @@
               <div class="input-group-prepend">
                 <div style="width: 7em" class="input-group-text">@Messages(pos.toString)</div>
               </div>
-              <input type="text" class="form-control" name="group@pos.toString" id="group@pos.toString" value="@texts.groupLabel(pos)">
+              <input type="text" class="form-control" name="group@pos.toString" id="group@pos.toString" value="@if(texts.groupLabel(pos).isEmpty){@Messages("campaignMgmt.frontPage.groupLabel.default."+pos)} else{@texts.groupLabel(pos)}">
             </div>
            }
         </div>
@@ -82,7 +82,7 @@
               <tr>
                 <th>@Messages(gender.toString)</th>
               @for( pos <- positions ){<td class="p-1">
-                <input type="text" id="@{gender + pos.toString}Label" name="@{gender + pos.toString}Label" value="@texts.kmLabel((gender, pos))">
+                <input type="text" id="@{gender + pos.toString}Label" name="@{gender + pos.toString}Label" value="@if(texts.kmLabel((gender, pos)).isEmpty){@Messages("campaignMgmt.frontPage.label.default."+gender+"."+pos)} else{@texts.kmLabel((gender, pos))}">
                 </td>}
               </tr>
             }
