@@ -2,7 +2,7 @@ package dataaccess
 
 import javax.inject.Inject
 import models._
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
@@ -25,6 +25,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   private val texts = TableQuery[CampaignTextTable]
   private val camGroups = TableQuery[RelevantGroupTable]
   private val users = TableQuery[UserTable]
+  private val kms = TableQuery[KnessetMemberTable]
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
   
@@ -230,5 +231,14 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
                .groupBy( _._1 ) // camp.id=>Seq[(camp.id, admin.name, admin.email)]
                .map( kv => (kv._1, kv._2.map(t=>(t._2, t._3))))
     )
+  }
+
+  def initialCampaignPositions(camId:Long) = {
+    for {
+      kmsSeq <- db.run(kms.result).map(_.map(_.id))
+    } yield {
+      val toInsert = kmsSeq.map(id => KmPosition(id, camId, Position.Undecided))
+      db.run((positions ++= toInsert))
+    }
   }
 }
