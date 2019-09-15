@@ -62,7 +62,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
           kmPosition <- campaigns.getPosition(camp.id, kmId)
           effPosition = kmPosition.map( _.position).getOrElse(Position.Undecided)
           kmContact  <- kms.getContactOptions(kmId).map( _.filter( _.platformObj.isDefined)
-            .groupBy(_.platformObj).map(e=>(e._1.get,e._2.head)))
+            .groupBy(_.platformObj).map(e=>(e._1.get,e._2)))
           imagePrefix = conf.get[String]("hearUs.files.mkImages.url")
           bkgPrefix = conf.get[String]("hearUs.files.campaignImages.url")
           kmImageOpt <- images.getImageForKm(kmId)
@@ -73,11 +73,11 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
         } yield {
           kmOpt match {
             case Some(km) => {
-              val twitterHandleOpt = kmContact.get(Platform.Twitter)
-              val messages = cannedMessages.map(kv=>(kv._1, kv._2.process(km,twitterHandleOpt.map(_.details))))
+//              val twitterHandleOpt = kmContact.get(Platform.Twitter)
+//              val messages = cannedMessages.map(kv=>(kv._1, kv._2.process(km,twitterHandleOpt.map(_.details))))
               Ok(views.html.campaignPublic.campaignKMPage(camp, campaignImage, texts.get, km, party,
                 effPosition, kmImageUrl, kmImageCredit, actions,
-                kmContact -- Set(Platform.Phone, Platform.Fax), messages ))
+                kmContact -- Set(Platform.Phone, Platform.Fax), cannedMessages ))
             }
             case None => NotFound( views.html.errorPage(404, messagesApi.preferred(req)("errors.campaignNotFound")))
           }
