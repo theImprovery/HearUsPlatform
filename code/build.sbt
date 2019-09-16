@@ -33,7 +33,8 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "polyglot" % "2.2.2",
   "org.webjars" % "sweetalert" % "2.1.0",
   "org.webjars" % "requirejs" % "2.3.6",
-  "org.webjars" % "bootstrap" % "4.3.1"
+  "org.webjars" % "bootstrap" % "4.3.1",
+  "org.webjars.bower" % "hopscotch" % "0.3.1"
 )
 
 // TODO add sections and table helpers
