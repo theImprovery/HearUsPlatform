@@ -250,6 +250,7 @@ campaigns.slug=שורת סדר (slug)
 campaigns.slug.new=בחר כתובת חדשה
 campaigns.slug.help=התווים האחרונים של כתובת אתר הקמפיין. חייבים להיות ייחודיים לקמפיין זה. כמו כן, עדיף לא לשנות ערך זה אחרי שמתפרסמים לינקים חיצוניים לאתר זה, כיוון שאז לינקים אלו יפסיקו לעבוד.
 campaigns.title=שם הקמפיין
+campaigns.status=סטטוס הקמפיין
 campaigns.title.help=שם הקמפיין, מופיע בכותרת הדף וברשימות
 campaigns.analyticsCode=קוד איסוף סטטיסטיקה
 campaigns.analyticsCode.help=משמש לצורך איסוף סטטיסטיקות על המשתמשים באתר. ניתן לקבל קוד כזה משירותים שאוספים סטטיסטיקה כזו, כדוגמת Google Analytics או matomo.org. יש להכניס את הקוד בשלמותו, כולל תגיות ה-<script>.
