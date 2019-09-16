@@ -18,7 +18,6 @@ import play.api.mvc.{Action, Call, ControllerComponents, InjectedController, Res
 import security.HearUsSubject
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Random, Success}
 

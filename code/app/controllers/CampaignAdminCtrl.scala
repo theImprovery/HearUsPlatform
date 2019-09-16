@@ -7,19 +7,12 @@ import javax.inject.Inject
 import models._
 import play.api.{Configuration, Logger}
 import play.api.i18n.{Langs, MessagesApi, MessagesImpl, MessagesProvider}
-import play.api.libs.json.{JsError, JsObject, Json}
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, ControllerComponents, InjectedController, Result}
+import play.api.mvc.{ControllerComponents, InjectedController, Result}
 import dataaccess.JSONFormats._
-import play.api.data.Form
-import play.api.data.Forms.number
 import security.HearUsSubject
-import play.api.data.Forms._
-import sun.net.www.protocol.http.AuthenticationHeader
-
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
 
 class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                   users:UserDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,

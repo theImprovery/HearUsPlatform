@@ -1,14 +1,6 @@
 package controllers
 
-import java.awt
-import java.awt.RenderingHints
-import java.awt.geom.AffineTransform
-import java.awt.image.{BufferedImage, ByteLookupTable, LookupOp}
-import java.io.{ByteArrayOutputStream, IOException}
-import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{CopyOption, Files, Path, Paths, StandardCopyOption}
-import java.sql.Timestamp
-import java.util.Calendar
 
 import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
 import javax.inject.Inject
@@ -21,13 +13,10 @@ import play.api.i18n._
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{ControllerComponents, InjectedController}
 import dataaccess.JSONFormats._
-import javax.imageio.ImageIO
 import play.api.libs.ws.WSClient
 
 import scala.collection.JavaConversions._
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 case class GroupData(id:Long, name:String, knessetKey:Long, kmsIds:String)
 
