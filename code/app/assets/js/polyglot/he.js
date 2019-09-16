@@ -82,6 +82,10 @@ polyglot.extend({
         "front_page":"מעדכן את העמוד הראשי",
         "messages":"מעדכן מסרים",
         "position":"העמדה שונתה",
+        "group":{
+            "add":"הועדה הוספה",
+            "remove":"הועדה הורדה"
+        },
         "party":"מעדכן מפלגה",
         "success":"העדכון הצליח",
         "failed":"העדכון נכשל",

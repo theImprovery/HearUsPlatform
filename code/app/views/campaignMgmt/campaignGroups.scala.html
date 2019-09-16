@@ -1,14 +1,8 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaign:Campaign, groups:Seq[KmGroupDN], currentUser:User)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+@(campaign:Campaign, campaignGroups:Seq[KmGroupDN], currentUser:User, allGroups:Seq[KmGroupDN])(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
 
 @scripts = {
   <script src="@routes.Assets.versioned("/js/campaignEditor/campaignGroups.js")"></script>
-  <script >
-          const groupsIds = [@Html(groups.map(_.id).mkString(","))];
-          const campaignId = @campaign.id;
-          const csrfValue="@helper.CSRF.getToken.value";
-          const csrfName="@helper.CSRF.getToken.name";
-  </script>
 }
 
 @templates.campaignNavbar(if(campaign.title == "") {Messages("navbar.campaigns.new")} else {campaign.title},
@@ -21,57 +15,31 @@
       </div>
     </div>
   </div>
-
   <div class="row">
     <div class="col">
-      <h3>@Messages("campaignMgmt.groups.part")</h3>
-      <table class="table table-sm table-striped" id="groupTable">
-        <thead>
-          <tr>
-            <th>@Messages("groupName")</th>
-          </tr>
-        </thead>
-        <tbody>
-        @for( group <- groups ) {
-          <tr>
-            <td>
-              <a href="@routes.KnessetMemberCtrl.showEditGroup(group.id)">@group.name</a>
-              <button onclick='removeFromCampaign(@group.id, "@group.name")' class="btn btn-sm btn-outline-danger">@Messages("campaignMgmt.groups.removeFromCampaign")</button>
-            </td>
-          </tr>
-        }
-        </tbody>
-      </table>
+      <input type="hidden" name="id" id="id" value="@campaign.id">
+      <label for="searchStr">@Messages("search")</label>
+      <input type="text" placeholder="@Messages("campaignMgmt.groups.groupSearch.placeholder")" id="searchStr" onkeyup="filterGroupsList(this.value)">
     </div>
-
+  </div>
+  <div class="row">
     <div class="col">
-      <h3>@Messages("campaignMgmt.groups.add")</h3>
-      <div class="form-row row mb-2">
-        <label for="groupSearchField" class="col-sm-4 col-form-label">@Messages("campaignMgmt.groups.groupSearch")</label>
-        <div class="col-sm-8">
-          <div class="input-group">
-            <input type="text" onchange="searchGroups(this.value)" class="form-control" name="groupSearchField" id="groupSearchField" placeholder="@Messages("campaignMgmt.groups.groupSearch.placeholder")">
-            <div class="input-group-append">
-              <button onclick="searchGroups(document.getElementById('groupSearchField').value)" class="btn btn-primary"><i class="fa fa-search"></i> </button>
+      <div style="text-align: center; font-size:4px"><span id="groupListCenter">&nbsp;</span></div>
+      <ul id="groupsList" style="list-style-type:none">
+      @for(group <- allGroups) {
+        <li data-group-name="@group.name.replaceAll("'", "%").replaceAll("\"", "@")">
+          <div class="row">
+            <div class="col">
+              <label for="name">@group.name</label>
+            </div>
+            <div class="col custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="@group.id" @if(campaignGroups.contains(group)){checked} onchange="changeGroup(this)">
+                <label class="custom-control-label" for="@group.id"></label>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div id="noResults" class="noData py-5">
-          @Messages("errors.noGroupsFound")
-          </div>
-            <div id="groupsListCtnr">
-            <ul id="groupsList">
-              <li class="py-1" id="groupTemplate"><em>Name</em>
-                <button type="button" class="btn btn-xs btn-outline-secondary" onclick="addGroup(this)"><i class="fa fa-plus-circle"></i> @Messages("addGroup")</button>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+        </li>
+      }
+      </ul>
     </div>
-
-</div>
+  </div>
 }

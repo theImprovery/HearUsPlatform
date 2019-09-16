@@ -509,78 +509,47 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id) {
       for {
         campaign <- campaigns.getCampaign(id)
-          groups <- groups.getGroupsForCampaign(id)
+        campaignGroups <- groups.getGroupsForCampaign(id)
+        allGroups <- groups.allGroupsDN(None)
       } yield campaign match{
         case None => NotFound("Can't find campaign")
         case Some(c) => {
           val curUser = req.subject.get.asInstanceOf[HearUsSubject].user
-          Ok( views.html.campaignMgmt.campaignGroups(c, groups, curUser )
+          Ok( views.html.campaignMgmt.campaignGroups(c, campaignGroups, curUser, allGroups )
           )
         }
       }
     }
   }
 
-
-  def getGroups(searchStr:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
-    val sqlSearch = "%"+searchStr.trim+"%"
-    groups.allGroupsDN(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans)))
-  }
-
-  val groupIdForm = Form( single(
-    "groupId" -> longNumber
-  ))
-
-  def doAddGroupToCampaign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
-    campaignEditorAction(id) {
-      groupIdForm.bindFromRequest().fold(
-        fwe => {
-          Logger.warn( fwe.errors.mkString("\n") )
-          Future(BadRequest("Error"))
-        },
-        groupId => {
-          for {
-            groupOpt <- groups.getGroupDN(groupId)
-            added <- if (groupOpt.isDefined)
-              groups.addGroupToCampaign(RelevantGroup(id, groupId)).map(_ => true)
-            else Future(false)
-          } yield {
-            if (added) {
-              Redirect(routes.CampaignMgrCtrl.showCampaignGroups(id)).flashing(
-                FlashKeys.MESSAGE -> Informational(InformationalLevel.Success,
-                  Messages("campaignMgmt.groups.groupAdded", groupOpt.get.name)).encoded)
-            } else {
-              NotFound("Can't find group " + groupId)
-            }
-          }
+  def removeGroupFromCamp = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
+    req.body.validate[RelevantGroup].fold(
+      errors => {
+        Logger.info("errors " + errors.mkString("\n"))
+        Future(BadRequest("can't remove group"))
+      },
+      relGroup => {
+        campaignEditorAction(relGroup.camId){
+          groups.removeGroupFromCamp(relGroup.camId, relGroup.groupId).map(ans => Ok(Json.toJson(ans)))
         }
-      )
-    }
+      }
+    )
   }
 
-  def doRemoveGroupFromCampaign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(cc.parsers.tolerantJson) { implicit req =>
-    campaignEditorAction(id) {
-      req.body.validate[JsObject].fold(
-        fwe => {
-          Logger.warn( fwe.mkString("\n") )
-          Future(BadRequest("Error"))
-        },
-        json => {
-          val groupId = json("groupId").as[Long]
-          for {
-            groupOpt <- groups.getGroupDN(groupId)
-          } yield groupOpt match {
-            case None => NotFound("Can't find group " + groupId)
-            case Some(group) => {
-              groups.removeGroupFromCamp(id, groupId)
-              Ok("").flashing(
-                FlashKeys.MESSAGE->Informational(InformationalLevel.Success, Messages("campaignMgmt.groups.groupRemoved")).encoded)
-            }
-          }
-        })
-    }
+  def addGroupToCamp = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
+    req.body.validate[RelevantGroup].fold(
+      errors => {
+        Logger.info("errors " + errors.mkString("\n"))
+        Future(BadRequest("can't remove group"))
+      },
+      relGroup => {
+        campaignEditorAction(relGroup.camId){
+          groups.addGroupToCampaign(relGroup).map(ans => Ok(Json.toJson(ans)))
+        }
+      }
+    )
   }
-  
+
   val designForm = Form( tuple(
     "css"->text,
     "imageCredit"->text
