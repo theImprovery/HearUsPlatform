@@ -35,7 +35,7 @@ function filterGroupsList(searchStr) {
     searchStr = searchStr.replace(/״/g, "@");
     allGroups.find("li").each(function(idx, emt ) {
         if((emt.dataset.groupName.indexOf(searchStr) !== -1)) {
-            emt.style.display = "block";
+            emt.style.display = "flex";
         } else emt.style.display = "none";
     });
 }

@@ -5,6 +5,7 @@
   <script src="@routes.Assets.versioned("/js/campaignEditor/campaignGroups.js")"></script>
 }
 
+
 @templates.campaignNavbar(if(campaign.title == "") {Messages("navbar.campaigns.new")} else {campaign.title},
   views.Structure.campaignEditorItems(campaign), views.CampaignEditorSections.CampaignGroups, extraBottom = scripts) {
 
@@ -27,16 +28,12 @@
       <div style="text-align: center; font-size:4px"><span id="groupListCenter">&nbsp;</span></div>
       <ul id="groupsList" style="list-style-type:none">
       @for(group <- allGroups) {
-        <li data-group-name="@group.name.replaceAll("'", "%").replaceAll("\"", "@")">
-          <div class="row">
-            <div class="col">
-              <label for="name">@group.name</label>
-            </div>
-            <div class="col custom-control custom-switch">
-              <input type="checkbox" class="custom-control-input" id="@group.id" @if(campaignGroups.contains(group)){checked} onchange="changeGroup(this)">
-                <label class="custom-control-label" for="@group.id"></label>
-            </div>
+        <li class="group" data-group-name="@group.name.replaceAll("'", "%").replaceAll("\"", "@")">
+          <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="@group.id" @if(campaignGroups.contains(group)){checked} onchange="changeGroup(this)">
+              <label class="custom-control-label" for="@group.id"></label>
           </div>
+          <label for="@group.id">@group.name</label>
         </li>
       }
       </ul>

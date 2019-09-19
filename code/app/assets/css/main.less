@@ -252,3 +252,18 @@ input[type=radio]:checked + label.buttonLike.pos-for{
   background-color: #080;
   color: #0F0;
 }
+
+
+li.group {
+  display: flex;
+  flex-direction: row;
+  .custom-control {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+  label {
+    padding-right: 1em;
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+}
