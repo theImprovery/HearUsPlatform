@@ -37,7 +37,7 @@ object Informational {
     }
   }
    def defaultTimes = Map(InformationalLevel.Success -> 2000,
-     InformationalLevel.Info -> 1700,
+     InformationalLevel.Info -> 2000,
      InformationalLevel.Warning -> 3000,
      InformationalLevel.Danger ->10000
    )

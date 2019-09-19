@@ -86,7 +86,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   )
 
   val emailForm = Form(mapping(
-    "email" -> text
+    "email" -> email
     )(ForgotPassFormData.apply)(ForgotPassFormData.unapply)
   )
 
@@ -394,7 +394,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   def doForgotPassword = Action.async{ implicit req =>
     emailForm.bindFromRequest().fold(
-      fwi => Future(BadRequest(views.html.users.forgotPassword(None,Some("Error processing forgot password form")))),
+      fwi => Future(BadRequest(views.html.users.forgotPassword(None,Some(Messages("forgotPassword.formProcessError"))))),
       fd => {
         for {
           userOpt <- users.getUserByEmail(fd.email)
