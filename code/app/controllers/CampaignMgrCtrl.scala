@@ -69,8 +69,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   def createCampaign(title:String) = deadbolt.SubjectPresent()() { implicit req =>
     val userId = req.subject.asInstanceOf[Option[HearUsSubject]].map(hus => hus.user.id).getOrElse(-1L)
     for {
-      campaign <- campaigns.store(Campaign(-1l, title, "", null, "", conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""),
-                "", "", CampaignStatus.WorkInProgress))
+      campaign <- campaigns.store(CampaignFactory.createWithDefaults(title, conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse("")))
       rel <- usersCampaigns.connectUserToCampaign(UserCampaign(userId, campaign.id, isAdmin=true))
       camps <- usersCampaigns.getCampaginsForUser( userId )
       _ <- campaigns.initializeCampaignPositions(campaign.id)

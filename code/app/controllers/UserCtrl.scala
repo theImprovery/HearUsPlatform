@@ -6,7 +6,7 @@ import java.util.UUID
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
 import dataaccess._
 import javax.inject.Inject
-import models.{Campaign, CampaignStatus, Invitation, PasswordResetRequest, User, UserCampaign, UserRole}
+import models.{Campaign, CampaignFactory, CampaignStatus, Invitation, PasswordResetRequest, User, UserCampaign, UserRole}
 import play.api.{Configuration, Logger, cache}
 import play.api.cache.Cached
 import play.api.data._
@@ -283,8 +283,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
               users.tryAddUser(user).flatMap({
                 case Success(user) => {
                   for {
-                    campaign <- campaigns.store(Campaign(-1l, title, "", null, "", conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""),
-                      "", "", CampaignStatus.WorkInProgress))
+                    campaign <- campaigns.store(CampaignFactory.createWithDefaults(title, conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse("")))
                     rel <- usersCampaigns.connectUserToCampaign(UserCampaign(user.id, campaign.id, isAdmin = true))
                     _ <- campaigns.initializeCampaignPositions(campaign.id)
                   } yield {

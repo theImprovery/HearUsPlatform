@@ -31,6 +31,24 @@ case class Campaign( id:Long,
                      status:  CampaignStatus.Value)
 
 
+object CampaignFactory {
+  
+  private val letters = Range('A','Z')++Range('a','z')
+  
+  def makeSlug: String = {
+    var cur = java.lang.System.currentTimeMillis()
+    var out = collection.mutable.Buffer[Char]()
+    while ( cur > 0 ){
+      out += letters((cur % 32).toInt).toChar
+      cur = cur >> 5
+    }
+    out.mkString
+  }
+  
+  
+  def createWithDefaults(title:String, design:String) = Campaign(-1L, title, "", Some(makeSlug), "", design, "", "", CampaignStatus.WorkInProgress )
+}
+
 /** Subset of `Campaign`, when there's no need to transfer
   * the entire object over app boundaries/network.
   *
