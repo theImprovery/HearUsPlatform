@@ -38,8 +38,9 @@ navbar.campaigns.mgmt.CampaignGroups=ועדות רלוונטיות
 
 admin.campaign-table.title=קמפיינים במערכת
 
-forgotPassword.emailNotFound=Sorry, there is no user with this email in this system.
-forgotPassword.emailSent=An email with instructions of how to reset your password has been send to {0}.
+forgotPassword.title=איפוס סיסמה
+forgotPassword.emailNotFound=מצטערים, לא מצאנו את האימייל הזה במערכת שלנו.
+forgotPassword.emailSent=אימייל איפוס סיסמה נשלח ל-{0}. אם אתם לא מוצאים אותו שם, חפשו בתיקיית הספאם.
 
 inviteEmail.title=Invitation to Open an Account at HearUs
 inviteEmail.body=You have been invited to open an account at hear-us, a new direct campaign platform. To sign up, click the link below.\n{0}
@@ -57,8 +58,6 @@ index.title.hear=תשמעו
 index.title.us=אותנו
 index.slogan=מבית התנועה לזכויות דיגיטליות. ההשקה בקרוב. הם עוד ישמעו אותנו.
 index.note=בשביל לפתוח קמפיין חדש יש להכנס למערכת או להרשם (ההרשמה חינם!)
-
-forgotPassword.title=איפוס סיסמה
 
 passwordReset.requestNotFound=בקשת איפוס סיסמה לא נמצאה
 passwordReset.requestExpired=בקשת איפוס סיסמה פגת תוקף

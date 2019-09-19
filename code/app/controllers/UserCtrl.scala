@@ -40,7 +40,7 @@ case class ResetPassFormData ( password1:String, password2:String, uuid:String)
 case class ChangePassFormData ( previousPassword:String, password1:String, password2:String)
 
 /**
-  * Contoller for user-related actions (login, account mgmt...)
+  * Controller for user-related actions (login, account mgmt...)
   * @param deadbolt
   * @param conf
   * @param cached
@@ -103,8 +103,6 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     "password2" -> text
     )(ChangePassFormData.apply)(ChangePassFormData.unapply)
   )
-
-
   
   def showLogin = Action { implicit req =>
     Ok( views.html.users.login(loginForm) )
