@@ -12,7 +12,9 @@ GET     /campaigns/:slug/KnessetMembers/:kmId          controllers.CampaignPubli
 GET     /-x-                      controllers.HomeCtrl.notImplYet
 
 GET     /signup                      controllers.UserCtrl.showSignupPage
+GET     /signup/campaign             controllers.UserCtrl.showSignupPageForNewCamp(title:String)
 POST    /signup                      controllers.UserCtrl.doSignup
+POST    /signup/campaign             controllers.UserCtrl.doSignupForNewCamp(title:String)
 
 # back office
 GET     /bkofc/                      controllers.UserCtrl.userHome
@@ -54,7 +56,7 @@ POST    /bkofc/api/km/update          controllers.ParseCtrl.apiKms
 POST    /bkofc/api/committee/update   controllers.ParseCtrl.apiUpdateCommittees
 
 GET     /bkofc/campainers/:name       controllers.CampaignAdminCtrl.getCampaigners(name:String)
-GET     /bkofc/campaigns/new              controllers.CampaignMgrCtrl.createCampaign
+POST    /bkofc/campaigns/:title/new              controllers.CampaignMgrCtrl.createCampaign(title:String)
 POST    /bkofc/campaigns/                 controllers.CampaignMgrCtrl.saveCampaign
 GET     /bkofc/campaigns                  controllers.CampaignAdminCtrl.showCampaigns
 PATCH   /bkofc/campaigns/sm/              controllers.CampaignMgrCtrl.updateSocialMedia
@@ -84,7 +86,7 @@ PATCH   /bkofc/campaigns/labels/          controllers.CampaignMgrCtrl.updateLabe
 PATCH   /bkofc/campaigns/updatePublish    controllers.CampaignStatusCtrl.updateStatus
 PATCH   /bkofc/campaigns/changeRequestStatus/:id/:status    controllers.CampaignStatusCtrl.changeRequestStatus(id:Long, status:Int)
 
-GET     /bkofc/campaigns/:id/details/      controllers.CampaignMgrCtrl.details(id:Long)
+GET     /bkofc/campaigns/:id/details/      controllers.CampaignMgrCtrl.details(id:Long, tour:Boolean)
 GET     /bkofc/campaigns/:id/positions/    controllers.CampaignMgrCtrl.positions(id:Long)
 
 GET     /bkofc/campaigns/:id/design/      controllers.CampaignMgrCtrl.showCampaignDesign(id:Long)

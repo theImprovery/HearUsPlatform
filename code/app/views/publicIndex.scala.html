@@ -15,7 +15,8 @@
           </div>
           <div class="text-center">
             <a class="btn btn-outline-info" href="@routes.UserCtrl.showLogin" style="margin-left: 2em">@Messages("login") </a>
-            <a class="btn btn-outline-info" href="@routes.UserCtrl.showSignupPage">@Messages("signup")</a>
+            <a class="btn btn-outline-info" href="@routes.UserCtrl.showSignupPage" style="margin-left: 2em">@Messages("signup")</a>
+            <button class="btn btn-outline-info" onclick="chooseTitleForCampaign('feRoutes')">@Messages("startNewCampaign")</button>
           </div>
 
           <p class="my-4 text-center">@Messages("index.note")</p>

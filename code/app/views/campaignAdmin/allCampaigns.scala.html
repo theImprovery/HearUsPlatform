@@ -12,7 +12,7 @@
 
 @templates.backEndBase("campaigns", BackOfficeSections.ManageSystemCampaigns, head, bottom) {
   @comps.pageTitleRow(Messages("admin.campaign-table.title")){
-    <a class="btn btn-outline-primary" href="@routes.CampaignMgrCtrl.createCampaign()"><i class="fa fa-plus-circle"></i> @Messages("campaigns.createNew")</a>
+    <button class="btn btn-outline-primary" onclick="chooseTitleForCampaign('beRoutes')"><i class="fa fa-plus-circle"></i> @Messages("campaigns.createNew")</button>
   }
 
   <div class="row">
@@ -20,7 +20,7 @@
       @if( campaigns.isEmpty ) {
         <div class="noData">
           @Messages("campaigns.noCampaignsInSystem") <br>
-          <a href="@routes.CampaignMgrCtrl.createCampaign()">@Messages("campaigns.createNew")</a>
+          <button onclick="chooseTitleForCampaign('beRoutes')" class="linkLike">@Messages("campaigns.createNew")</button>
         </div>
       } else {
         <table class="table table-striped">
