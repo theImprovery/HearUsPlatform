@@ -54,7 +54,9 @@ class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached,
       Ok(
         routing.JavaScriptReverseRouter("feRoutes")(
           routes.javascript.HomeCtrl.apiSayHi,
-          routes.javascript.UserCtrl.showSignupPage
+          routes.javascript.UserCtrl.showSignupPage,
+          routes.javascript.CampaignMgrCtrl.createCampaign,
+          routes.javascript.UserCtrl.showSignupPageForNewCamp
         )).as("text/javascript")
   }
   

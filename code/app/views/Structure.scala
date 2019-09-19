@@ -3,6 +3,7 @@ package views
 import controllers.routes
 import models.Campaign
 import play.api.mvc.Call
+import play.twirl.api.Html
 
 /*
 This file contains classes and data structures that describe the site structure (or structure*s*, in case
@@ -12,6 +13,7 @@ there are a few sections).
 abstract sealed class SectionItem
 case class PageSectionItem(title:String, call:Call) extends SectionItem
 case object SeparatorSectionItem extends SectionItem
+case class JsSectionItem(title:String, html:Html) extends SectionItem
 
 abstract sealed class TopSiteSection[T]{
   def id:T
@@ -71,7 +73,7 @@ object Structure {
     )),
     MultiPageSection("navbar.campaigns", BackOfficeSections.ManageSystemCampaigns, Seq(
       PageSectionItem("navbar.campaigns.list", routes.CampaignAdminCtrl.showCampaigns() ),
-      PageSectionItem("navbar.campaigns.new", routes.CampaignMgrCtrl.createCampaign() )
+      JsSectionItem("navbar.campaigns.new", Html("chooseTitleForCampaign('beRoutes')") )
     )),
     MultiPageSection("navbar.users.title", BackOfficeSections.Users, Seq(
       PageSectionItem("navbar.users.invite", routes.UserCtrl.showInviteUser()),
@@ -85,7 +87,7 @@ object Structure {
   )
 
   def campaignEditorItems(campaign:Campaign):Seq[TopSiteSection[CampaignEditorSections.Value]] = Seq(
-    PageSection("navbar.campaigns.mgmt.details",   CampaignEditorSections.Details, routes.CampaignMgrCtrl.details(campaign.id)),
+    PageSection("navbar.campaigns.mgmt.details",   CampaignEditorSections.Details, routes.CampaignMgrCtrl.details(campaign.id, false)),
     PageSection("navbar.campaigns.mgmt.messages",  CampaignEditorSections.Messages, routes.CampaignMgrCtrl.editMessages(campaign.id)),
 //    PageSection("navbar.campaigns.mgmt.frontPage", CampaignEditorSections.FrontPage, routes.CampaignMgrCtrl.showFrontPageEditor(campaign.id)),
     PageSection("navbar.campaigns.mgmt.design",    CampaignEditorSections.Design, routes.CampaignMgrCtrl.showCampaignDesign(campaign.id)),

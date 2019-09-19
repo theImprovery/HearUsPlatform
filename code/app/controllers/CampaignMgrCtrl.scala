@@ -66,17 +66,16 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     )
   }
 
-  def createCampaign = deadbolt.SubjectPresent()() { implicit req =>
+  def createCampaign(title:String) = deadbolt.SubjectPresent()() { implicit req =>
     val userId = req.subject.asInstanceOf[Option[HearUsSubject]].map(hus => hus.user.id).getOrElse(-1L)
     for {
-      campaign <- campaigns.store(Campaign(-1l, "", "", null, "", conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""),
+      campaign <- campaigns.store(Campaign(-1l, title, "", null, "", conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""),
                 "", "", CampaignStatus.WorkInProgress))
       rel <- usersCampaigns.connectUserToCampaign(UserCampaign(userId, campaign.id, isAdmin=true))
       camps <- usersCampaigns.getCampaginsForUser( userId )
-      _ <- campaigns.initialCampaignPositions(campaign.id)
+      _ <- campaigns.initializeCampaignPositions(campaign.id)
     } yield {
-      Ok(views.html.campaignMgmt.details(campaign, true))
-
+      Redirect(routes.CampaignMgrCtrl.details(campaign.id, true))
     }
   }
 
@@ -126,12 +125,11 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
 
   }
 
-
-  def details(id:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+  def details(id:Long, tour:Boolean) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     campaignEditorAction(id){
       for {
         campaignOpt <- campaigns.getCampaign(id)
-      } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c, false))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
+      } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c, tour))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
     }
   }
 
