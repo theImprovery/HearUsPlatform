@@ -64,6 +64,7 @@ passwordReset.requestNotFound=בקשת איפוס סיסמה לא נמצאה
 passwordReset.requestExpired=בקשת איפוס סיסמה פגת תוקף
 passwordReset.validationFailed=על הסיסמאות להיות זהות, ולהכיל כמה תווים
 passwordReset.success=הסיסמה עודכנה בהצלחה
+passwordReset.title=שנה סיסמה
 password.changed=הסיסמה עודכנה בהצלחה
 
 signup.title=Sign up for an account at a PSPS Server
@@ -161,6 +162,7 @@ add=הוספה
 addUser=צירוף לצוות
 cancel=ביטול
 back=חזור
+change=שנה
 delete=מחיקה
 details=פרטים
 settings=הגדרות
