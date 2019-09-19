@@ -19,9 +19,22 @@ body {
   direction: rtl;
 }
 
+footer {
+  background-color: #000;
+  border-top-color: #888;
+  color: #DDD;
+  a {
+    color: #FFA;
+  }
+}
+
+.btn {
+  font-family: Alef, Verdana, "Lucida Grande", "Arian Heberw", sans-serif;
+}
+
 @btn-round-edge: 4em;
 .btn-round {
-  border: 1px solid currentColor;
+  border: 2px solid white;
   border-radius: @btn-round-edge/2;
   width: @btn-round-edge;
   height: @btn-round-edge;
@@ -30,8 +43,10 @@ body {
   line-height: @btn-round-edge;
   i.fa {
     text-align: center;
+    color: white;
   }
 }
+
 
 @media(min-width: 768px) {
   header {
@@ -92,6 +107,10 @@ ul.socialLinks {
     font-size: 2em;
     a {
       display: inline-block;
+      color: #EEE;
+      &:hover {
+        text-shadow: 0 0 8px #FF0;
+      }
     }
   }
 }
@@ -229,12 +248,13 @@ ul.km-list {
     position: relative;
     box-shadow: 0 4px 4px rgba(0,0,0,.5);
     width: auto;
-    border: 1px solid black;
+    border: 1px solid white;
     margin: 0;
     padding: .3em;
     transition: background-color 0.5s;
     border-radius: 0;
     border-left: none;
+    color: white;
 
     &:first-child {
       border-radius: 0 5px 5px 0;
@@ -247,8 +267,7 @@ ul.km-list {
 
     &:hover {
       box-shadow: 0 0 8px white inset;
-      border-color: currentColor;
-
+      color: #FFFFAA;
       span.badge {
         box-shadow: 0 0 8px white;
       }
@@ -360,4 +379,21 @@ a.poweredBy {
 
 .btn-sm {
   padding: .25rem .5rem
+}
+
+#mainNav.navbar-shrink {
+  background-color: #333;
+  a.nav-link {
+    color: #BBB;
+  }
+  a.nav-link.active {
+    color: #EEE;
+  }
+  a.navbar-brand {
+    color: #EFE;
+  }
+}
+
+#noMksFound {
+  padding: 3em 0;
 }

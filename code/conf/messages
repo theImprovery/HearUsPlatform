@@ -388,6 +388,7 @@ public.kmPage.openInLocalMail=לפתיחה בתוכנת אימייל
 public.kmPage.actions=פעולות של ח״כ
 public.contactUs=צרו קשר
 public.mainSite=לעמוד הרשמי
+public.createdWith=נוצר בעזרת 
 
 answer=תשובה
 signup.wrongAnswer=המילה לא מתאימה

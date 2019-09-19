@@ -60,7 +60,7 @@
 
   <header id="page-top">
     <div class="container">
-      <div class="row">
+      <div class="row my-5">
         <div class="col text-center">
           <div class="masthead-x">
             <h1 class="mx-auto">@texts.title</h1>
@@ -83,7 +83,7 @@
 
   <section id="sectionMainText">
     <div class="container">
-      <div class="row">
+      <div class="row my-5">
         <div class="col-lg-8 mx-auto">
           @Html(texts.bodyText)
         </div>
@@ -98,7 +98,7 @@
 
   <section id="sectionKMs" class="text-center">
     <div class="container">
-      <div class="row">
+      <div class="row my-5">
         <div class="col-lg-8 mx-auto">
           <h2>@Messages("public.sections.mks.title")</h2>
           <div>
@@ -107,9 +107,13 @@
               <optgroup label="@Messages("public.filter.menu.parties")">
                 @for( p<-parties ){ <option value="p_@p.id">@p.name</option>}
               </optgroup>
-              <optgroup label="@Messages("public.filter.menu.committees")">
-              @for( c<-committees ){<option value="c_@c.id">@c.name</option>}
-              </optgroup>
+              @if( committees.nonEmpty ) {
+                <optgroup label="@Messages("public.filter.menu.committees")">
+                @for(c <- committees) {
+                  <option value="c_@c.id">@c.name</option>
+                }
+                </optgroup>
+              }
             </select>
             <br />
             <div id="filterButtons" class="filter-btns">
@@ -137,7 +141,7 @@
 
   <section id="footerSection" class="text-center">
     <div class="container">
-      <div class="row my-2">
+      <div class="row my-5">
         <div class="col-lg-8 mx-auto">
           @if(campaign.website.trim.nonEmpty){
             <a href="@campaign.website.trim" title="@Messages("public.mainSite")">@texts.footer</a>
@@ -147,9 +151,9 @@
         </div>
       </div>
       @if( campaign.contactEmail.trim.nonEmpty ) {
-        <div class="row my-2">
+        <div class="row my-5">
           <div class="col-lg-8 mx-auto">
-            <button onclick="contactUs()" type="button" class="btn btn-outline-dark btn-sm">@Messages("public.contactUs")</button>
+            <button onclick="contactUs()" type="button" class="btn btn-outline-light btn-sm">@Messages("public.contactUs")</button>
           </div>
         </div>
       }
