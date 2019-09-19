@@ -76,9 +76,8 @@ POST    /bkofc/campaigns/:id/team/nonadmins controllers.CampaignMgrCtrl.doRemove
 POST    /bkofc/campaigns/:id/team/expel     controllers.CampaignMgrCtrl.doRemoveFromTeam(id:Long)
 
 GET     /bkofc/campaigns/:id/groups       controllers.CampaignMgrCtrl.showCampaignGroups(id:Long)
-POST    /bkofc/campaigns/:id/groups       controllers.CampaignMgrCtrl.doAddGroupToCampaign(id:Long)
-DELETE  /bkofc/campaigns/:id/groups       controllers.CampaignMgrCtrl.doRemoveGroupFromCampaign(id:Long)
-GET     /bkofc/groups/                    controllers.CampaignMgrCtrl.getGroups(str:String)
+POST    /bkofc/campaigns/groups       controllers.CampaignMgrCtrl.addGroupToCamp
+DELETE  /bkofc/campaigns/groups       controllers.CampaignMgrCtrl.removeGroupFromCamp
 
 PATCH   /bkofc/campaigns/:id/details/     controllers.CampaignMgrCtrl.updateDetails(id:Long)
 PATCH   /bkofc/campaigns/labels/          controllers.CampaignMgrCtrl.updateLabels

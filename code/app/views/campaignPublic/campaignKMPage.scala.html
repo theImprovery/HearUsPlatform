@@ -43,32 +43,12 @@
 }
 @showAction(act:KmAction)={
 <div class="kmAction">
-  @actionIcon(act.actionType) @if( act.link.trim.nonEmpty ){ <a href="@act.link">@act.title<a>}else{@act.title}
+  @actionIcon(act.actionType) @if( act.link.trim.nonEmpty ){ <a href="@act.link">@act.title</a>}else{@act.title}
   @if( act.details.trim.nonEmpty ){<p class="details">@act.details</p>}
 </div>
 }
 
-@scripts={
-<script>
-@*function updateFbLink() {*@
-@*    let links = document.getElementsByClassName("fbLink");*@
-@*    let here = document.location.href;*@
-@*    Array.prototype.filter.call(links, function(link){*@
-@*      link.href = link.href + encodeURI(here);*@
-@*    });*@
-
-@*}*@
-
-@* if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading"){*@
-@*        updateFbLink();*@
-@*      } else {*@
-@*        document.addEventListener('DOMContentLoaded', updateFbLink);*@
-@*      }*@
-
-@*</script>*@
-}
-
-@templates.publicCampaign(campaign, campaign.title + ": " + km.name, imageOpt, Html(""), scripts){
+@templates.publicCampaign(campaign, campaign.title + ": " + km.name, imageOpt, Html("")){
   <div class="container">
     <div class="row my-2">
       <div class="col">
