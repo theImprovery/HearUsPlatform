@@ -233,7 +233,7 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
     )
   }
 
-  def initialCampaignPositions(camId:Long) = {
+  def initializeCampaignPositions(camId:Long) = {
     for {
       kmsSeq <- db.run(kms.result).map(_.map(_.id))
     } yield {

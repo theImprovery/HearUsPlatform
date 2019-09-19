@@ -6,7 +6,7 @@ import java.util.UUID
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
 import dataaccess._
 import javax.inject.Inject
-import models.{Invitation, PasswordResetRequest, User, UserRole}
+import models.{Campaign, CampaignStatus, Invitation, PasswordResetRequest, User, UserCampaign, UserRole}
 import play.api.{Configuration, Logger, cache}
 import play.api.cache.Cached
 import play.api.data._
@@ -55,7 +55,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
                          users: UserDAO, invitations:InvitationDAO,
                          forgotPasswords:PasswordResetRequestDAO,
                          knesset: KnessetMemberDAO, campaigns:CampaignDAO,
-                         committees: KmGroupDAO,
+                         committees: KmGroupDAO, usersCampaigns:UserCampaignDAO,
                          mailerClient: MailerClient, langs:Langs, messagesApi:MessagesApi) extends InjectedController {
 
   implicit private val ec = cc.executionContext
@@ -163,9 +163,9 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       users.get(userId).map({
         case None => notFound(userId)
         case Some(user) => Ok(
-          views.html.users.userEditor(userForm.fill(UserFormData.of(user)),
+          views.html.users.userEditorBackEnd(userForm.fill(UserFormData.of(user)),
             routes.UserCtrl.doSaveUser(user.username),
-            isNew=false, false))
+            isNew=false, false)(new AuthenticatedRequest(req, None), messagesProvider))
       })
     } else {
       Future( Forbidden("A user cannot edit the profile of another user.") )
@@ -176,7 +176,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     val user = req.subject.get.asInstanceOf[HearUsSubject].user
     if ( userId == user.username ) {
       userForm.bindFromRequest().fold(
-        fwe => Future(BadRequest(views.html.users.userEditor(fwe, routes.UserCtrl.doSaveUser(userId), isNew = false, false))),
+        fwe => Future(BadRequest(views.html.users.userEditorBackEnd(fwe, routes.UserCtrl.doSaveUser(userId), isNew = false, false)(new AuthenticatedRequest(req, None), messagesProvider))),
         fData => {
           for {
             userOpt <- users.get(userId)
@@ -193,21 +193,42 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   }
 
   def showNewUserPage = deadbolt.SubjectPresent()(){ implicit req =>
-    Future(Ok( views.html.users.userEditor(userForm, routes.UserCtrl.doSaveNewUser, true, true) ))
+    Future(Ok( views.html.users.userEditorBackEnd(userForm, routes.UserCtrl.doSaveNewUser, true, true)(new AuthenticatedRequest(req, None), messagesProvider) ))
   }
   
   def doSaveNewUser = deadbolt.SubjectPresent()(){ implicit req =>
     userForm.bindFromRequest().fold(
-      fwe => Future(BadRequest(views.html.users.userEditor(fwe, routes.UserCtrl.doSaveNewUser, isNew=true, true))),
-      fData => processUserForm(fData, routes.UserCtrl.showUserList(None), routes.UserCtrl.doSaveNewUser(), isNew=true )
+      fwe => Future(BadRequest(views.html.users.userEditorBackEnd(fwe, routes.UserCtrl.doSaveNewUser, isNew=true, true)(new AuthenticatedRequest(req, None), messagesProvider))),
+      fData => {
+        processUserForm(fData, req.session.get("answer")).flatMap {
+          case Right(b) => {
+            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""),
+              Set(UserRole.Campaigner),
+              users.hashPassword(fData.pass1.get.trim))
+            users.tryAddUser(user).flatMap({
+              case Success(user) => Future(Redirect(routes.UserCtrl.showUserList(None))//.withNewSession.withSession("userId" -> user.id.toString)
+                .flashing(FlashKeys.MESSAGE -> Informational(InformationalLevel.Success, messagesProvider.messages("account.created")).encoded))
+              case Failure(exp) => Future(BadRequest(views.html.users.userEditorBackEnd(userForm.fill(fData).withGlobalError(exp.getMessage), routes.UserCtrl.doSaveNewUser(), isNew = true, true)(new AuthenticatedRequest(req, None), messagesProvider)))
+            })
+          }
+          case Left(form) => Future(BadRequest(views.html.users.userEditorBackEnd(form, routes.UserCtrl.doSaveNewUser(), isNew = true, true)(new AuthenticatedRequest(req, None), messagesProvider)))
+        }
+      }
     )
   }
   
   def showSignupPage = Action { implicit req =>
     val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
     val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-      Ok( views.html.users.userEditor( userForm, routes.UserCtrl.doSignup, isNew=true, false, randomSentence=randomSentence, randomWord=randomWord
-                                    )(new AuthenticatedRequest(req, None), messagesProvider)).addingToSession("answer"->randomSentence.split("\\s")(randomWord))
+      Ok( views.html.users.userEditorBS( userForm, routes.UserCtrl.doSignup, isNew=true, false, randomSentence=randomSentence, randomWord=randomWord
+                                    )(req, messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
+  }
+
+  def showSignupPageForNewCamp(title:String) = Action { implicit req =>
+    val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
+    val randomWord = Random.nextInt(randomSentence.split("\\s").length)
+      Ok( views.html.users.userEditorBS( userForm, routes.UserCtrl.doSignupForNewCamp(title), isNew=true, false, randomSentence=randomSentence, randomWord=randomWord
+              )(req, messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
   }
   
   def doSignup = Action.async{ implicit req =>
@@ -216,54 +237,101 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
         logger.info(fwe.errors.toString)
         val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
         val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-        Future(BadRequest(views.html.users.userEditor(fwe, routes.UserCtrl.doSignup, isNew=true, false, randomSentence=randomSentence, randomWord=randomWord)(new AuthenticatedRequest(req, None), messagesProvider)).addingToSession("answer"->randomSentence.split("\\s")(randomWord)))
+        Future(BadRequest(views.html.users.userEditorBS(fwe, routes.UserCtrl.doSignup, isNew=true, false,
+          randomSentence=randomSentence, randomWord=randomWord)(req,messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
       },
       fData => {
-          processUserForm( fData, routes.UserCtrl.showLogin, routes.UserCtrl.doSignup, isNew=true, false)(new AuthenticatedRequest(req, None))
+        val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
+        val randomWord = Random.nextInt(randomSentence.split("\\s").length)
+          processUserForm( fData, req.session.get("answer"), false).flatMap {
+            case Right(b) => {
+              val user = User(0, fData.username, fData.name, fData.email.getOrElse(""),
+                Set(UserRole.Campaigner),
+                users.hashPassword(fData.pass1.get.trim))
+              users.tryAddUser(user).map({
+                case Success(user) => Redirect(routes.UserCtrl.userHome()).withNewSession.withSession("userId" -> user.id.toString)
+                  .flashing(FlashKeys.MESSAGE -> Informational(InformationalLevel.Success, messagesProvider.messages("account.created")).encoded)
+                case Failure(exp) => BadRequest(views.html.users.userEditorBS(userForm.fill(fData).withGlobalError(exp.getMessage),
+                  routes.UserCtrl.doSignup(), isNew = true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
+                  .addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
+              })
+            }
+            case Left(form) => Future(BadRequest(views.html.users.userEditorBS(form, routes.UserCtrl.doSignup(),
+              isNew = true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
+              .addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
+          }
+      }
+    )
+  }
+
+  def doSignupForNewCamp(title:String) = Action.async{ implicit req =>
+    val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
+    val randomWord = Random.nextInt(randomSentence.split("\\s").length)
+    userForm.bindFromRequest().fold(
+    fwe => {
+        logger.info(fwe.errors.toString)
+        Future(BadRequest(views.html.users.userEditorBS(fwe, routes.UserCtrl.doSignupForNewCamp(title),
+          isNew=true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
+          .addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
+      },
+      fData => {
+        processUserForm( fData, req.session.get("answer"), false).flatMap {
+          case Right(b) => {
+            val user = User(0, fData.username, fData.name, fData.email.getOrElse(""),
+              Set(UserRole.Campaigner),
+              users.hashPassword(fData.pass1.get.trim))
+              users.tryAddUser(user).flatMap({
+                case Success(user) => {
+                  for {
+                    campaign <- campaigns.store(Campaign(-1l, title, "", null, "", conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""),
+                      "", "", CampaignStatus.WorkInProgress))
+                    rel <- usersCampaigns.connectUserToCampaign(UserCampaign(user.id, campaign.id, isAdmin = true))
+                    _ <- campaigns.initializeCampaignPositions(campaign.id)
+                  } yield {
+                    Redirect(routes.CampaignMgrCtrl.details(campaign.id, true)).withNewSession.withSession("userId" ->user.id.toString)
+                  }
+                }
+                case Failure(exp) => Future(BadRequest(views.html.users.userEditorBS(userForm.fill(fData).withGlobalError(exp.getMessage), routes.UserCtrl.doSignupForNewCamp(title), isNew = true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
+                  .addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
+              })
+          }
+          case Left(form) => {
+            Future(BadRequest(views.html.users.userEditorBS(form, routes.UserCtrl.doSignupForNewCamp(title), isNew = true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
+              .addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
+          }
+        }
       }
     )
   }
   
-  private def processUserForm(fData:UserFormData, onSuccess:Call, onFailure:Call, isNew:Boolean, isInvited:Boolean=true)(implicit req:AuthenticatedRequest[_]):Future[Result] = {
+  private def processUserForm(fData:UserFormData, answer:Option[String], isInvited:Boolean=true):Future[Either[Form[UserFormData], Boolean]] = {
     for {
       usernameExists <- users.usernameExists(fData.username)
       emailExists <- fData.email.map(users.emailExists).getOrElse(Future(false))
       passwordOK = fData.pass1.nonEmpty &&
         fData.pass1.map(_.trim.length).getOrElse(0) > 0 &&
         fData.pass1.map(_.trim) == fData.pass2.map(_.trim)
-      captchaOK = isInvited || (fData.captchaAns == req.session.get("answer"))
+      captchaOK = isInvited || (fData.captchaAns == answer)
       canCreateUser = !usernameExists && !emailExists && passwordOK && captchaOK
-      res <- if (canCreateUser) attemptUserCreation(fData, onSuccess, onFailure)
-      else {
-        var form = userForm.fill(fData)
-        if (emailExists) form = form.withError("email", "error.email.exists")
-        if (usernameExists) form = form.withError("username", "error.username.exists")
-        if (!passwordOK) form = form.withError("password1", "error.password")
-          .withError("password2", "error.password")
-        if (!captchaOK) form = form.withError("answer", "signup.wrongAnswer")
-        val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
-        val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-        Future(BadRequest(views.html.users.userEditor(form, onFailure, isNew = true, isInvited, randomSentence=randomSentence, randomWord=randomWord)).addingToSession("answer"->randomSentence.split("\\s")(randomWord)))
-      }
+      res =
+        if (canCreateUser) Right(true)
+        else {
+          var form = userForm.fill(fData)
+          if (emailExists) form = form.withError("email", "error.email.exists")
+          if (usernameExists) form = form.withError("username", "error.username.exists")
+          if (!passwordOK) form = form.withError("password1", "error.password")
+            .withError("password2", "error.password")
+          if (!captchaOK) form = form.withError("answer", "signup.wrongAnswer")
+          Left(form)
+        }
     } yield res
-  }
-  
-  private def attemptUserCreation( form:UserFormData, onSuccess:Call, onFailure:Call )(implicit req:AuthenticatedRequest[_]): Future[Result] = {
-    val user = User(0, form.username, form.name, form.email.getOrElse(""),
-                  Set(UserRole.Campaigner),
-                  users.hashPassword(form.pass1.get.trim))
-    
-    users.tryAddUser(user).map( {
-      case Success(user) => Redirect(onSuccess).flashing(FlashKeys.MESSAGE->Informational(InformationalLevel.Success, messagesProvider.messages("account.created")).encoded)
-      case Failure(exp) => BadRequest( views.html.users.userEditor(userForm.fill(form).withGlobalError(exp.getMessage), onFailure, isNew=true, false))
-    } )
   }
 
   def showNewUserInvitation(uuid:String) = Action { implicit req =>
     val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
     val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-    Ok( views.html.users.userEditor( userForm.bind(Map("uuid"->uuid)).discardingErrors, routes.UserCtrl.doNewUserInvitation,
-      isNew=true, false, randomSentence=randomSentence, randomWord=randomWord)(new AuthenticatedRequest(req, None), messagesProvider)).addingToSession("answer"->randomSentence.split("\\s")(randomWord))
+    Ok( views.html.users.userEditorBS( userForm.bind(Map("uuid"->uuid)).discardingErrors, routes.UserCtrl.doNewUserInvitation,
+      isNew=true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
   }
 
   def doNewUserInvitation() = Action.async { implicit req =>
@@ -271,8 +339,8 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       fwe => {
         val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
         val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-        Future(BadRequest(views.html.users.userEditor(fwe, routes.UserCtrl.doNewUserInvitation, isNew=true, false, randomSentence=randomSentence, randomWord=randomWord
-                                                     )(new AuthenticatedRequest(req, None), messagesProvider)).addingToSession("answer"->randomSentence.split("\\s")(randomWord)))
+        Future(BadRequest(views.html.users.userEditorBS(fwe, routes.UserCtrl.doNewUserInvitation, isNew=true, false, randomSentence=randomSentence, randomWord=randomWord
+                                                     )(req, messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
       },
       fData => {
         val res = for {
@@ -280,14 +348,14 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
           usernameExists <- users.usernameExists(fData.username)
           emailExists    <- fData.email.map(users.emailExists).getOrElse(Future(false))
           passwordOK     = fData.pass1.nonEmpty && fData.pass1 == fData.pass2
-          captchaOK      = fData.captchaAns != req.session.get("answer")
+          captchaOK      = fData.captchaAns == req.session.get("answer")
           canCreateUser  = uuidExists && !usernameExists && !emailExists && passwordOK && captchaOK
         } yield {
           if (canCreateUser){
             val user = User(0, fData.username, fData.name, fData.email.getOrElse(""), Set(UserRole.Campaigner),
               users.hashPassword(fData.pass1.get))
             invitations.delete(fData.uuid.get)
-            users.addUser(user).map(_ => Redirect(routes.UserCtrl.userHome()).withNewSession.withSession(("userId",user.id.toString)))
+            users.addUser(user).map(nUser => Redirect(routes.UserCtrl.userHome()).withNewSession.withSession("userId"->nUser.id.toString))
 
           }
           else{
@@ -300,8 +368,8 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
             if( !captchaOK ) form = form.withError("answer", "signup.wrongAnswer")
             val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
             val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-            Future(BadRequest(views.html.users.userEditor(form, routes.UserCtrl.doNewUserInvitation, isNew = true, false, randomSentence=randomSentence, randomWord=randomWord
-                                                          )(new AuthenticatedRequest(req, None), messagesProvider)).addingToSession("answer"->randomSentence.split("\\s")(randomWord)))
+            Future(BadRequest(views.html.users.userEditorBS(form, routes.UserCtrl.doNewUserInvitation, isNew = true, false, randomSentence=randomSentence, randomWord=randomWord
+                                                          )(req, messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
           }
         }
         
@@ -361,7 +429,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
           forgotPasswords.deleteForUser(requestId)
           Gone(views.html.errorPage(410, Messages("passwordReset.requestExpired"), None, None)(req, messagesProvider ))
         } else {
-          Ok(views.html.users.passwordReset(prr, None))
+          Ok(views.html.users.passwordReset(prr, None)(req, messagesProvider))
         }
       }
     })
@@ -370,7 +438,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   def doResetPassword() = Action.async{ implicit req =>
     resetPassForm.bindFromRequest().fold(
-      fwi => Future(BadRequest(views.html.users.passwordReset(PasswordResetRequest("","",null), Some("Error processing reset password form")))),
+      fwi => Future(BadRequest(views.html.users.passwordReset(PasswordResetRequest("","",null), Some("Error processing reset password form"))(req, messagesProvider))),
       fd => {
         for {
           prrOpt      <- forgotPasswords.get(fd.uuid)
@@ -382,7 +450,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
           prrOpt match {
             case None => NotFound( views.html.errorPage(404, Messages("passwordReset.requestNotFound"), None, None)(req, messagesProvider ) )
             case Some(prr) => {
-              if ( invalidPass ) BadRequest(views.html.users.passwordReset(prr, Some(Messages("passwordReset.validationFailed"))))
+              if ( invalidPass ) BadRequest(views.html.users.passwordReset(prr, Some(Messages("passwordReset.validationFailed")))(req, messagesProvider))
               else if (reqExpired ) Gone(views.html.errorPage(410, Messages("passwordReset.requestExpired"), None, None)(req, messagesProvider ))
               else {
                 userOpt match {
@@ -394,7 +462,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
                     // we're OK to reset
                     forgotPasswords.deleteForUser(prr.username)
                     users.updatePassword(user, fd.password1)
-                    Redirect(routes.UserCtrl.showLogin()).flashing(FlashKeys.MESSAGE->Messages("passwordReset.success"))
+                    Redirect(routes.UserCtrl.userHome()).withNewSession.withSession(("userId", user.id.toString)).flashing(FlashKeys.MESSAGE->Messages("passwordReset.success"))
                   }
                 }
               }
@@ -469,23 +537,23 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     val user = req.subject.get.asInstanceOf[HearUsSubject].user
     changePassForm.bindFromRequest().fold(
       fwi => {
-        Future(BadRequest(views.html.users.userEditor(userForm, routes.UserCtrl.doSaveNewUser, isNew = false, false)))
+        Future(BadRequest(views.html.users.userEditorBackEnd(userForm, routes.UserCtrl.doSaveNewUser, isNew = false, false)))
       },
       fd => {
         if(users.verifyPassword(user, fd.previousPassword)){
           if (fd.password1.nonEmpty && fd.password1 == fd.password2) {
             users.updatePassword(user, fd.password1).map(_ => {
               val message = Informational(InformationalLevel.Success, Messages("password.changed"))
-              Redirect(routes.UserCtrl.userHome()).flashing(FlashKeys.MESSAGE->message.encoded)
+              Redirect(routes.UserCtrl.userHome()).withNewSession.withSession(("userId",user.id.toString)).flashing(FlashKeys.MESSAGE->message.encoded)
             })
           } else {
             val form = userForm.fill(UserFormData of user).withError("password1", "error.password")
               .withError("password2", "error.password")
-            Future(BadRequest(views.html.users.userEditor(form, routes.UserCtrl.doSaveNewUser, isNew = false, false, activeFirst=false)))
+            Future(BadRequest(views.html.users.userEditorBackEnd(form, routes.UserCtrl.doSaveNewUser, isNew = false, false, activeFirst=false)))
           }
         } else{
           val form = userForm.fill(UserFormData of user).withError("previousPassword", "error.password.incorrect")
-          Future(BadRequest( views.html.users.userEditor(form, routes.UserCtrl.doSaveNewUser, isNew=false, false, activeFirst=false )))
+          Future(BadRequest( views.html.users.userEditorBackEnd(form, routes.UserCtrl.doSaveNewUser, isNew=false, false, activeFirst=false )))
         }
       }
     )

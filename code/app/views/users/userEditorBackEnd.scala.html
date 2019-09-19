@@ -1,0 +1,7 @@
+@import views.BackOfficeSections
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@import Helpers._
+
+@(form:Form[UserFormData], destination:Call, isNew:Boolean, isInvited:Boolean, activeFirst:Boolean=true, randomSentence:String="", randomWord:Int=0)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+
+@templates.backEndBase("Profile Editor", BackOfficeSections.Users )(users.userEditorForm(form, destination, isNew, isInvited, activeFirst, randomSentence, randomWord)(request, msgs))
