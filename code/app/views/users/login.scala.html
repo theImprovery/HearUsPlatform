@@ -28,14 +28,14 @@
   <div class="container">
     <div class="row mt-4">
       <div class="col text-center">
-        <h2>@Messages("application.title")</h2>
-        <h3 class="text-muted">@Messages("application.slogan")</h3>
+        <h1> @Messages("index.title.hear")<strong> @Messages("index.title.us")</strong></h1>
+        <h3 class="text-muted">@Html(Messages("application.slogan"))</h3>
       </div>
     </div>
     <div class="row mt-5 justify-content-md-center">
       <div class="col-md-6">
         <div class="loginCtnr">
-          <h1>@Messages("login.title")</h1>
+          <h2>@Messages("login.title")</h2>
           <form action="@routes.UserCtrl.doLogin" method="POST">
             @helper.CSRF.formField
             @for( m <- form.globalErrors ){

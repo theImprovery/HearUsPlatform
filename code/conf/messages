@@ -1,6 +1,6 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 application.title=תשמעו אותנו
-application.slogan=מערכת קמפיינים ישירים, מבית התנועה לזכויות דיגיטליות
+application.slogan=מערכת קמפיינים ישירים, מבית <a href="https://www.digitalrights.org.il">התנועה לזכויות דיגיטליות</a>
 application.url=http://hear-us.codeworth.io
 
 account.created=החשבון נוצר בהצלחה
