@@ -33,7 +33,7 @@
         <label for="idInput" class="col-sm-2 control-label">@Messages("username")</label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="usernameInput" name="username" value="@form("username").value.getOrElse("")"
-          placeholder="username" @if(!isNew){readonly}>
+          placeholder="username" autocomplete="off" @if(!isNew){readonly}>
           @formErrors(form("username"))
         </div>
       </div>
@@ -43,7 +43,7 @@
             <label for="password1Input" class="col-sm-2 control-label">@Messages("password")</label>
             <div class="col-sm-10">
               <input type="password" class="form-control" id="password1Input" name="password1" value="@form("password1").value.getOrElse("")"
-              placeholder="@Messages("password")">
+              placeholder="@Messages("password")" autocomplete="off">
               @formErrors(form("password1"))
             </div>
           </div>
@@ -51,7 +51,7 @@
             <label for="password2Input" class="col-sm-2 control-label">@Messages("passwordAgain")</label>
             <div class="col-sm-10">
               <input type="password" class="form-control" id="password2Input" name="password2" value="@form("password2").value.getOrElse("")"
-              placeholder="@Messages("password")">
+              placeholder="@Messages("password")" autocomplete="off">
               @formErrors(form("password2"))
             </div>
           </div>
@@ -77,7 +77,9 @@
         </div>
       </div>
 
-        @if(!isInvited){
+        @if( isInvited || randomSentence.trim.isEmpty ){
+          <input type="hidden" value="@form("answer").value.getOrElse("")" name="answer" id="answer">
+        } else {
           <div class="row alert alert-info">
             <div class="col text-right">
               <h6>@Messages("signup.question",Messages("signup.placeOfWord."+randomWord))</h6>
@@ -90,8 +92,6 @@
               @formErrors(form("answer"))
             </div>
           </div>
-        }else{
-          <input type="hidden" value="@form("answer").value.getOrElse("")" name="answer" id="answer">
         }
 
 
@@ -131,7 +131,7 @@
             </div>
           </div>
           @helper.CSRF.formField
-          <div class="form-group">
+          <div class="form-group row">
             <div class="col">
               <div class="text-left">
                 <a class="btn btn-secondary" href="@routes.UserCtrl.userHome()"><i class="fa fa-close"></i> @Messages("cancel")</a>

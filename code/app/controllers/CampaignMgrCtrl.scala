@@ -507,7 +507,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       for {
         campaign <- campaigns.getCampaign(id)
         campaignGroups <- groups.getGroupsForCampaign(id)
-        allGroups <- groups.allGroupsDN(None)
+        allGroups <- groups.allGroupsDN(None).map(_.sortBy(_.name))
       } yield campaign match{
         case None => NotFound("Can't find campaign")
         case Some(c) => {

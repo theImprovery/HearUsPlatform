@@ -1,5 +1,5 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(u:User, mkCount:Int, ptCount:Int, comCount:Int, campaignCount:Int)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(u:User, mkCount:Int, ptCount:Int, comCount:Int, campaignCount:Int, camps:Seq[Campaign])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/userHome.js")"></script>
@@ -9,7 +9,7 @@
     <div class="content">
       <div class="row my-3">
         <div class="col-md-6">
-          <h3>@Messages("userHome.commonActions")</h3>
+          <h3>@Messages("userHome.adminActions")</h3>
           <div class="buttonBox">
             @if(u.roles.contains(UserRole.Admin)){
               <a href="@routes.KnessetMemberCtrl.showKms(None, None, None)" class="btn btn-lg btn-primary">
@@ -19,8 +19,7 @@
                 @Messages("userHome.editParties")
               </a>
 
-              <hr>
-              <a href="@routes.CampaignMgrCtrl.index()" class="btn btn-lg btn-success">
+              <a href="@routes.CampaignAdminCtrl.showCampaigns()" class="btn btn-lg btn-success">
                 @Messages("userHome.editCampaigns")
               </a>
               <button type="button" onclick="updateKmsAndPartes()" class="btn btn-lg btn-danger">
@@ -30,13 +29,14 @@
                 @Messages("committee.api.update")
               </button>
             }
-            <hr>
-            <a href="@routes.UserCtrl.showEditUserPage(u.username)" class="btn btn-lg btn-secondary">
+
+            <a href="@routes.UserCtrl.showEditUserPage()" class="btn btn-lg btn-secondary">
               @Messages("userEditor.title")
             </a>
             <a href="@routes.UserCtrl.showInviteUser()" class="btn btn-lg btn-secondary">
               @Messages("users.inviteUser")
             </a>
+            <button class="btn btn-lg btn-primary" onclick="chooseTitleForCampaign('beRoutes')">@Messages("startNewCampaign")</button>
           </div>
         </div>
         <div class="col-md-6">
@@ -47,6 +47,17 @@
             <li>@Messages("committees"): @comCount</li>
             <li>@Messages("campaigns"): @campaignCount</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="row my-5">
+        <div class="col">
+          <h3>@Messages("navbar.campaigner.myCampaigns")</h3>
+        </div>
+      </div>
+      <div class="row my-3">
+        <div class="col">
+          @comps.campaignerCampaignTable( camps )
         </div>
       </div>
 

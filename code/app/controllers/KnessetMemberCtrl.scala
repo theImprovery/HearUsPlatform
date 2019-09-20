@@ -182,7 +182,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def showGroups = deadbolt.SubjectPresent()() { implicit req =>
     for {
-      groupList <- groups.allGroupsDN(None)
+      groupList <- groups.allGroupsDN(None).map( _.sortBy(_.name))
     } yield {
       Ok(views.html.knesset.groups(groupList))
     }

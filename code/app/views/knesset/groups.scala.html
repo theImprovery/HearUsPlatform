@@ -4,7 +4,7 @@
 
 @templates.backEndBase("Groups", views.BackOfficeSections.Knesset, Html("")) {
   @comps.pageTitleRow(Messages("groups.title"), Messages("groups.subtitle")){
-    <a href="@routes.KnessetMemberCtrl.showNewGroup()" class="btn btn-large btn-default"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
+    <a href="@routes.KnessetMemberCtrl.showNewGroup()" class="btn btn-large btn-outline-secondary"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
   }
 
   <div class="row">

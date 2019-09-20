@@ -101,7 +101,7 @@ users.noPendingInvitations=אין הזמנות ממתינות
 users.pendingInvitations=הזמנות ממתינות
 
 userEditor.title=עריכת פרופיל
-userEditor.new.title=פרטי משתמש
+userEditor.new.title=הצטרפות
 userEditor.updateDetailsTab=פרטים
 userEditor.changePasswordTab=שינוי סיסמה
 userEditor.emailHelpText=כתובת דוא״ל זו משמשת לאיפוס סיסמאות ולמשלוח הודעות מהמערכת
@@ -117,6 +117,7 @@ userHome.statistics=מצב המערכת
 userHome.editKMs=עריכת חברי כנסת
 userHome.editParties=עריכת מפלגות
 userHome.editCampaigns=עריכת קמפיינים
+userHome.adminActions=ניהול
 
 parties.title=מפלגות
 parties.empty=לא רשומות מפלגות כרגע.
@@ -241,7 +242,7 @@ committee.api.update=ייבוא ועדות
 
 campaign.status.WorkInProgress=בהכנה
 campaign.status.PublicationRequested=הוגש לפרסום
-campaign.status.Published=מפורסם
+campaign.status.Published=באוויר
 campaign.status.Rejected=נדחה
 
 campaigns.delete=מחיקת קמפיין

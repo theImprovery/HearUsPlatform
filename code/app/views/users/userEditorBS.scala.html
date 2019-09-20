@@ -5,4 +5,5 @@
 @(form:Form[UserFormData], destination:Call, isNew:Boolean, isInvited:Boolean, activeFirst:Boolean=true, randomSentence:String="", randomWord:Int=0
 )(implicit request: RequestHeader,msgs:MessagesProvider)
 
-@templates.bsBase("New User")(users.userEditorForm(form, destination, isNew, isInvited, activeFirst, randomSentence, randomWord)(request, msgs))
+@templates.bsBase(Messages( if (isNew||isInvited) "userEditor.new.title" else "userEditor.title")
+                 )(users.userEditorForm(form, destination, isNew, isInvited, activeFirst, randomSentence, randomWord)(request, msgs))

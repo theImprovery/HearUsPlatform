@@ -24,8 +24,8 @@ POST    /bkofc/logout                controllers.UserCtrl.doLogout
 GET     /bkofc/users/                controllers.UserCtrl.showUserList(search:Option[String])
 GET     /bkofc/users/new             controllers.UserCtrl.showNewUserPage
 POST    /bkofc/users/                controllers.UserCtrl.doSaveNewUser
-GET     /bkofc/users/:id/edit        controllers.UserCtrl.showEditUserPage(id)
-POST    /bkofc/users/:id/edit        controllers.UserCtrl.doSaveUser(id)
+GET     /bkofc/users/myProfile       controllers.UserCtrl.showEditUserPage()
+POST    /bkofc/users/myProfile       controllers.UserCtrl.doSaveUser()
 GET     /bkofc/forgotPassword        controllers.UserCtrl.showForgotPassword
 POST    /bkofc/forgotPassword        controllers.UserCtrl.doForgotPassword
 GET     /bkofc/resetPassword/:id     controllers.UserCtrl.showResetPassword(id)

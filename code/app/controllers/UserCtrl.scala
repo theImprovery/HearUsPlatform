@@ -136,8 +136,9 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       ptCount <- knesset.countParties
       comCount <- committees.countGroups()
       campaignCount <- campaigns.count
+      camps <- usersCampaigns.getCampaginsForUser(user.id)
     } yield {
-      Ok( views.html.users.userHome(user, mkCount, ptCount, comCount, campaignCount) )
+      Ok( views.html.users.userHome(user, mkCount, ptCount, comCount, campaignCount, camps) )
     }
   }
 
@@ -157,39 +158,31 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   }
 
 
-  def showEditUserPage( userId:String ) = deadbolt.SubjectPresent()(){ implicit req =>
+  def showEditUserPage() = deadbolt.SubjectPresent()(){ implicit req =>
     val user = req.subject.get.asInstanceOf[HearUsSubject].user
-    if ( userId ==  user.username ) {
-      users.get(userId).map({
-        case None => notFound(userId)
-        case Some(user) => Ok(
-          views.html.users.userEditorBackEnd(userForm.fill(UserFormData.of(user)),
-            routes.UserCtrl.doSaveUser(user.username),
-            isNew=false, false)(new AuthenticatedRequest(req, None), messagesProvider))
-      })
-    } else {
-      Future( Forbidden("A user cannot edit the profile of another user.") )
-    }
+    Future(
+      Ok( views.html.users.userEditorBackEnd(userForm.fill(UserFormData.of(user)),
+        routes.UserCtrl.doSaveUser(),
+        isNew=false, isInvited=false))
+    )
   }
 
-  def doSaveUser(userId:String) = deadbolt.SubjectPresent()(){ implicit req =>
+  def doSaveUser() = deadbolt.SubjectPresent()(){ implicit req =>
     val user = req.subject.get.asInstanceOf[HearUsSubject].user
-    if ( userId == user.username ) {
-      userForm.bindFromRequest().fold(
-        fwe => Future(BadRequest(views.html.users.userEditorBackEnd(fwe, routes.UserCtrl.doSaveUser(userId), isNew = false, false)(new AuthenticatedRequest(req, None), messagesProvider))),
-        fData => {
-          for {
-            userOpt <- users.get(userId)
-            _ <- userOpt.map( user => users.updateUser(fData.update(user)) ).getOrElse(Future(()))
-          } yield {
-            userOpt.map(_ => Redirect(routes.UserCtrl.showUserList(None)))
-              .getOrElse(notFound(userId))
+    userForm.bindFromRequest().fold(
+      fwe => Future(BadRequest(views.html.users.userEditorBackEnd(fwe, routes.UserCtrl.doSaveUser(), isNew = false, false)(new AuthenticatedRequest(req, None), messagesProvider))),
+      fData => {
+        for {
+          userOpt <- users.get(user.id)
+          _ <- userOpt.map( user => users.updateUser(fData.update(user)) ).getOrElse(Future(()))
+        } yield {
+          userOpt match {
+            case Some(_) => Redirect(routes.UserCtrl.showUserList(None))
+            case None => notFound(user.id.toString)
           }
         }
-      )
-    } else {
-      Future( Forbidden("A user cannot edit the profile of another user.") )
-    }
+      }
+    )
   }
 
   def showNewUserPage = deadbolt.SubjectPresent()(){ implicit req =>
