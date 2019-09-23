@@ -3,8 +3,7 @@ package controllers
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
 import dataaccess._
 import javax.inject.Inject
-
-import models._
+import models.{CampaignStatus, _}
 import play.api.{Configuration, Logger}
 import play.api.i18n.{Langs, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.libs.json.Json
@@ -12,7 +11,17 @@ import play.api.libs.ws.WSClient
 import play.api.mvc.{ControllerComponents, InjectedController, Result}
 import dataaccess.JSONFormats._
 import security.HearUsSubject
+
 import scala.concurrent.Future
+
+object CampaignAdminCtrl {
+  val statusSortOrder: Map[CampaignStatus.Value, String] = Map(
+    CampaignStatus.PublicationRequested -> "0",
+    CampaignStatus.Published            -> "1",
+    CampaignStatus.WorkInProgress       -> "2",
+    CampaignStatus.Rejected             -> "3"
+  )
+}
 
 class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                   users:UserDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
@@ -24,32 +33,28 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }
-
-
-
+  
   def showCampaigns = deadbolt.SubjectPresent()() { implicit req =>
+    val userId = req.asInstanceOf[AuthenticatedRequest[_]].subject.get.asInstanceOf[HearUsSubject].user.id
     for {
       camps <- campaigns.getAllCampaigns
       contacts <- campaigns.getCampaignContact
-    } yield Ok(views.html.campaignAdmin.allCampaigns(camps.sortBy(_.title), contacts))
+      myCampaignIds <- userCampaigns.getCampaginsForUser(userId).map( _.map(_.id).toSet )
+    } yield Ok(views.html.campaignAdmin.allCampaigns(camps.sortBy(c => CampaignAdminCtrl.statusSortOrder(c.status) + c.title), contacts, myCampaignIds))
   }
 
   def getCampaigners(searchStr:String) = deadbolt.SubjectPresent()() { implicit req =>
     val sqlSearch = "%"+searchStr.trim+"%"
     users.allCampaigners(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans.map(_.dn))))
   }
-
-
   
   def deleteCampaign(id:Long, from:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     for {
       deleted <- campaigns.deleteCampaign(id)
-      camps <- campaigns.getAllCampaigns
-      contacts <- campaigns.getCampaignContact
     } yield {
       val goTo = from match {
-        case "admin" => views.html.campaignAdmin.allCampaigns(camps, contacts)
-        case "campaigner" => views.html.campaignMgmt.index(camps)
+        case "admin" => routes.CampaignAdminCtrl.showCampaigns().url
+        case "campaigner" => routes.CampaignMgrCtrl.index().url
       }
       Ok(goTo).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("campaigns.deleted"))
     }

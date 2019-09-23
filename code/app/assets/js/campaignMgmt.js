@@ -14,7 +14,6 @@ function deleteCampaign(id, from) {
                     return c.CampaignAdminCtrl.deleteCampaign(id, from);}).fetch()
                 .then( function(res){
                     if (res.ok) {
-                        console.log("res", res);
                         window.location.reload();
                     } else {
                         Informationals.makeDanger(polyglot.t("campaign.delete.failed"), polyglot.t("server_logs_details"), 1500).show();
