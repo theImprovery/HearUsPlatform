@@ -4,7 +4,7 @@ import be.objectify.deadbolt.scala.DeadboltActions
 import be.objectify.deadbolt.scala.models.Subject
 import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UserDAO}
 import javax.inject.Inject
-import models.{Campaign, CampaignStatus, CannedMessage, Platform, Position, UserRole}
+import models.{Campaign, CampaignStatus, CannedMessage, ContactOption, Platform, Position, UserRole}
 import play.api.{Configuration, Logger}
 import play.api.i18n.{I18nSupport, Langs, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.libs.ws.WSClient
@@ -73,11 +73,19 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
         } yield {
           kmOpt match {
             case Some(km) => {
-//              val twitterHandleOpt = kmContact.get(Platform.Twitter)
-//              val messages = cannedMessages.map(kv=>(kv._1, kv._2.process(km,twitterHandleOpt.map(_.details))))
+              val twitterHandleOpt = kmContact.get(Platform.Twitter).flatMap(_.headOption).map(_.details)
+              val emailMessageOpt = cannedMessages.get(Platform.Email).map( _.process(km, twitterHandleOpt))
+              val twitterMessageMap = cannedMessages.get(Platform.Twitter) match {
+                case None => Map[ContactOption, String]()
+                case Some( cndMsg ) => {
+                  kmContact.getOrElse(Platform.Twitter, Seq[ContactOption]()).map(hdl =>
+                    ( hdl -> cndMsg.process(km, Some(hdl.details)).text )
+                  ).toMap
+                }
+              }
               Ok(views.html.campaignPublic.campaignKMPage(camp, campaignImage, texts.get, km, party,
                 effPosition, kmImageUrl, kmImageCredit, actions,
-                kmContact -- Set(Platform.Phone, Platform.Fax), cannedMessages ))
+                kmContact -- Set(Platform.Phone, Platform.Fax), emailMessageOpt, twitterMessageMap ))
             }
             case None => NotFound( views.html.errorPage(404, messagesApi.preferred(req)("errors.campaignNotFound")))
           }

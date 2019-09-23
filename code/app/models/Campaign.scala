@@ -94,8 +94,8 @@ case class CannedMessage( camId: Long,
   
   def process(km: KnessetMember, twitterHandle:Option[String]) = {
     val updatedText = text.replaceAll("@name", km.name)
-    
-    copy( text=updatedText.replaceAll("@twitter", twitterHandle.getOrElse(km.name)))
+    val effTwitterHdl = twitterHandle.map(t => t.trim).map( t=> if (t.startsWith("@")) t else "@"+t )
+    copy( text=updatedText.replaceAll("@twitter", effTwitterHdl.getOrElse(km.name)))
   }
 }
 

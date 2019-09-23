@@ -1,6 +1,8 @@
 @(campaign:Campaign, imageOpt:Option[String], texts:CampaignText, km:KnessetMember, party:Option[Party], position:Position.Value,
         imageUrl:String, imageCredit:Option[String],
-        actions:Seq[KmAction], contactOptions:Map[Platform.Value,Seq[ContactOption]], messages:Map[Platform.Value,CannedMessage]
+        actions:Seq[KmAction], contactOptions:Map[Platform.Value,Seq[ContactOption]],
+        emailCndMsgOpt: Option[CannedMessage],
+        twitterCndMsgs:Map[ContactOption, String]
 )(implicit request: RequestHeader, msgs:MessagesProvider)
 
 @platformIcon(platformName:Option[Platform.Value])={
@@ -88,28 +90,29 @@
         <div class="col-md">
           <h2>@Messages("public.kmPage.writeToKm") @km.name</h2>
             <ul class="mkItemList">
-              @for( cos<-contactOptions.get(Platform.Twitter)  ){
-                @for( co <- cos ) {
-                  <li>@platformIcon(co.platformObj) <a href="https://twitter.com/intent/tweet?text=@Html(helper.urlEncode(messages.get(Platform.Twitter).map(_.process(km, Some(co.details))).map(_.text).getOrElse("@"+co.details)))">@Messages("public.kmPage.tweetOnTwitter") - @co.details </a></li>
-                }
+              @for( hdlMsgPair <- twitterCndMsgs  ){
+                <li>@platformIcon(hdlMsgPair._1.platformObj)
+                  @Messages("public.kmPage.tweetOnTwitter")<a target="_blank" href="https://twitter.com/intent/tweet?text=@Html(helper.urlEncode(hdlMsgPair._2))">@@@hdlMsgPair._1.details
+                    @views.Helpers.ifNotEmpty(hdlMsgPair._1.title){t=>(@t)}</a>
+                </li>
               }
               @for( cos<-contactOptions.get(Platform.Facebook)  ){
                 @for( co <- cos ){
                   <li>@platformIcon(co.platformObj) <a class="fbLink" href="https://www.facebook.com/@co.details">@Messages("public.kmPage.openOnFacebook", co.details)</a></li>
                 }
               }
-              @for( cos<-contactOptions.get(Platform.Email)  ){
+              @for( cos<-contactOptions.get(Platform.Email); msg <-emailCndMsgOpt  ){
                 @for( co <- cos ){
                   <li>@platformIcon(cos.head.platformObj) @Messages("public.kmPage.sendEmail", co.details)
-                  <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)&body=@helper.urlEncode(messages.get(Platform.Email).map( _.text).getOrElse("")).replaceAll("\\+","%20")">
+                  <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")">
                     <i class="fa fa-send"></i> @Messages("public.kmPage.openInGMail")</a>
-                    <a class="btn btn-outline-secondary btn-sm" target="_blank" href="mailto:@co.details?subject=@helper.urlEncode(campaign.title + ": " + campaign.slogan).replaceAll("\\+","%20")&body=@helper.urlEncode(messages.get(Platform.Email).map( _.text).getOrElse("")).replaceAll("\\+","%20")">
+                    <a class="btn btn-outline-secondary btn-sm" target="_blank" href="mailto:@co.details?subject=@helper.urlEncode(campaign.title + ": " + campaign.slogan).replaceAll("\\+","%20")&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")">
                     <i class="fa fa-send-o"></i> @Messages("public.kmPage.openInLocalMail")</a>
                   </li>
                 }
                 <li>@Messages("public.kmPage.emailText")
-                  @for( text <- messages.get(Platform.Email).map( _.text) ){
-                    <textarea class="form-control" style="color: inherit; background-color:rgba(.5,.5,.5,.1); height:14em;" onclick="this.select()" style="cursor:text; height:10em" readonly autocomplete="off">@text</textarea>
+                  @for( msg <- emailCndMsgOpt ){
+                    <textarea class="form-control" style="color: inherit; background-color:rgba(.5,.5,.5,.1); height:14em;" onclick="this.select()" style="cursor:text; height:10em" readonly autocomplete="off">@msg.text</textarea>
                   }
                 </li>
               }
