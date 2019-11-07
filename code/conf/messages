@@ -1,7 +1,7 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 application.title=תשמעו אותנו
 application.slogan=מערכת קמפיינים ישירים, מבית <a href="https://www.digitalrights.org.il">התנועה לזכויות דיגיטליות</a>
-application.url=http://hear-us.codeworth.io
+application.url=http://hear-us.mbarsinai.com
 
 account.created=החשבון נוצר בהצלחה
 
@@ -340,7 +340,8 @@ campaignMgmt.sendToApprove=נשלח לאישור מנהל
 campaignMgmt.sendToApprove.failed=נסה שוב
 campaigns.table.title=שם הקמפיין
 campaigns.table.admins=מנהלי הקמפיין
-campaigns.table.status-actions=מצב ופעולות
+campaigns.table.status=מצב
+campaigns.table.actions=פעולות
 campaigns.table.inWorking=הקמפיין עדיין בהכנה
 campaigns.table.isPublish=הקמפיין מפורסם
 campaigns.table.publish=פרסום

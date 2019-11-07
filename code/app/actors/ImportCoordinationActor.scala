@@ -192,7 +192,7 @@ class ImportSinglePageActor extends Actor {
             val name = (node \ "FirstName" text) + " " + (node \ "LastName" text)
             val gender = if( (node \ "GenderID").text == "251") "Male" else "Female"
             val knessetKey = (node \ "PersonID").text.toLong
-            KnessetMember(-1L, name, gender, true, "", -1L, knessetKey)
+            KnessetMember(-1L, name, gender, isActive = true, "", -1L, knessetKey)
           }).toSet
           val mappedEmails = currentKms.map( node => {
             ((node \ "PersonID").text, (node \ "Email").text)

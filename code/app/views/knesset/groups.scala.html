@@ -2,7 +2,7 @@
 
 @(groups:Seq[KmGroupDN])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
 
-@templates.backEndBase("Groups", views.BackOfficeSections.Knesset, Html("")) {
+@templates.backEndBase(Messages("groups.title"), views.BackOfficeSections.Knesset, Html("")) {
   @comps.pageTitleRow(Messages("groups.title"), Messages("groups.subtitle")){
     <a href="@routes.KnessetMemberCtrl.showNewGroup()" class="btn btn-large btn-outline-secondary"><i class="fa fa-plus-circle"></i> @Messages("add")</a>
   }
