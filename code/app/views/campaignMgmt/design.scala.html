@@ -102,18 +102,18 @@
     <div class="form-group row">
       <label id="imageRow" for="imageFile" class="col-sm-2">@Messages("backgroundImage")</label>
       <div class="col-md-5">
-          <div class="form-group row">
-            <label class="col-sm-2 control-label" for="imageCredit">@Messages("campaignMgmt.design.imageCredit")</label>
-            <div class="col-sm-10">
-              <input type="text" value="@imageOpt.map(_.credit).getOrElse("")" name="imageCredit" class="form-control" id="imageCredit">
-            </div>
+        <div class="form-group row">
+          <label class="col-sm-2 control-label" for="imageCredit">@Messages("campaignMgmt.design.imageCredit")</label>
+          <div class="col-sm-10">
+            <input type="text" value="@imageOpt.map(_.credit).getOrElse("")" name="imageCredit" class="form-control" id="imageCredit">
           </div>
-          <div class="form-group row">
-            <label class="col-sm-2 control-label" for="imageFile">@Messages("campaignMgmt.design.imageFile")</label>
-            <div class="col-sm-10">
-                <input type="file" name="imageFile" id="imageFile" class="form-control">
-            </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 control-label" for="imageFile">@Messages("campaignMgmt.design.imageFile")</label>
+          <div class="col-sm-10">
+              <input type="file" name="imageFile" id="imageFile" class="form-control">
           </div>
+        </div>
         <div class="row">
           <div class="col">
             <button id="deleteImageBtn" onclick="deleteImage()" type="button" class="btn btn-danger">@Messages("campaignMgmt.design.deleteImage")</button>
@@ -128,11 +128,7 @@
         </div>
 
         <div id="imageDiv" class="text-center">
-          @if( imageOpt.isEmpty ){
-            <img style="max-height: 300px; max-width:300px" src="" alt="">
-          } else {
-            <img style="max-height: 300px; max-width:300px" src="@prefix@campaign.id" alt="">
-          }
+          <img style="max-height: 300px; max-width:300px" src="@for(i<-imageOpt){@prefix@campaign.id}" alt="">
         </div>
 
       </div>
