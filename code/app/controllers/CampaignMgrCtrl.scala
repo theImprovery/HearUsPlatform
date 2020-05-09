@@ -81,14 +81,14 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   def saveCampaign = deadbolt.SubjectPresent()() { implicit req =>
     newCampaignForm.bindFromRequest().fold(
       fwe => {
-        Logger.info("errors " + fwe.errors.map(e => fwe.errors(e.key).mkString(", ")).mkString("\n"))
+        logger.info("errors " + fwe.errors.map(e => fwe.errors(e.key).mkString(", ")).mkString("\n"))
         Future(BadRequest(views.html.campaignMgmt.createCampaign(fwe)))
       },
       adminCampaign => {
         for {
           slugExists <- campaigns.campaignSlugExists(adminCampaign.slug)
           camOpt:Option[Campaign] <- {
-            if (!slugExists) campaigns.store(Campaign(-1l, adminCampaign.name, "", Some(adminCampaign.slug), "",
+            if (!slugExists) campaigns.store(Campaign(-1L, adminCampaign.name, "", Some(adminCampaign.slug), "",
               conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse(""), "", "", CampaignStatus.WorkInProgress)).map(Some(_))
             else Future(None)
           }
@@ -160,7 +160,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   
   val frontPageForm = Form(
     mapping(
-      "campaignId" -> ignored(0l), // we get that from the url.
+      "campaignId" -> ignored(0L), // we get that from the url.
       "title"->text,
       "subtitle" -> text,
       "bodyText" -> text,
@@ -264,7 +264,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           campaignOpt <- campaigns.getCampaign(camId)
           knessetMember: Option[KnessetMember] <- campaignOpt.map(_ => kms.getKM(kmId)).getOrElse(Future(None))
         } yield {
-          Logger.info(formWithErrors.errors.mkString("\n"))
+          logger.info(formWithErrors.errors.mkString("\n"))
           knessetMember.map(km => BadRequest(views.html.campaignMgmt.kmActionEditor(formWithErrors, km, campaignOpt.get, ActionType.values.toSeq)))
             .getOrElse(NotFound("campaign with id " + camId + "does not exist"))
         }
@@ -295,7 +295,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   def updatePosition = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
     req.body.validate[KmPosition].fold(
       errors => {
-        Logger.info("errors " + errors.mkString("\n"))
+        logger.info("errors " + errors.mkString("\n"))
         Future(BadRequest("can't update position"))
       },
       pos => {
@@ -313,7 +313,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   def updateLabels() = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
     req.body.validate[Seq[LabelText]].fold(
       errors => Future({
-        Logger.info("errors " + errors.mkString("\n"))
+        logger.info("errors " + errors.mkString("\n"))
         BadRequest("can't parse label text")
       }),
       labels => {
@@ -332,7 +332,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id){
       req.body.validate[Seq[CannedMessage]].fold(
         errors => {
-          Logger.info("errors " + errors.mkString("\n"))
+          logger.info("errors " + errors.mkString("\n"))
           Future(BadRequest(Json.obj("message"->"can't parse canned message", "details"->errors.mkString("\n"))))
         },
         msgs => {
@@ -349,7 +349,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   def updateSocialMedia() = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
     req.body.validate[Seq[SocialMedia]].fold(
       errors => {
-        Logger.info("errors " + errors.mkString("\n"))
+        logger.info("errors " + errors.mkString("\n"))
         Future(BadRequest("can't parse social media details"))
       },
       sms => {
@@ -384,7 +384,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id) {
       userIdForm.bindFromRequest().fold(
         fwe => {
-          Logger.warn( fwe.errors.mkString("\n") )
+          logger.warn( fwe.errors.mkString("\n") )
           Future(BadRequest("Error"))
         },
         userId => {
@@ -408,7 +408,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id) {
       userIdForm.bindFromRequest().fold(
         fwe => {
-          Logger.warn( fwe.errors.mkString("\n") )
+          logger.warn( fwe.errors.mkString("\n") )
           Future(BadRequest("Error"))
         },
         userId => {
@@ -433,7 +433,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id) {
       userIdForm.bindFromRequest().fold(
         fwe => {
-          Logger.warn( fwe.errors.mkString("\n") )
+          logger.warn( fwe.errors.mkString("\n") )
           Future(BadRequest("Error"))
         },
         userId => {
@@ -463,7 +463,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id) {
       userIdForm.bindFromRequest().fold(
         fwe => {
-          Logger.warn( fwe.errors.mkString("\n") )
+          logger.warn( fwe.errors.mkString("\n") )
           Future(BadRequest("Error"))
         },
         userId => {
@@ -522,7 +522,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   def removeGroupFromCamp = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
     req.body.validate[RelevantGroup].fold(
       errors => {
-        Logger.info("errors " + errors.mkString("\n"))
+        logger.info("errors " + errors.mkString("\n"))
         Future(BadRequest("can't remove group"))
       },
       relGroup => {
@@ -536,7 +536,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   def addGroupToCamp = deadbolt.SubjectPresent()(cc.parsers.tolerantJson) { implicit req =>
     req.body.validate[RelevantGroup].fold(
       errors => {
-        Logger.info("errors " + errors.mkString("\n"))
+        logger.info("errors " + errors.mkString("\n"))
         Future(BadRequest("can't remove group"))
       },
       relGroup => {

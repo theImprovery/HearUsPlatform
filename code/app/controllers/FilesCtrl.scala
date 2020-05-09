@@ -8,7 +8,7 @@ import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import java.sql.Timestamp
 import java.util.Calendar
-
+import scala.jdk.CollectionConverters._
 import javax.inject.Inject
 import be.objectify.deadbolt.scala.DeadboltActions
 import dataaccess.ImagesDAO
@@ -20,7 +20,6 @@ import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{ControllerComponents, InjectedController, PlayBodyParsers}
 import play.api.{Configuration, Environment, Logger}
 
-import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
@@ -43,8 +42,8 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
     val filename = req.body.dataParts("qqfilename").head
     val suffix = getFileSuffix(filename)
     
-    Logger.info( s"got file $filename with suffix $suffix")
-    Logger.info( "Uploaded: " + uploadedFile.toString  + " -- " + uploadedFile.ref.toString )
+    logger.info( s"got file $filename with suffix $suffix")
+    logger.info( "Uploaded: " + uploadedFile.toString  + " -- " + uploadedFile.ref.toString )
     val related = subjectType match {
       case "kms" => (Some(subjectId.toLong), None)
       case "camps" => (None, Some(subjectId.toLong))
@@ -57,9 +56,9 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
       .map(fileDbRecord => {
         val localPath = filePath.resolve(subjectId + "." + suffix)
         
-        Logger.info("Moving file to " + localPath.toAbsolutePath.toString )
+        logger.info("Moving file to " + localPath.toAbsolutePath.toString )
         val res = uploadedFile.ref.atomicMoveWithFallback(localPath)
-        Logger.info( "res: " + res.toString)
+        logger.info( "res: " + res.toString)
         
         Utils.ensureImageServerReadPermissions(localPath)
         // top object must contain a "success:true" field, for fineUploader to know the upload went well.
@@ -243,7 +242,7 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
       RenderingHints.KEY_INTERPOLATION -> RenderingHints.VALUE_INTERPOLATION_BICUBIC,
       RenderingHints.KEY_RENDERING -> RenderingHints.VALUE_RENDER_QUALITY,
       RenderingHints.KEY_FRACTIONALMETRICS -> RenderingHints.VALUE_FRACTIONALMETRICS_ON
-    ))
+    ).asJava)
     val scaler = AffineTransform.getScaleInstance(destWidth/inImage.getWidth.toDouble, destHeight/inImage.getHeight.toDouble)
     g2.drawImage(inImage, scaler, null)
     g2.dispose()
@@ -263,8 +262,8 @@ class FilesCtrl @Inject() (images:ImagesDAO, cc:ControllerComponents, parsers:Pl
     val lookupBytes = Range(0,256).map( i => (i-min)*factor ).map(x=>math.max(0,math.min(255,x))).map(_.toByte).toArray
     val lookupTable = new ByteLookupTable(0, lookupBytes)
     val stretchOp = new LookupOp( lookupTable, new RenderingHints(Map(
-      RenderingHints.KEY_COLOR_RENDERING->RenderingHints.VALUE_COLOR_RENDER_QUALITY
-    )))
+      RenderingHints.KEY_COLOR_RENDERING->RenderingHints.VALUE_COLOR_RENDER_QUALITY).asJava
+    ))
     
     stretchOp.filter(inImage, null)
   }

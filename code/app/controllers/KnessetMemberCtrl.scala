@@ -1,22 +1,19 @@
 package controllers
 
-import java.nio.file.{CopyOption, Files, Path, Paths, StandardCopyOption}
-
-import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
+import java.nio.file.{Files, Paths}
 import javax.inject.Inject
-import models._
-import dataaccess._
-import play.api.{Configuration, Environment, Logger}
+import scala.concurrent.Future
+import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
+import play.api.{Configuration, Logger}
 import play.api.data.{Form, _}
 import play.api.data.Forms._
 import play.api.i18n._
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{ControllerComponents, InjectedController}
-import dataaccess.JSONFormats._
 import play.api.libs.ws.WSClient
-
-import scala.collection.JavaConversions._
-import scala.concurrent.Future
+import models._
+import dataaccess._
+import dataaccess.JSONFormats._
 
 case class GroupData(id:Long, name:String, knessetKey:Long, kmsIds:String)
 
@@ -28,7 +25,8 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }
-
+  private val logger = Logger( classOf[KnessetMemberCtrl] )
+  
   val knessetMemberForm = Form(
     mapping(
       "id" -> number.transform[Long](_.asInstanceOf[Long], _.asInstanceOf[Int]),
@@ -102,7 +100,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
           parties <- kms.getAllParties
           imageOpt <- images.getImageForKm(formWithErrors.data("id").toLong)
         } yield {
-          Logger.info(formWithErrors.errors.mkString("\n"))
+          logger.info(formWithErrors.errors.mkString("\n"))
           val partyMap = parties.map(p => p.id -> p).toMap
           BadRequest(views.html.knesset.knessetMemberEditor(formWithErrors,
             conf.get[String]("hearUs.files.mkImages.url"), imageOpt,
@@ -134,7 +132,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def updateContactOption(kmId: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson){ implicit req =>
     req.body.validate[Seq[ContactOption]].fold(
       errors => {
-        Logger.warn(errors.mkString("\n"))
+        logger.warn(errors.mkString("\n"))
         Future(BadRequest(Json.obj("status" -> "error", "data" -> JsError.toJson(errors))))
       },
       cos => {
@@ -149,7 +147,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         for {
           parties <- kms.getAllParties
         } yield {
-          Logger.info(errors.mkString("\n"))
+          logger.info(errors.mkString("\n"))
           BadRequest(views.html.knesset.parties(parties))
         }
       },
@@ -216,7 +214,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         for {
           knessetMembers <- kms.getAllKms
         } yield {
-          Logger.info(formWithErrors.errors.mkString("\n"))
+          logger.info(formWithErrors.errors.mkString("\n"))
           BadRequest(views.html.knesset.groupEditor(formWithErrors, knessetMembers))
         }
       },

@@ -10,7 +10,7 @@
 @scripts={
   <script>
     let mk2cmt = {
-      @km2Cmt.map( kc => kc._1 + ": " + kc._2.mkString("[",",","]") ).mkString(",\n")
+      @km2Cmt.map( kc => s"${kc._1}: ${kc._2.mkString("[",",","]")}" ).mkString(",\n")
     };
 
     @if( campaign.contactEmail.trim.nonEmpty ) {

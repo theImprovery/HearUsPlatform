@@ -36,7 +36,7 @@ class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, kn
                                         langs:Langs, messagesApi:MessagesApi) extends Actor {
   private val logger = Logger(classOf[ImportCoordinationActor])
 
-  implicit val timeout = Timeout(20 seconds)
+  implicit val timeout = Timeout(20.seconds)
   private var kmsCount = 0
   private var partiesCount = 0
   private var ptfCount = 0
@@ -55,23 +55,23 @@ class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, kn
         .get()
         .map(res => {
           val properties = scala.xml.XML.loadString(res.body) \ "entry" \ "content" \ "properties"
-          val currentK = properties.filter(node => (node \ "IsCurrent" text).toBoolean).head
-          knessetNum = (currentK \ "KnessetNum" text).toInt
+          val currentK = properties.filter(node => (node\"IsCurrent").text.toBoolean).head
+          knessetNum = (currentK \ "KnessetNum").text.toInt
           kmsCount += 1
           partiesCount += 1
           ptfCount += 1
           //Start load kms
           var child = context.actorOf(ImportSinglePageActor.props)
           child ! importKmSinglePage(kmsFirstPage, knessetNum, ws, cc, self)
-          children = children + child
+          children += child
           //Start load parties
           child = context.actorOf(ImportSinglePageActor.props)
           child ! importPartiesSinglePage(partiesFirstPage, knessetNum, ws, cc, self)
-          children = children + child
+          children += child
           //Start load person to faction
           child = context.actorOf(ImportSinglePageActor.props)
           child ! importPtoFSinglePage(ptpPage, ws, cc, self)
-          children = children + child
+          children += child
         })
     }
     case loadKmNextPage(nextPage:String) => {
@@ -174,7 +174,7 @@ class ImportSinglePageActor extends Actor {
 
 //  override def preStart(): Unit = Logger.info("supervised actor started " + self.path)
 //  override def postStop(): Unit = Logger.info("supervised actor stopped " + self.path)
-  implicit val timeout = Timeout(6 seconds)
+  implicit val timeout:Timeout = Timeout(6.seconds)
   override def receive: Receive = {
     case importKmSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, sender:ActorRef) => {
       implicit val ec = cc.executionContext
@@ -189,7 +189,7 @@ class ImportSinglePageActor extends Actor {
           }
           val currentKms = xml \ "entry" \ "content" \ "properties"
           val mappedKms = currentKms.map( node => {
-            val name = (node \ "FirstName" text) + " " + (node \ "LastName" text)
+            val name = (node \ "FirstName").text + " " + (node \ "LastName").text
             val gender = if( (node \ "GenderID").text == "251") "Male" else "Female"
             val knessetKey = (node \ "PersonID").text.toLong
             KnessetMember(-1L, name, gender, isActive = true, "", -1L, knessetKey)
@@ -212,7 +212,7 @@ class ImportSinglePageActor extends Actor {
           if(getNext(links).isDefined){
             sender ! loadPartyNextPage(getNext(links).get)
           }
-          val relevantParties = (xml \ "entry" \ "content" \ "properties").filter( node => ( node \ "KnessetNum" text ) == knessetNum.toString )
+          val relevantParties = (xml \ "entry" \ "content" \ "properties").filter( node => (node\"KnessetNum").text == knessetNum.toString )
           sender ! newParties(relevantParties.map(node => ((node \ "FactionID").text, (node \ "Name").text)).toMap)
           sender ! partiesIspaFinish(self)
         })
@@ -244,7 +244,7 @@ class ImportSinglePageActor extends Actor {
           if(getNext(links).isDefined){
             sender ! loadCommNextPage(getNext(links).get)
           }
-          val relevantCommittees = properties.filter( node => ( node \ "KnessetNum" text ) == knessetNum.toString )
+          val relevantCommittees = properties.filter( node => ( node \ "KnessetNum").text == knessetNum.toString )
           sender ! newCommittees(relevantCommittees.map( node => KmGroup(-1L, (node \ "Name").text, (node \ "CommitteeID").text.toLong, Set())).toSet)
           sender ! commIspaFinish(self)
         })
@@ -261,7 +261,7 @@ class ImportSinglePageActor extends Actor {
           if(getNext(links).isDefined){
             sender ! loadPtoPNextPage(getNext(links).get)
           }
-          val relevantPositions = properties.filter( node => ( node \ "KnessetNum" text ) == knessetNum.toString )
+          val relevantPositions = properties.filter( node => ( node \ "KnessetNum").text == knessetNum.toString )
           sender ! newPtoP( relevantPositions.map( node => ( (node \ "CommitteeID").text, (node \ "PersonID").text) ).toSet )
           sender ! ptpIspaFinish(self)
         })
@@ -304,8 +304,8 @@ class ImportCommitteesActor @Inject()(ws:WSClient, cc:ControllerComponents, knes
         .get()
         .map(res => {
           val properties = scala.xml.XML.loadString(res.body) \ "entry" \ "content" \ "properties"
-          val currentK = properties.filter(node => (node \ "IsCurrent" text).toBoolean).head
-          knessetNum = (currentK \ "KnessetNum" text).toInt
+          val currentK = properties.filter(node => (node \ "IsCurrent").text.toBoolean).head
+          knessetNum = (currentK \ "KnessetNum").text.toInt
           commCount += 1
           ptpCount  += 1
           var child = context.actorOf(ImportSinglePageActor.props)

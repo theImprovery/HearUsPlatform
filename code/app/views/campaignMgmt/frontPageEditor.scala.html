@@ -9,8 +9,8 @@
   <script src="@routes.Assets.versioned("/lib/summernote/lang/summernote-he-IL.js")"></script>
   <script src="@routes.Assets.versioned("/js/campaignEditor/frontPageEditor.js")"></script>
   <script>
-    var positionStrings = [@Html(positions.toSeq.map(_.toString).mkString("'","','","'"))];
-    var genderStrings = [@Html(genders.toSeq.map(_.toString).mkString("'","','","'"))];
+    const positionStrings = [@Html(positions.toSeq.map(_.toString).mkString("'","','","'"))];
+    const genderStrings = [@Html(genders.toSeq.map(_.toString).mkString("'","','","'"))];
     document.addEventListener('DOMContentLoaded', frontPageEditorSetup);
   </script>
 }
@@ -54,12 +54,12 @@
       <div class="col-sm-10">
         <small class="form-text text-muted">@Messages("campaignMgmt.frontPage.groupNames.help")</small>
         <div style="column-count: 2">
-          @for( pos <- positions ) {
+          @for( pos <- positions.toIndexedSeq ) {
             <div class="input-group mb-1">
               <div class="input-group-prepend">
                 <div style="width: 7em" class="input-group-text">@Messages(pos.toString)</div>
               </div>
-              <input type="text" class="form-control" name="group@pos.toString" id="group@pos.toString" value="@if(texts.groupLabel(pos).isEmpty){@Messages("campaignMgmt.frontPage.groupLabel.default."+pos)} else{@texts.groupLabel(pos)}">
+              <input type="text" class="form-control" name="group@pos.toString" id="group@pos.toString" value="@if(texts.groupLabel(pos).isEmpty){@Messages(s"campaignMgmt.frontPage.groupLabel.default.$pos")} else{@texts.groupLabel(pos)}">
             </div>
            }
         </div>
@@ -74,16 +74,17 @@
           <thead>
             <tr>
               <th>&nbsp;</th>
-            @for( pos <- positions ){<th>@Messages(pos.toString)</th>}
+            @for( pos <- positions.toIndexedSeq ){<th>@Messages(pos.toString)</th>}
             </tr>
           </thead>
           <tbody>
-            @for(gender<-genders){
+            @for(gender<-genders.toIndexedSeq){
               <tr>
                 <th>@Messages(gender.toString)</th>
-              @for( pos <- positions ){<td class="p-1">
-                <input type="text" id="@{gender + pos.toString}Label" name="@{gender + pos.toString}Label" value="@if(texts.kmLabel((gender, pos)).isEmpty){@Messages("campaignMgmt.frontPage.label.default."+gender+"."+pos)} else{@texts.kmLabel((gender, pos))}">
-                </td>}
+              @for( pos <- positions.toIndexedSeq ){<td class="p-1">
+                @defining(if(texts.kmLabel((gender, pos)).isEmpty) Messages(s"campaignMgmt.frontPage.label.default.${gender.toString}.$pos") else texts.kmLabel((gender, pos))){value=>
+                  <input type="text" id="@{gender.toString + pos.toString}Label" name="@{gender.toString + pos.toString}Label" value="@value">
+                }</td>}
               </tr>
             }
           </tbody>

@@ -21,11 +21,6 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   private val contactOptions = TableQuery[ContactOptionTable]
   private val kmsPartiesView = TableQuery[KmsPartiesView]
   
-//  object KmOrderBy {
-//    val Name = (f:KnessetMemberTable)=>f.name
-//    val Party = (f:KnessetMemberTable)=>f.party
-//  }
-
   def addKM( km:KnessetMember ):Future[KnessetMember] = {
     db.run {
       (knessetMembers returning knessetMembers).insertOrUpdate(km)
@@ -136,13 +131,13 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
     db.run(contactOptions += co).map(_ => co)
   }
 
-  def addContactOption( cos: Traversable[ContactOption] ):Future[Seq[ContactOption]] = {
+  def addContactOption( cos: Iterable[ContactOption] ):Future[Seq[ContactOption]] = {
     Future.sequence(cos.map(co => addContactOption(co)).toSeq)
   }
 
   def getAllContactOptions():Future[Seq[ContactOption]] = db.run(contactOptions.result)
   
-  def setContactOptions( kmId:Long, conOps: Traversable[ContactOption] ):Future[Unit] = {
+  def setContactOptions( kmId:Long, conOps: Iterable[ContactOption] ):Future[Unit] = {
     val connectedConOps = conOps.map( c => c.copy(kmId=Some(kmId)) )
     val deleteCurrent = contactOptions.filter( _.kmId === kmId ).delete
     val insertNew     = DBIO.sequence( connectedConOps.map( contactOptions.insertOrUpdate ) )
@@ -165,8 +160,6 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   def countParties:Future[Int] = db.run(parties.filter(_.isActive).size.result)
   private def order( col:Rep[String], isAsc:Boolean ) = if ( isAsc ) col.asc else col.desc
 }
-
-
 
 object SortBy extends Enumeration {
   val Parties = Value("parties")

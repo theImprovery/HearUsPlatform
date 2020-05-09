@@ -10,8 +10,8 @@
       const campaignId = @campaign.id;
       const currentUserId = @currentUser.id;
       let teamIds = [@Html(team.users.map(_.id).mkString(","))];
-      let teamNames = {@Html(team.users.map( u=>u.id + ":\"" + u.name.replaceAll("\"","\\\"") + "\"").mkString(","))};
-      let teamUsernames = {@Html(team.users.map( u=>u.id + ":\"" + u.username.replaceAll("\"","\\\"") + "\"").mkString(","))};
+      let teamNames = {@Html(team.users.map(u=>(u.id, Helpers.sanitizeJs(u.name))).map( u=> s"${u._1}:${'"'}${u._2}${'"'}").mkString(","))};
+      let teamUsernames = {@Html(team.users.map( u=>s"${u.id}: ${'"'}${u.username}${'"'}").mkString(","))};
       document.addEventListener("DOMContentLoaded", campaignTeamSetup);
     </script>
   }

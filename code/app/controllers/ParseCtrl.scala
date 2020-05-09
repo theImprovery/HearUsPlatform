@@ -28,7 +28,7 @@ class ParseCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms
   }
 
   def apiKms = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
-    implicit val timeout = Timeout(60 seconds)
+    implicit val timeout = Timeout(60.seconds)
     importActor ? importAll(
       conf.get[String]("xml.km"),
       conf.get[String]("xml.factions"),
@@ -38,7 +38,7 @@ class ParseCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms
   }
 
   def apiUpdateCommittees = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
-    implicit val timeout = Timeout(60  seconds)
+    implicit val timeout = Timeout(60.seconds)
     committeeActor ? importCommittees(
       conf.get[String]("xml.committees"),
       conf.get[String]("xml.ptpCommittees"),

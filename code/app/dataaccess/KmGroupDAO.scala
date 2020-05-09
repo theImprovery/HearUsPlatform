@@ -133,8 +133,4 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
     )
   }
 
-  private def idsToSet( ids:Iterable[Long] ):Set[KnessetMember] = {
-    val res = Future.sequence(ids.map(knessetMembers.getKM).toSet)
-    Await.result(res.map( fokm => fokm.flatten ), 10 seconds)
-  }
 }

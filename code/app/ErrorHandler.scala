@@ -23,13 +23,14 @@ class ErrorHandler @Inject() (
   private implicit val execCtxt = ec
   val accJson = play.api.mvc.Accepting(MimeTypes.JSON)
   val accHtml = play.api.mvc.Accepting(MimeTypes.HTML)
+  private val log = Logger( classOf[ErrorHandler] )
   
   private def logException( exception:UsefulException ) = {
     val incidentId = java.util.UUID.randomUUID.toString
-    Logger.error( "[" + incidentId + "] play-id:" + exception.id)
-    Logger.error( "[" + incidentId + "] title:" + exception.title)
-    Logger.error( "[" + incidentId + "] description:" + exception.description)
-    Logger.error( "[" + incidentId + "] cause:", exception.cause)
+    log.error( s"[$incidentId] play-id: ${exception.id}")
+    log.error( s"[$incidentId] title: ${exception.title}")
+    log.error( s"[$incidentId] description: ${exception.description}")
+    log.error( s"[$incidentId] cause: ${exception.cause}")
     incidentId
   }
   
@@ -77,7 +78,12 @@ class ErrorHandler @Inject() (
   }
   
   override def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
-    val effMessage = if(message.nonEmpty) message else { if(statusCode==404){"Page not Found"} else {"Error " + statusCode}}
+    val effMessage = (message,statusCode) match {
+      case (m,_) if m.nonEmpty => m
+      case (_,404) => "Page not found"
+      case (_, s)  => s"Error $s"
+    }
+    
     Future.successful(
       request match {
         case accHtml() => Status(statusCode)(views.html.errorPage(statusCode,

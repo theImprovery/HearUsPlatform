@@ -11,22 +11,21 @@ import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.Files.TemporaryFile
 import slick.jdbc.JdbcProfile
-import java.nio.file.attribute.PosixFilePermission._
-import java.nio.file.{CopyOption, Files, Paths, StandardCopyOption}
+import java.nio.file.{Files, Paths}
 
 import javax.imageio.ImageIO
 import play.api.mvc.MultipartFormData
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Success
 
 class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
   private val images = TableQuery[ImageTable]
-
+  private val logger = Logger(classOf[ImagesDAO])
+  
   def storeImage(anImage:KMImage ):Future[KMImage] = {
     db.run( images.insertOrUpdate(anImage) ).map( _ => anImage )
   }
@@ -64,14 +63,14 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
   
   def storeCampaignImageFile( campaignId:Long, filePart:MultipartFormData.FilePart[TemporaryFile] ):Unit = {
     import scala.concurrent.duration._
-    Logger.info("Storing image for campaign %d: %s (%s)".format(campaignId, filePart.filename, filePart.contentType.toString))
+    logger.info("Storing image for campaign %d: %s (%s)".format(campaignId, filePart.filename, filePart.contentType.toString))
     val folderPath = Paths.get(conf.get[String]("hearUs.files.campaignImages.folder"))
     if (!Files.exists(folderPath)) {
       Files.createDirectories(folderPath)
-      Files.setPosixFilePermissions(folderPath, Set(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, GROUP_READ, GROUP_EXECUTE, OTHERS_READ))
+      controllers.Utils.ensureImageServerReadPermissions(folderPath)
     }
     
-    val previousImage = Await.result(getImageForCampaign(campaignId), 30 seconds )
+    val previousImage = Await.result(getImageForCampaign(campaignId), 30.seconds )
     previousImage.foreach( deleteCampaignImageFile )
     
     val suffix = filePart.filename.split("\\.").last
@@ -109,7 +108,7 @@ class ImagesDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider
         RenderingHints.KEY_RENDERING -> RenderingHints.VALUE_RENDER_QUALITY,
         RenderingHints.KEY_INTERPOLATION -> RenderingHints.VALUE_INTERPOLATION_BICUBIC,
         RenderingHints.KEY_FRACTIONALMETRICS -> RenderingHints.VALUE_FRACTIONALMETRICS_ON
-      ))
+      ).asJava)
       g2.drawImage(inImage, scaler, null)
       g2.dispose()
       resized

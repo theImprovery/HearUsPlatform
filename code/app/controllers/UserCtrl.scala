@@ -476,7 +476,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     val user = req.subject.get.asInstanceOf[HearUsSubject].user
     emailForm.bindFromRequest().fold(
       formWithErrors => {
-        Logger.info( formWithErrors.errors.mkString("\n") )
+        logger.info( formWithErrors.errors.mkString("\n") )
         for {
           invitations <- invitations.all
         } yield BadRequest(views.html.users.inviteUser(invitations))
@@ -558,7 +558,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   }
 
   def updateRole() = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(cc.parsers.tolerantJson) { implicit req =>
-    Logger.info("update role")
+    logger.info("update role")
     val json = req.body.as[JsObject]
     val roles = if(json("isAdmin").asOpt[Boolean].getOrElse(true)) { Set(UserRole.Admin, UserRole.Campaigner) }
             else { Set(UserRole.Campaigner) }
