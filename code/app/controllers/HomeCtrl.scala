@@ -13,7 +13,7 @@ import views.PaginationInfo
   * application's home page.
   */
 
-class HomeCtrl @Inject()(langs: Langs, messagesApi: MessagesApi, cached: Cached, cc: ControllerComponents
+class HomeCtrl @Inject()( cc: ControllerComponents
                         ) extends AbstractController(cc) with I18nSupport {
   
 //  implicit val mApiImplicit = messagesApi

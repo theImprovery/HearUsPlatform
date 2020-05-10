@@ -1,7 +1,7 @@
 package controllers
 
-import actors.ImportCommitteesActor.importCommittees
-import actors.ImportCoordinationActor.{getKnessetNum, importAll}
+import actors.ImportCommitteesActor.ImportCommittees
+import actors.ImportCoordinationActor.{GetKnessetNum, ImportAll}
 import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
 import dataaccess.{ImagesDAO, KmGroupDAO, KnessetMemberDAO}
@@ -29,21 +29,21 @@ class ParseCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms
 
   def apiKms = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     implicit val timeout = Timeout(60.seconds)
-    importActor ? importAll(
+    importActor ! ImportAll(
       conf.get[String]("xml.km"),
       conf.get[String]("xml.factions"),
       conf.get[String]("xml.knessetDates"),
       conf.get[String]("xml.ptpParties"))
-    Future(Ok("updated"))
+    Future(Ok("update started"))
   }
 
   def apiUpdateCommittees = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     implicit val timeout = Timeout(60.seconds)
-    committeeActor ? importCommittees(
+    committeeActor ! ImportCommittees(
       conf.get[String]("xml.committees"),
       conf.get[String]("xml.ptpCommittees"),
       conf.get[String]("xml.knessetDates"))
-    Future(Ok("update"))
+    Future(Ok("update started"))
   }
 
 

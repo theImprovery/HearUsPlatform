@@ -16,13 +16,12 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
   private val groups = TableQuery[GroupTable]
   private val kmsGroups = TableQuery[KmGroupTable]
   private val camGroups = TableQuery[RelevantGroupTable]
-  private val campaigns = TableQuery[CampaignTable]
 
   def addGroup( group:KmGroup ):Future[KmGroup] = {
     val groupRow = KmGroupDN(group.id, group.name, group.knessetKey)
     if( group.id != 0 || group.id != -1 ) {
       Await.result(db.run {
-        //delete stores group's kms
+        // remove group members
         kmsGroups.filter( _.groupId === group.id ).delete
       }, Duration.Inf)
     }

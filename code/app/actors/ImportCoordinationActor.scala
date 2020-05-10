@@ -4,364 +4,158 @@ import actors.ImportCommitteesActor._
 import actors.ImportCoordinationActor._
 import actors.ImportSinglePageActor._
 import akka.actor.{Actor, ActorRef, Props}
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import play.api.libs.ws.WSClient
 import play.api.mvc.ControllerComponents
 import akka.util.Timeout
 import dataaccess.{KmGroupDAO, KnessetMemberDAO}
 import models.{ContactOption, KmGroup, KnessetMember, Party}
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.i18n._
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.xml.NodeSeq
 
 object ImportCoordinationActor {
   def props = Props[ImportCoordinationActor]
-  case class importAll(kmsFirstPage:String, partiesFirstPage:String, numPage:String, ptpPage:String)
-  case class loadKmNextPage(nextPage:String)
-  case class loadPartyNextPage(nextPage:String)
-  case class loadPtFNextPage(nextPage:String)
-  case class newParties(newParties:Map[String,String])
-  case class newKms(newKms:Set[KnessetMember], mappedEmails:Map[String, String])
-  case class partiesIspaFinish(finished:ActorRef)
-  case class kmIspaFinish(finished:ActorRef)
-  case class ptfIspaFinish(finished:ActorRef)
-  case class getKnessetNum(page:String)
-  case class newPersonToFaction(newPtF:Map[String, String])
+  case class ImportAll(kmsFirstPage:String, partiesFirstPage:String, numPage:String, ptpPage:String)
+  case class LoadKmPage(nextPage:String)
+  case class LoadPartyPage(nextPage:String)
+  case class LoadPsn2FcnPage(nextPage:String)
+  case class AddParties(newParties:Map[String,String])
+  case class AddKms(newKms:Set[KnessetMember], mappedEmails:Map[String, String])
+  case class GetKnessetNum(page:String)
+  case class AddPsn2Fcn(newPtF:Map[String, String]) // Person to faction
 }
 
-class ImportCoordinationActor @Inject()(ws:WSClient, cc:ControllerComponents, knessetMembers: KnessetMemberDAO,
-                                        langs:Langs, messagesApi:MessagesApi) extends Actor {
-  private val logger = Logger(classOf[ImportCoordinationActor])
+class ImportCoordinationActor @Inject()(ws:WSClient, knessetMemberStore: KnessetMemberDAO,
+                                        langs:Langs, messagesApi:MessagesApi,
+                                        @Named("committee-actor") committeeImportActor:ActorRef,
+                                        ec:ExecutionContext, conf:Configuration)
+  extends BaseKnessetActor(ec, ws) {
+  val logger:Logger = Logger(classOf[ImportCoordinationActor])
 
-  implicit val timeout = Timeout(20.seconds)
-  private var kmsCount = 0
-  private var partiesCount = 0
-  private var ptfCount = 0
-  private var children: scala.collection.mutable.Set[ActorRef] = scala.collection.mutable.Set()
-  private var kms: scala.collection.mutable.Set[KnessetMember] = scala.collection.mutable.Set()
-  private var parties: scala.collection.mutable.Set[Party] = scala.collection.mutable.Set()
+  private var activeKmQueries = 0
+  private var activePartyQueries = 0
+  private var activePsn2FcnQueries = 0
+  private var knessetNum = 0
+  private val kms: scala.collection.mutable.Set[KnessetMember] = scala.collection.mutable.Set()
+  private val parties: scala.collection.mutable.Set[Party] = scala.collection.mutable.Set()
   private var partyKeyMap: Map[String, String] = Map()
   private var personToFaction: Map[String, String] = Map()
   private var personToMail:Map[String, String] = Map()
-  private var knessetNum = 0
+  
   override def receive: Receive = {
-    case importAll(kmsFirstPage:String, partiesFirstPage:String, numPage:String, ptpPage:String) => {
-      implicit val ec = cc.executionContext
-      ws.url(numPage)
-        .withFollowRedirects(true)
-        .get()
-        .map(res => {
-          val properties = scala.xml.XML.loadString(res.body) \ "entry" \ "content" \ "properties"
-          val currentK = properties.filter(node => (node\"IsCurrent").text.toBoolean).head
-          knessetNum = (currentK \ "KnessetNum").text.toInt
-          kmsCount += 1
-          partiesCount += 1
-          ptfCount += 1
-          //Start load kms
-          var child = context.actorOf(ImportSinglePageActor.props)
-          child ! importKmSinglePage(kmsFirstPage, knessetNum, ws, cc, self)
-          children += child
-          //Start load parties
-          child = context.actorOf(ImportSinglePageActor.props)
-          child ! importPartiesSinglePage(partiesFirstPage, knessetNum, ws, cc, self)
-          children += child
-          //Start load person to faction
-          child = context.actorOf(ImportSinglePageActor.props)
-          child ! importPtoFSinglePage(ptpPage, ws, cc, self)
-          children += child
-        })
+    case ImportAll(kmsFirstPage:String, partiesFirstPage:String, numPage:String, ptpPage:String) => {
+      logger.info("Starting full Knesset Import")
+      get(numPage, res => {
+        val properties = scala.xml.XML.loadString(res.body) \ "entry" \ "content" \ "properties"
+        val currentK = properties.filter(node => (node\"IsCurrent").text.toBoolean).head
+        knessetNum = (currentK \ "KnessetNum").text.toInt
+        self ! LoadKmPage(kmsFirstPage)
+        self ! LoadPartyPage(partiesFirstPage)
+        self ! LoadPsn2FcnPage(ptpPage)
+        logger.info( s"Import of Knesset #$knessetNum initiated")
+      })
     }
-    case loadKmNextPage(nextPage:String) => {
-      kmsCount += 1
-      val child = context.actorOf(ImportSinglePageActor.props)
-      child ! importKmSinglePage(nextPage, knessetNum, ws, cc, self)
-      children += child
+    case LoadKmPage(nextPage:String) => {
+      activeKmQueries += 1
+      children.route( ImportSingleKmPage(nextPage, knessetNum, self), self )
     }
-    case loadPartyNextPage(nextPage:String) => {
-      partiesCount += 1
-      val child = context.actorOf(ImportSinglePageActor.props)
-      child ! importPartiesSinglePage(nextPage, knessetNum, ws, cc, self)
-      children += child
+    case LoadPartyPage(nextPage:String) => {
+      activePartyQueries += 1
+      children.route( ImportSinglePartyPage(nextPage, knessetNum, self), self )
     }
-    case loadPtFNextPage(nextPage:String) => {
-      ptfCount += 1
-      val child = context.actorOf(ImportSinglePageActor.props)
-      child ! importPtoFSinglePage(nextPage, ws, cc, self)
-      children += child
+    case LoadPsn2FcnPage(nextPage:String) => {
+      activePsn2FcnQueries += 1
+      children.route( ImportSinglePerson2FactionPage(nextPage, self), self )
     }
-    case newParties(newParties:Map[String,String]) => {
+    
+    case AddParties(newParties:Map[String,String]) => {
       partyKeyMap ++= newParties
-      parties ++= newParties.map( tupl => Party(-1L, tupl._2, "", true))
+      parties ++= newParties.map( tupl => Party(-1L, tupl._2, "", isActive=true))
+      activePartyQueries -= 1
+      possiblyFinish()
     }
-    case newKms(newKms:Set[KnessetMember], mappedEmails:Map[String, String]) => {
+    
+    case AddKms(newKms:Set[KnessetMember], mappedEmails:Map[String, String]) => {
+      activeKmQueries -= 1
       kms ++= newKms
       personToMail ++= mappedEmails
+      possiblyFinish()
     }
-    case newPersonToFaction(newPtF:Map[String, String]) => {
+    
+    case AddPsn2Fcn(newPtF:Map[String, String]) => {
+      activePsn2FcnQueries -= 1
       personToFaction ++= newPtF
+      possiblyFinish()
     }
-    case kmIspaFinish(finished:ActorRef) => {
-      context.stop(finished)
-      kmsCount -= 1
-      if( partiesCount == 0 & kmsCount == 0 & ptfCount == 0){
-        updateAll()
-      }
-    }
-    case partiesIspaFinish(finished:ActorRef) => {
-      context.stop(finished)
-      partiesCount -= 1
-      if( partiesCount == 0 & kmsCount == 0 & ptfCount == 0){
-        updateAll()
-      }
-    }
-    case ptfIspaFinish(finished:ActorRef) => {
-      context.stop(finished)
-      ptfCount -= 1
-      if( partiesCount == 0 & kmsCount == 0 & ptfCount == 0){
-        updateAll()
-      }
-    }
+    
   }
 
+  private def possiblyFinish():Unit = {
+    if ( activePartyQueries == 0 && activeKmQueries == 0 && activePsn2FcnQueries == 0 ) {
+      updateAll()
+    }
+  }
+  
   private def updateAll() = {
+    implicit val ecc:ExecutionContext = ec
     implicit val messagesProvider: MessagesProvider = {
       MessagesImpl(langs.availables.head, messagesApi)
     }
-    kms = kms.filter(km => personToFaction.contains(km.knessetKey.toString))
-    implicit val ec = cc.executionContext
+    
+    val kmsWithFaction = kms.filter(km => personToFaction.contains(km.knessetKey.toString))
+    logger.info( s"KM # in Knesset: ${kms.size} / ${kmsWithFaction.size}")
+    kmsWithFaction.toSeq.zipWithIndex.foreach( kmt => logger.info(s"(${kmt._2}) ${kmt._1.knessetKey} ${kmt._1.name}"))
+    
+    logger.info("======")
+    logger.info("Parties:")
+    parties.toSeq.zipWithIndex.foreach(pt => logger.info(s"(${pt._2}) ${pt._1.name} ${pt._1.isActive}"))
     for {
-        updatedParties <- knessetMembers.updateParties(parties.toSeq)
-        activeParties  <- knessetMembers.getAllActiveParties()
-        partyNameToID  = activeParties.map(party => (party.name, party.id)).toMap
-        allContactOptions <- knessetMembers.getAllContactOptions()
-        kmToCo         = allContactOptions.groupBy(_.kmId.get)
-        mappedKms = kms.map(km => {
+        // update parties and factions
+      updatedParties <- knessetMemberStore.updateParties(parties.toSeq)
+      activeParties  <- knessetMemberStore.getAllActiveParties()
+  
+      // update knesset members
+      allContactOptions <- knessetMemberStore.getAllContactOptions()
+      partyNameToID  = activeParties.map(party => (party.name, party.id)).toMap
+      kmToContactOpt = allContactOptions.groupBy(_.kmId.get)
+      kmsWithParty = kmsWithFaction.map(km => {
           val partyId = partyNameToID(personToFaction(km.knessetKey.toString))
-          KnessetMember(km.id, km.name, km.gender, km.isActive, km.webPage, partyId, km.knessetKey)
+          km.copy(partyId = partyId)
         })
-        _  <- knessetMembers.updateKms(mappedKms.toSeq)
-        currentKms <- knessetMembers.getAllActiveKms()
+      _  <- knessetMemberStore.updateKms(kmsWithParty.toSeq)
+      currentKms <- knessetMemberStore.getAllActiveKms()
     } yield {
       val knessetKeyToPerson = currentKms.map( ck => ( ck.knessetKey, ck.id )).toMap
       personToMail = personToMail.filter( p => knessetKeyToPerson.contains(p._1.toLong) )
 
       //Check for duplicate ContactOption from KnessetApi and add if non exists
       val newContacts:Set[ContactOption] = personToMail.filter( ptm => {
-        !kmToCo.getOrElse(knessetKeyToPerson(ptm._1.toLong), Seq())
+        !kmToContactOpt.getOrElse(knessetKeyToPerson(ptm._1.toLong), Seq())
           .exists(co => (co.platform == "Email" && co.title == Messages("platform.email.title")
             && co.details == ptm._2 && co.note == Messages("platform.email.note")))
       }).map(ptm => ContactOption( 0, Some(knessetKeyToPerson(ptm._1.toLong)), None, "Email",
           Messages("platform.email.title"), ptm._2, Messages("platform.email.note"))).toSet
-
-      knessetMembers.addContactOption(newContacts)
-    }
-  }
-}
-
-object ImportSinglePageActor {
-  def props = Props[ImportSinglePageActor]
-  case class importKmSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, actor:ActorRef)
-  case class importPartiesSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, actor:ActorRef)
-  case class importPtoFSinglePage(page:String, ws:WSClient, cc:ControllerComponents, actorRef: ActorRef)
-  case class importCommitteesSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, sender:ActorRef)
-  case class importPtoPSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, sender:ActorRef)
-}
-
-class ImportSinglePageActor extends Actor {
-
-//  override def preStart(): Unit = Logger.info("supervised actor started " + self.path)
-//  override def postStop(): Unit = Logger.info("supervised actor stopped " + self.path)
-  implicit val timeout:Timeout = Timeout(6.seconds)
-  override def receive: Receive = {
-    case importKmSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, sender:ActorRef) => {
-      implicit val ec = cc.executionContext
-      ws.url(page)
-        .withFollowRedirects(true)
-        .get()
-        .map(res => {
-          val xml = scala.xml.XML.loadString(res.body)
-          val links = xml \ "link"
-          if(getNext(links).isDefined){
-            sender ! loadKmNextPage(getNext(links).get)
-          }
-          val currentKms = xml \ "entry" \ "content" \ "properties"
-          val mappedKms = currentKms.map( node => {
-            val name = (node \ "FirstName").text + " " + (node \ "LastName").text
-            val gender = if( (node \ "GenderID").text == "251") "Male" else "Female"
-            val knessetKey = (node \ "PersonID").text.toLong
-            KnessetMember(-1L, name, gender, isActive = true, "", -1L, knessetKey)
-          }).toSet
-          val mappedEmails = currentKms.map( node => {
-            ((node \ "PersonID").text, (node \ "Email").text)
-          }).toMap
-          sender ! newKms(mappedKms, mappedEmails)
-          sender ! kmIspaFinish(self)
-        })
-    }
-    case importPartiesSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, sender:ActorRef) => {
-      implicit val ec = cc.executionContext
-      ws.url(page)
-        .withFollowRedirects(true)
-        .get()
-        .map(res => {
-          val xml = scala.xml.XML.loadString(res.body)
-          val links = xml \ "link"
-          if(getNext(links).isDefined){
-            sender ! loadPartyNextPage(getNext(links).get)
-          }
-          val relevantParties = (xml \ "entry" \ "content" \ "properties").filter( node => (node\"KnessetNum").text == knessetNum.toString )
-          sender ! newParties(relevantParties.map(node => ((node \ "FactionID").text, (node \ "Name").text)).toMap)
-          sender ! partiesIspaFinish(self)
-        })
-    }
-    case importPtoFSinglePage(page:String, ws:WSClient, cc:ControllerComponents, sender:ActorRef) => {
-      implicit val ec = cc.executionContext
-      ws.url(page)
-        .withFollowRedirects(true)
-        .get()
-        .map(res => {
-          val properties = scala.xml.XML.loadString(res.body) \ "entry" \ "content" \ "properties"
-          val links = scala.xml.XML.loadString(res.body) \ "link"
-          if(getNext(links).isDefined){
-            sender ! loadPtFNextPage(getNext(links).get)
-          }
-          sender ! newPersonToFaction(properties.map(node => (node \ "PersonID").text -> (node \ "FactionName").text).toMap)
-          sender ! ptfIspaFinish(self)
-        })
-    }
-
-    case importCommitteesSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, sender:ActorRef) => {
-      implicit val ec = cc.executionContext
-      ws.url(page)
-        .withFollowRedirects(true)
-        .get()
-        .map(res => {
-          val properties = scala.xml.XML.loadString(res.body) \ "entry" \ "content" \ "properties"
-          val links = scala.xml.XML.loadString(res.body) \ "link"
-          if(getNext(links).isDefined){
-            sender ! loadCommNextPage(getNext(links).get)
-          }
-          val relevantCommittees = properties.filter( node => ( node \ "KnessetNum").text == knessetNum.toString )
-          sender ! newCommittees(relevantCommittees.map( node => KmGroup(-1L, (node \ "Name").text, (node \ "CommitteeID").text.toLong, Set())).toSet)
-          sender ! commIspaFinish(self)
-        })
-    }
-    case importPtoPSinglePage(page:String, knessetNum:Int, ws:WSClient, cc:ControllerComponents, sender:ActorRef) => {
-      implicit val ec = cc.executionContext
-      ws.url(page)
-        .withFollowRedirects(true)
-        .get()
-        .map(res => {
-          val properties = scala.xml.XML.loadString(res.body) \ "entry" \ "content" \ "properties"
-          val links = scala.xml.XML.loadString(res.body) \ "link"
-          //TODO add the handling
-          if(getNext(links).isDefined){
-            sender ! loadPtoPNextPage(getNext(links).get)
-          }
-          val relevantPositions = properties.filter( node => ( node \ "KnessetNum").text == knessetNum.toString )
-          sender ! newPtoP( relevantPositions.map( node => ( (node \ "CommitteeID").text, (node \ "PersonID").text) ).toSet )
-          sender ! ptpIspaFinish(self)
-        })
-    }
-  }
-
-  private def getNext(nodes:NodeSeq): Option[String] = {
-    val next = nodes.filter(node => (node \\ "@rel").text == "next").map(node => node \\ "@href")
-    if(next.isEmpty) None
-    else Some(next(0).text)
-  }
-}
-
-object ImportCommitteesActor {
-  def props = Props[ImportCommitteesActor]
-  case class importCommittees(commFirstPage:String, ptpFirstPage:String, numPage:String)
-  case class loadCommNextPage(nextPage:String)
-  case class loadPtoPNextPage(nextPage:String)
-  case class commIspaFinish(finished:ActorRef)
-  case class ptpIspaFinish(finished:ActorRef)
-  case class newCommittees(newCommittees:Set[KmGroup])
-  case class newPtoP(newPtoP:Set[(String, String)])
-}
-
-class ImportCommitteesActor @Inject()(ws:WSClient, cc:ControllerComponents, knessetMembers: KnessetMemberDAO,
-                                      kmGroups: KmGroupDAO, langs:Langs, messagesApi:MessagesApi ) extends Actor {
-  private val logger = Logger(classOf[ImportCommitteesActor])
-//    override def preStart(): Unit = logger.info("supervised actor started " + self.path)
-  private var knessetNum = 0
-  private var commCount = 0
-  private var ptpCount = 0
-  private var committees:scala.collection.mutable.Set[KmGroup] = scala.collection.mutable.Set()
-  private var ptp:scala.collection.mutable.Set[(String, String)] = scala.collection.mutable.Set() //(CommitteeID, PersonID)
-
-  override def receive: Receive = {
-    case importCommittees(commFirstPage:String, ptpFirstPage:String, numPage:String) => {
-      implicit val ec = cc.executionContext
-      ws.url(numPage)
-        .withFollowRedirects(true)
-        .get()
-        .map(res => {
-          val properties = scala.xml.XML.loadString(res.body) \ "entry" \ "content" \ "properties"
-          val currentK = properties.filter(node => (node \ "IsCurrent").text.toBoolean).head
-          knessetNum = (currentK \ "KnessetNum").text.toInt
-          commCount += 1
-          ptpCount  += 1
-          var child = context.actorOf(ImportSinglePageActor.props)
-          child ! importCommitteesSinglePage(commFirstPage, knessetNum, ws, cc, self)
-          child = context.actorOf(ImportSinglePageActor.props)
-          child ! importPtoPSinglePage(ptpFirstPage, knessetNum, ws, cc, self)
-        })
-    }
-    case loadCommNextPage(nextPage:String) => {
-      commCount += 1
-      val child = context.actorOf(ImportSinglePageActor.props)
-      child ! importCommitteesSinglePage(nextPage, knessetNum, ws, cc, self)
-    }
-    case loadPtoPNextPage(nextPage:String) => {
-      ptpCount += 1
-      val child = context.actorOf(ImportSinglePageActor.props)
-      child ! importPtoPSinglePage(nextPage, knessetNum, ws, cc, self)
-    }
-    case newCommittees(newCommittees:Set[KmGroup]) => {
-        committees ++= newCommittees
-    }
-    case newPtoP(newPtoP:Set[(String, String)]) => {
-        ptp ++= newPtoP
-    }
-    case commIspaFinish(finished:ActorRef) => {
-      context.stop(finished)
-      commCount -= 1
-      if( commCount == 0 & ptpCount == 0 ){
-        updateAll()
-      }
-    }
-    case ptpIspaFinish(finished:ActorRef) => {
-      context.stop(finished)
-      ptpCount -= 1
-      if( commCount == 0 & ptpCount == 0 ){
-        updateAll()
-      }
-    }
-  }
-
-  private def updateAll() = {
-    implicit val ec = cc.executionContext
-    for {
-      activeKms <- knessetMembers.getAllActiveKms()
-      knessetKeyToKmID = activeKms.map( km => (km.knessetKey, km.id) ).toMap
-    } yield {
-      ptp = ptp.filter(p => committees.map(_.knessetKey).contains(p._1.toLong))
-      val members = (p:String, links:mutable.Set[(String,String)]) => links.filter(_._1 == p).map(_._2)
-      val comWithPersonsImmutable = ptp.map( p => ( p._1, members(p._1, ptp))).toMap
-      var comWithPersons:scala.collection.mutable.Map[String, mutable.Set[String]] = collection.mutable.Map(comWithPersonsImmutable.toSeq: _*)
-      committees.foreach( com => if( !comWithPersons.contains(com.knessetKey.toString)) comWithPersons += (com.knessetKey.toString -> mutable.Set()) )
-      val updatedGroups = committees.map(group => {
-        val setOfKms = comWithPersons(group.knessetKey.toString).map(p => knessetKeyToKmID(p.toLong) )
-        KmGroup(group.id, group.name, group.knessetKey, setOfKms.toSet)
+      
+      knessetMemberStore.addContactOption(newContacts).map(_ => {
+        // MKs done, import committees.
+        logger.info("Knesset members and factions imported. Moving on to committees.")
+        committeeImportActor ! ImportCommittees(
+          conf.get[String]("xml.committees"),
+          conf.get[String]("xml.ptpCommittees"),
+          conf.get[String]("xml.knessetDates"))
       })
-      kmGroups.updateGroups(updatedGroups.toSeq)
     }
   }
 }
+
+
+
+
+
+
+

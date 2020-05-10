@@ -50,7 +50,7 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
 
   def getKms(searchStr:Option[String], isAsc:Boolean, sortBy:SortBy.Value):Future[Seq[KmsParties]] = {
     db.run (
-      prepareView(searchStr, sortBy, isAsc).result
+      prepareView(searchStr, sortBy, isAsc).filter( _.isActive===true ).result
     )
   }
   
