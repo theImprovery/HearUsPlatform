@@ -50,7 +50,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def showParties = deadbolt.SubjectPresent()() { implicit req =>
     for {
-      parties <- kms.getAllParties
+      parties <- kms.getAllActiveParties
     } yield {
       Ok(views.html.knesset.parties(parties.sortBy(_.name)))
     }
@@ -63,7 +63,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     val isAsc = asc.getOrElse("1") == "1"
     for {
       knessetMembers <- kms.getKms(sqlSearch, isAsc, sortBy)
-      parties <- kms.getAllParties
+      parties <- kms.getAllActiveParties
     } yield {
       val partyMap = parties.map(p => p.id -> p).toMap
       Ok(views.html.knesset.knessetMembers(knessetMembers, effectiveSearch, isAsc, sortBy))
@@ -72,7 +72,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def showNewKM() = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     for {
-      parties <- kms.getAllParties
+      parties <- kms.getAllActiveParties
     } yield {
       Ok(views.html.knesset.knessetMemberEditor(knessetMemberForm, conf.get[String]("hearUs.files.mkImages.url"), None,
         parties.map(p => (p.id, p.name)).toMap, Platform.values.toSeq))
@@ -82,7 +82,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def showEditKM(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     for {
       km <- kms.getKM(id)
-      parties <- kms.getAllParties
+      parties <- kms.getAllActiveParties
       imageOpt <- images.getImageForKm(id)
     } yield {
       km.map(m => Ok(views.html.knesset.knessetMemberEditor(knessetMemberForm.fill(m),
@@ -118,7 +118,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for {
       deleted <- kms.deleteKM(id)
       knessetMembers <- kms.getKms(None, true, SortBy.KnessetMember)
-      parties <- kms.getAllParties
+      parties <- kms.getAllActiveParties
     } yield {
       val partyMap = parties.map(p => p.id -> p).toMap
       Ok(views.html.knesset.knessetMembers(knessetMembers, None, true, SortBy.KnessetMember)).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("knessetMember.deleted"))
@@ -145,7 +145,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     req.body.validate[Party].fold(
       errors => {
         for {
-          parties <- kms.getAllParties
+          parties <- kms.getAllActiveParties
         } yield {
           logger.info(errors.mkString("\n"))
           BadRequest(views.html.knesset.parties(parties))
@@ -160,7 +160,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def deleteParty(id: Long) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     for {
       deleted <- kms.deleteParty(id)
-      parties <- kms.getAllParties
+      parties <- kms.getAllActiveParties
     } yield {
       Ok(views.html.knesset.parties(parties))
     }
@@ -188,7 +188,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   def showNewGroup = deadbolt.SubjectPresent()() { implicit req =>
     for {
-      knessetMembers <- kms.getAllKms
+      knessetMembers <- kms.getAllActiveKms
     } yield {
       Ok(views.html.knesset.groupEditor(groupForm, knessetMembers))
     }
@@ -198,7 +198,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for {
       groupOpt <- groups.getGroupDN(id)
       groupKms <- groups.getKmForGroup(id)
-      knessetMembers <- kms.getAllKms
+      knessetMembers <- kms.getAllActiveKms
     } yield {
       groupOpt match {
         case Some(g) => Ok(views.html.knesset.groupEditor(groupForm.fill(GroupData(g.id, g.name, g.knessetKey, groupKms.mkString(","))),
@@ -212,7 +212,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     groupForm.bindFromRequest().fold(
       formWithErrors => {
         for {
-          knessetMembers <- kms.getAllKms
+          knessetMembers <- kms.getAllActiveKms
         } yield {
           logger.info(formWithErrors.errors.mkString("\n"))
           BadRequest(views.html.knesset.groupEditor(formWithErrors, knessetMembers))

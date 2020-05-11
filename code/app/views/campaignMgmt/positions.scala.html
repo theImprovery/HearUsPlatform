@@ -27,8 +27,8 @@
       <div style="text-align: center; font-size:4px"><span id="kmListCenter">&nbsp;</span></div>
       <ul id="kmsPositionList" style="list-style-type:none">
       @for(km <- kms) {
-        <li data-km-name="@km.name.replaceAll("'", "%").replaceAll("\"", "@")" data-party-name="@parties(km.partyId).replaceAll("'", "%").replaceAll("\"", "@")">
-          <label for="name" class="col-sm-4">@km.name <span class="text-info">@parties(km.partyId)</span></label>
+        <li data-km-name="@km.name.replaceAll("'", "%").replaceAll("\"", "@")" data-party-name="@parties.getOrElse(km.partyId,"").replaceAll("'", "%").replaceAll("\"", "@")">
+          <label for="name" class="col-sm-4">@km.name <span class="text-info">@parties.getOrElse(km.partyId,"")</span></label>
           @for(pos <- positions) {
             <input class="hidden" type="radio" name="@km.id-position"
             value="@pos" id="@km.id-@pos.toString" onchange="changePosition(this)"

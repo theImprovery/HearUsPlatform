@@ -109,10 +109,10 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       for {
         campaign <- campaigns.getCampaign(camId)
         imageOp <- images.getImageForCampaign(camId)
-        knessetMembers <- kms.getAllKms
+        knessetMembers <- kms.getAllActiveKms()
         positions <- campaigns.getPositions(camId)
         actions <- campaigns.getActions(camId)
-        parties <- kms.getAllParties
+        parties <- kms.getAllActiveParties
       } yield {
         campaign.map( c => Ok(views.html.knesset.campaignEditor(c, Position.values.toSeq, Platform.values.toSeq, imageOp,
           conf.get[String]("hearUs.files.camImages.url"), knessetMembers.sortBy(_.name),
@@ -218,9 +218,9 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id) {
       for {
         campaignOpt <- campaigns.getCampaign(id)
-        knessetMembers <- kms.getAllKms
+        knessetMembers <- kms.getAllActiveKms
         positions <- campaigns.getPositions(id)
-        parties <- kms.getAllParties
+        parties <- kms.getAllActiveParties
       } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.positions(c, knessetMembers.sortBy(_.name),
                                         Position.values.toSeq, positions.map(p => (p.kmId, p.position.toString)).toMap,
                                         parties.map(p => (p.id, p.name)).toMap))).getOrElse(NotFound("campaign with id " + id + "does not exist"))

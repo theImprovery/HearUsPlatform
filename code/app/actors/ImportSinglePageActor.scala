@@ -13,7 +13,7 @@ import play.api.mvc.ControllerComponents
 
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-import scala.xml.NodeSeq
+import scala.xml.{Node, NodeSeq}
 
 object ImportSinglePageActor {
   def nameOf( i:Int ) = s"${classOf[ImportSinglePageActor].getCanonicalName}-$i"
@@ -24,6 +24,13 @@ object ImportSinglePageActor {
   case class ImportSinglePerson2FactionPage(page:String, mgr:ActorRef)
   case class ImportSingleCommitteePage(page:String, knessetNum:Int, mgr:ActorRef)
   case class ImportSinglePersonToPositionPage(page:String, knessetNum:Int, mgr:ActorRef)
+  
+  // OpenKnesset PositionIDs that constitute committee membership
+  private val committeeMembershipPositionIds = Set(
+    42, // member (male)
+    41, // head (gender neutral)
+    66  // member (female)
+  )
 }
 
 /**
@@ -111,10 +118,21 @@ class ImportSinglePageActor @Inject() (anEx:ExecutionContext, cc:ControllerCompo
         getNext(links).foreach( nextPageLink => {
           mgr ! LoadPerson2PositionPPage(nextPageLink)
         })
-        val relevantPositions = properties.filter( node => (node\"IsCurrent").text=="true" && (node\"CommitteeID").text.trim.nonEmpty )
+        val positionFilter:Node=>Boolean = (n:Node)=>{
+          try {
+            (n\"IsCurrent").text=="true" &&
+            (n\"CommitteeID").text.trim.nonEmpty &&
+            (n\"PositionID").text.trim.nonEmpty &&
+            committeeMembershipPositionIds((n\"PositionID").text.trim.toInt)
+          } catch { case _:NumberFormatException => false }}
+        
+        val relevantPositions = properties.filter( positionFilter )
         val p2ps = relevantPositions.map(node => ( (node\"PersonID").text, (node\"CommitteeID").text) )
                     .map( t => PersonToPosition(t._1.toLong, t._2.toLong) ).toSet
+        logger.info("Detected p2ps: " + p2ps)
+        
         mgr ! AddPersonToPosition( p2ps )
+        
       })
     }
   }

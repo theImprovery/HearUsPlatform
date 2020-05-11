@@ -2,7 +2,7 @@ package dataaccess
 
 import javax.inject.Inject
 import models._
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
@@ -16,7 +16,8 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
   private val groups = TableQuery[GroupTable]
   private val kmsGroups = TableQuery[KmGroupTable]
   private val camGroups = TableQuery[RelevantGroupTable]
-
+  private val logger = Logger( classOf[KmGroupDAO] )
+  
   def addGroup( group:KmGroup ):Future[KmGroup] = {
     val groupRow = KmGroupDN(group.id, group.name, group.knessetKey)
     if( group.id != 0 || group.id != -1 ) {
@@ -41,6 +42,7 @@ class KmGroupDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvide
   }
 
   def updateGroups( newGroups:Seq[KmGroup] ):Future[Seq[KmGroup]] = {
+    logger.info("Updating groups: " + newGroups.map(_.knessetKey).mkString(","))
     db.run( DBIO.seq(kmsGroups.delete, groups.delete))
     Future.sequence(newGroups.map(gro => addGroup(gro)))
   }

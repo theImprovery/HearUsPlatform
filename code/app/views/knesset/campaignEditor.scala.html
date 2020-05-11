@@ -291,7 +291,7 @@
             <input type="text" placeholder="search" id="searchStr" onkeyup="filterKmsList(this.value)">
             <ul id="kmsPositionList" style="list-style-type:none">
               @for(km <- kms) {
-                <li data-km-name="@km.name.replaceAll("\"", "\\\\\"")" data-party-name="@parties(km.partyId).replaceAll("\"", "\\\\\"")">
+                <li data-km-name="@km.name.replaceAll("\"", "\\\\\"")" data-party-name="@parties.getOrElse(km.partyId,"").replaceAll("\"", "\\\\\"")">
                   <label for="name" class="col-sm-2">@km.name</label>
                   @for(pos <- positions) {
                     <input class="hidden" type="radio" name="@km.id-position"

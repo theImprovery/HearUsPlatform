@@ -75,7 +75,13 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
     }.map( _.headOption )
   }
 
-  def getAllParties:Future[Seq[Party]] = db.run( parties.result )
+  def getAllParties:Future[Seq[Party]] = db.run( parties.filter( _.isActive ).result )
+
+  def getAllActiveParties():Future[Seq[Party]] = {
+    db.run{
+      parties.filter( _.isActive ).result
+    }
+  }
 
   def deleteParty( id: Long ):Future[Int] = db.run(parties.filter( _.id === id ).delete)
 
@@ -114,13 +120,7 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
       db.run( DBIO.sequence(updateCommands))
     }
   }
-
-  def getAllActiveParties():Future[Seq[Party]] = {
-    db.run{
-      parties.filter( _.isActive ).result
-    }
-  }
-
+  
   def getAllActiveKms():Future[Seq[KnessetMember]] = {
     db.run{
       knessetMembers.filter( _.isActive ).result

@@ -46,8 +46,8 @@ class ImportCommitteesActor @Inject()(ws:WSClient, knessetMembers: KnessetMember
         knessetNum = (currentK \ "KnessetNum").text.toInt
         logger.info(s"Current knesset number: $knessetNum")
         
-        self ! LoadCommitteePage( commFirstPage )
-        self ! LoadPerson2PositionPPage(ptpFirstPage)
+        self ! LoadCommitteePage(s"$commFirstPage and KnessetNum eq $knessetNum")
+        self ! LoadPerson2PositionPPage(s"$ptpFirstPage and KnessetNum eq $knessetNum")
         
         logger.info("Committee import initiated")
       })
@@ -86,15 +86,27 @@ class ImportCommitteesActor @Inject()(ws:WSClient, knessetMembers: KnessetMember
   
   private def updateAll():Unit = {
     implicit val ecc:ExecutionContext = ec
+    logger.info("Committee import data collection done. Updating DB.")
     for {
       activeKms <- knessetMembers.getAllActiveKms()
-      activeKmIds = activeKms.map( _.id ).toSet
+      knessetKey2KmId = activeKms.map( km => km.knessetKey->km.id ).toMap
     } yield {
       logger.info( s"Found ${committees.size} committees and ${ptp.size} memberships")
-      val peopleByCmt = ptp.filter(t => activeKmIds(t.personId)).groupMap( _.committeeId )(_.personId)
-      val updatedGroups = committees.map( cmt => cmt.copy(kms=peopleByCmt(cmt.id).toSet))
-      kmGroups.updateGroups(updatedGroups.toSeq)
+      logger.info( s"Committees: \n " + committees.toSeq.sortBy(_.knessetKey).map( c => s"${c.knessetKey}: \t ${c.name}").mkString("\n") )
+      
+      val newCommitteeKK = committees.map( _.knessetKey ).toSet
+      val activePtPs = ptp.filter( p => newCommitteeKK(p.committeeKnessetKey) && knessetKey2KmId.contains(p.personId) ).toSet
+      logger.info(s"Active PtPs: ${activePtPs.size}")
+      
+      // group by committee, using Knesset keys.
+      val cmtKey2PsnKey = activePtPs.groupMap( _.committeeKnessetKey )(_.personId)
+      // convert MKs Knesset keys to db ids.
+      val cmtKey2PsnId = cmtKey2PsnKey.map( t => (t._1, t._2.map(knessetKey2KmId).toSet))
+      // add committee members
+      val committeesWithMembers = committees.map( cmt => cmt.copy(kms=cmtKey2PsnId.getOrElse(cmt.knessetKey, Set())))
+      
+      kmGroups.updateGroups(committeesWithMembers.toSeq)
+      logger.info("Committee import done.")
     }
-    logger.info("Committee import done")
   }
 }
