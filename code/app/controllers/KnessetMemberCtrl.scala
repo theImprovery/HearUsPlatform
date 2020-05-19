@@ -109,7 +109,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       },
       knessetMember => {
         val message = Informational(InformationalLevel.Success, Messages("knessetMember.update"))
-        kms.addKM(knessetMember).map(newKm => Redirect(routes.KnessetMemberCtrl.showEditKM(newKm.id)).flashing(FlashKeys.MESSAGE -> message.encoded))
+        kms.addKM(knessetMember.copy(isActive=true)).map(newKm => Redirect(routes.KnessetMemberCtrl.showEditKM(newKm.id)).flashing(FlashKeys.MESSAGE -> message.encoded))
       }
     )
   }

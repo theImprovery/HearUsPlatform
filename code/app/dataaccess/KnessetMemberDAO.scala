@@ -9,13 +9,14 @@ import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
+class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvider,
+                                  anEc:ExecutionContext, conf:Configuration) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
+  implicit val ec:ExecutionContext = anEc
   private val knessetMembers = TableQuery[KnessetMemberTable]
   private val parties = TableQuery[PartyTable]
   private val contactOptions = TableQuery[ContactOptionTable]
@@ -95,7 +96,7 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
     db.run( DBIO.seq(markAsNotActive, markAsActive, insertNewParties).transactionally )
   }
 
-  def updateKms(currentKms:Seq[KnessetMember]) = {
+  def updateKms(currentKms:Seq[KnessetMember]): Future[Seq[Int]] = {
     // Mark KMs as active/inactive.
     val kmKeysForCurrentKnesset = currentKms.map(_.knessetKey)
     val markAsNotActive = knessetMembers.filter(km => !km.knessetKey.inSet(kmKeysForCurrentKnesset)).map(_.isActive).update(false)
@@ -119,7 +120,7 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
       val updateCommands = kmsToUpdate.map(km => knessetMembers.insertOrUpdate(km))
       db.run( DBIO.sequence(updateCommands))
     }
-  }
+  }.flatten
   
   def getAllActiveKms():Future[Seq[KnessetMember]] = {
     db.run{
