@@ -20,7 +20,7 @@ function chooseTitleForCampaign(routes) {
                 closeModal: true
             }},
     }).then(title => {
-        if (!title) throw null;
+        if (!title) return;
         if ( typeof beRoutes !== "undefined" ) {
             return Playjax(beRoutes)
                 .using(function (c) {
@@ -29,11 +29,10 @@ function chooseTitleForCampaign(routes) {
         } else {
             return Playjax(feRoutes)
                 .using(function (c) {
-                    return c.UserCtrl.showSignupPageForNewCamp(title);
+                    return c.UserCtrl.showSignupPageForNewCampaign(title);
                 }).fetch();
         }
-    })
-        .then( function (res) {
+    }).then( function (res) {
             test = res;
                 if (!res.ok) {
                     swal(polyglot.t("went_wrong"), polyglot.t("try_again"), "error").then((val) => chooseTitleForCampaign());

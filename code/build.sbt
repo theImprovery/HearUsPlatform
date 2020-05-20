@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "polyglot" % "2.2.2",
   "org.webjars" % "sweetalert" % "2.1.0",
   "org.webjars" % "requirejs" % "2.3.6",
-  "org.webjars" % "bootstrap" % "4.4.1-1",
+  "org.webjars" % "bootstrap" % "4.5.0",
   "org.webjars.bower" % "hopscotch" % "0.3.1",
   "org.scalamock" %% "scalamock" % "4.4.0" % Test,
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test

@@ -110,6 +110,7 @@ userEditor.newPasswordAgain=סיסמה חדשה (שוב)
 userEditor.previousPassword=סיסמה קודמת
 userEditor.updatePassword=עידכון סיסמה
 userEditor.updateDetails=שמירת פרטים
+userEditor.existingUserLogin=כבר יש לך חשבון במערכת?
 
 userHome.title=תשמעו אותנו: מסך הבית
 userHome.commonActions=פעולות נפוצות
@@ -368,6 +369,7 @@ background=רקע
 selectFile=בחירת קובץ
 campaignColors=צבעי הקמפיין
 newCampaigner.noCampainger=נא לבחור מנהל קמפיין
+visitSite=הצג אתר
 
 public.navbar.menu=תפריט
 public.navbar.about=אודות
@@ -391,7 +393,7 @@ public.kmPage.actions=פעולות של ח״כ
 public.contactUs=צרו קשר
 public.mainSite=לעמוד הרשמי
 public.createdWith=נוצר בעזרת 
-
+public.footer.createYourOwn=רוצים ליצור קמפיין גם? לחצו כאן!
 answer=תשובה
 signup.wrongAnswer=המילה לא מתאימה
 signup.question=אנא העתק/י את המילה {0} במשפט הבא:

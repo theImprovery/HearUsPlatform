@@ -8,7 +8,7 @@ import dataaccess.UserDAO
 import play.api.i18n.{Langs, MessagesApi}
 
 /**
-  * Handlers cache for the JFE Handlers.
+  * Handlers cache for the Handlers.
   */
 
 @Singleton

@@ -5,6 +5,11 @@
 <div class="container">
   @if( isNew ){
     @comps.pageTitleRow(Messages("userEditor.new.title")) { }
+    <div class="row my-3">
+      <div class="col text-center">
+        <a class="btn btn-outline-success" href="@routes.UserCtrl.showLogin()">@Messages("userEditor.existingUserLogin") <i class="fa fa-sign-in"></i> </a>
+      </div>
+    </div>
   }else{
     @comps.pageTitleRow(Messages("userEditor.title")){ }
   }

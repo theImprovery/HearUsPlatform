@@ -12,9 +12,9 @@ GET     /campaigns/:slug/KnessetMembers/:kmId          controllers.CampaignPubli
 GET     /-x-                      controllers.HomeCtrl.notImplYet
 
 GET     /signup                      controllers.UserCtrl.showSignupPage
-GET     /signup/campaign             controllers.UserCtrl.showSignupPageForNewCamp(title:String)
+GET     /signup/campaign             controllers.UserCtrl.showSignupPageForNewCampaign(title:String)
 POST    /signup                      controllers.UserCtrl.doSignup
-POST    /signup/campaign             controllers.UserCtrl.doSignupForNewCamp(title:String)
+POST    /signup/campaign             controllers.UserCtrl.doSignupForNewCampaign(title:String)
 
 # back office
 GET     /bkofc/                      controllers.UserCtrl.userHome

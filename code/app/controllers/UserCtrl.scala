@@ -3,7 +3,7 @@ package controllers
 import java.sql.Timestamp
 import java.util.UUID
 
-import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
+import be.objectify.deadbolt.scala.{ActionBuilders, AuthenticatedRequest, DeadboltActions, allOfGroup}
 import dataaccess._
 import javax.inject.Inject
 import models.{Campaign, CampaignFactory, CampaignStatus, Invitation, PasswordResetRequest, User, UserCampaign, UserRole}
@@ -14,8 +14,8 @@ import play.api.data.Forms._
 import play.api.i18n._
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.mailer.{Email, MailerClient}
-import play.api.mvc.{Action, Call, ControllerComponents, InjectedController, Result}
-import security.HearUsSubject
+import play.api.mvc.{Action, Call, ControllerComponents, InjectedController, Request, Result}
+import security.{DeadboltHandler, HearUsSubject}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -60,7 +60,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   implicit private val ec = cc.executionContext
   
-  val logger = Logger(classOf[UserCtrl])
+  private val logger = Logger(classOf[UserCtrl])
   
   private val validUserId = "^[-._a-zA-Z0-9]+$".r
   implicit val messagesProvider: MessagesProvider = {
@@ -104,8 +104,21 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     )(ChangePassFormData.apply)(ChangePassFormData.unapply)
   )
   
-  def showLogin = Action { implicit req =>
-    Ok( views.html.users.login(loginForm) )
+  private def subjectPresentOrElse( withU:(User, Request[_])=>Result, noU:Request[_]=>Result )(implicit req:Request[_]):Future[Result] = {
+    req.session.get(DeadboltHandler.USER_ID_SESSION_KEY) match {
+      case None => Future(noU(req))
+      case Some(usrId) => users.get(usrId.toLong).map( {
+        case None => noU(req).withNewSession
+        case Some(u) => withU(u,req)
+      })
+    }
+  }
+  
+  def showLogin = Action.async{ implicit req =>
+      subjectPresentOrElse(
+        (_, _) => Redirect( routes.UserCtrl.userHome() ),
+        _ => Ok( views.html.users.login(loginForm) )
+    )
   }
   
   def doLogin = Action.async { implicit request =>
@@ -115,7 +128,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
         users.authenticate(loginData.username.trim, loginData.password.trim).map( {
           case Some(user) => {
             val redirectTo = request.session.get("targetUrl").getOrElse( routes.UserCtrl.userHome().url )
-            Redirect(redirectTo).withNewSession.withSession(("userId",user.id.toString))
+            Redirect(redirectTo).withNewSession.withSession((DeadboltHandler.USER_ID_SESSION_KEY,user.id.toString))
           }
           case None => BadRequest(views.html.users.login(loginForm.fill(loginData).withGlobalError("login.error.badUsernameEmailOrPassword")))
         })
@@ -217,11 +230,16 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
                                     )(req, messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
   }
 
-  def showSignupPageForNewCamp(title:String) = Action { implicit req =>
-    val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
-    val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-      Ok( views.html.users.userEditorBS( userForm, routes.UserCtrl.doSignupForNewCamp(title), isNew=true, false, randomSentence=randomSentence, randomWord=randomWord
-              )(req, messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
+  def showSignupPageForNewCampaign(title:String) = Action.async { implicit req =>
+    subjectPresentOrElse(
+      (_,_) => Redirect( routes.UserCtrl.userHome() ),
+      (_) => {
+        val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
+        val randomWord = Random.nextInt(randomSentence.split("\\s").length)
+          Ok( views.html.users.userEditorBS( userForm, routes.UserCtrl.doSignupForNewCampaign(title), isNew=true, false, randomSentence=randomSentence, randomWord=randomWord
+                  )(req, messagesProvider)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
+      }
+    )
   }
   
   def doSignup = Action.async{ implicit req =>
@@ -257,13 +275,13 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     )
   }
 
-  def doSignupForNewCamp(title:String) = Action.async{ implicit req =>
+  def doSignupForNewCampaign(title:String) = Action.async{ implicit req =>
     val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
     val randomWord = Random.nextInt(randomSentence.split("\\s").length)
     userForm.bindFromRequest().fold(
     fwe => {
         logger.info(fwe.errors.toString)
-        Future(BadRequest(views.html.users.userEditorBS(fwe, routes.UserCtrl.doSignupForNewCamp(title),
+        Future(BadRequest(views.html.users.userEditorBS(fwe, routes.UserCtrl.doSignupForNewCampaign(title),
           isNew=true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
           .addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
       },
@@ -283,12 +301,12 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
                     Redirect(routes.CampaignMgrCtrl.details(campaign.id, true)).withNewSession.withSession("userId" ->user.id.toString)
                   }
                 }
-                case Failure(exp) => Future(BadRequest(views.html.users.userEditorBS(userForm.fill(fData).withGlobalError(exp.getMessage), routes.UserCtrl.doSignupForNewCamp(title), isNew = true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
+                case Failure(exp) => Future(BadRequest(views.html.users.userEditorBS(userForm.fill(fData).withGlobalError(exp.getMessage), routes.UserCtrl.doSignupForNewCampaign(title), isNew = true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
                   .addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
               })
           }
           case Left(form) => {
-            Future(BadRequest(views.html.users.userEditorBS(form, routes.UserCtrl.doSignupForNewCamp(title), isNew = true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
+            Future(BadRequest(views.html.users.userEditorBS(form, routes.UserCtrl.doSignupForNewCampaign(title), isNew = true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider))
               .addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
           }
         }

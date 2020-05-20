@@ -19,9 +19,13 @@ case class HearUsSubject(user:User) extends Subject {
   override def permissions:List[Permission] = Nil
 }
 
+object DeadboltHandler {
+  val USER_ID_SESSION_KEY = "userId"
+}
 
 class DeadboltHandler(users:UserDAO, langs:Langs, messagesApi:MessagesApi) extends be.objectify.deadbolt.scala.DeadboltHandler {
-  
+  import DeadboltHandler._
+
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }
@@ -31,7 +35,7 @@ class DeadboltHandler(users:UserDAO, langs:Langs, messagesApi:MessagesApi) exten
   override def getDynamicResourceHandler[A](request: Request[A]) = Future(None)
 
   override def getSubject[A](request: AuthenticatedRequest[A]):Future[Option[Subject]] = {
-    request.session.get("userId")
+    request.session.get(USER_ID_SESSION_KEY)
            .map( sId => users.get(sId.toLong).map(_.map(u=>HearUsSubject(u))) )
            .getOrElse( Future(None) )
   }

@@ -56,7 +56,7 @@ class HomeCtrl @Inject()( cc: ControllerComponents
           routes.javascript.HomeCtrl.apiSayHi,
           routes.javascript.UserCtrl.showSignupPage,
           routes.javascript.CampaignMgrCtrl.createCampaign,
-          routes.javascript.UserCtrl.showSignupPageForNewCamp
+          routes.javascript.UserCtrl.showSignupPageForNewCampaign
         )).as("text/javascript")
   }
   
@@ -92,13 +92,14 @@ class HomeCtrl @Inject()( cc: ControllerComponents
           routes.javascript.KnessetMemberCtrl.deleteGroup,
           routes.javascript.ParseCtrl.apiKms,
           routes.javascript.ParseCtrl.apiUpdateCommittees,
-          routes.javascript.CampaignAdminCtrl.showCampaigns,
-          routes.javascript.CampaignMgrCtrl.createCampaign,
+          routes.javascript.CampaignPublicCtrl.index,
           routes.javascript.CampaignAdminCtrl.getCampaigners,
           routes.javascript.CampaignStatusCtrl.updateStatus,
           routes.javascript.CampaignStatusCtrl.changeRequestStatus,
-          routes.javascript.CampaignMgrCtrl.saveCampaign,
           routes.javascript.CampaignAdminCtrl.deleteCampaign,
+          routes.javascript.CampaignAdminCtrl.showCampaigns,
+          routes.javascript.CampaignMgrCtrl.createCampaign,
+          routes.javascript.CampaignMgrCtrl.saveCampaign,
           routes.javascript.CampaignMgrCtrl.getLabelText,
           routes.javascript.CampaignMgrCtrl.updateLabels,
           routes.javascript.CampaignMgrCtrl.getMessages,
@@ -118,7 +119,6 @@ class HomeCtrl @Inject()( cc: ControllerComponents
           routes.javascript.CampaignMgrCtrl.doRemoveFromTeam,
           routes.javascript.CampaignMgrCtrl.addGroupToCamp,
           routes.javascript.CampaignMgrCtrl.removeGroupFromCamp,
-          routes.javascript.CampaignPublicCtrl.index,
           routes.javascript.CampaignMgrCtrl.apiCheckAndUpdateSlug,
           routes.javascript.CampaignMgrCtrl.apiUpdateFrontPage,
           routes.javascript.CampaignMgrCtrl.index
