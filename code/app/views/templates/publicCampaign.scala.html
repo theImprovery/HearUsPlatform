@@ -1,5 +1,4 @@
-@(campaign:Campaign, pageTitle:String, campaignImage:Option[String], extraHead: Html=Html(""), extraBottom: Html=Html(""))(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
-
+@(campaign:Campaign, pageTitle:String, campaignImage:Option[String], extraHead: Html=Html(""), extraBottom: Html=Html(""), analyticsOpt:Option[String]=None)(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
 
 @top = {
   <meta property="og:title" content="@campaign.title"/>
@@ -38,6 +37,7 @@
   @campaign.analytics
   @extraBottom
   <script src="@routes.Assets.versioned("vnd/grayscale/grayscale.min.js")"></script>
+  @for(s<-analyticsOpt){@Html(s)}
 }
 
 @bsBase(pageTitle, top, bottom){

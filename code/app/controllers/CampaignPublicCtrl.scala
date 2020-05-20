@@ -15,8 +15,7 @@ import scala.concurrent.Future
 
 class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO,
                                    images: ImagesDAO, groups:KmGroupDAO,
-                                   campaigns:CampaignDAO, userCampaigns:UserCampaignDAO, users:UserDAO,
-                                   langs:Langs, messagesApi:MessagesApi, deadbolt:DeadboltActions,
+                                   campaigns:CampaignDAO, userCampaigns:UserCampaignDAO, messagesApi:MessagesApi, deadbolt:DeadboltActions,
                                    conf:Configuration, ws:WSClient) extends AbstractController(cc) with I18nSupport {
   
   implicit private val ec = controllerComponents.executionContext
@@ -46,7 +45,8 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
             val km2Image = kmsSeq.map( km => (km.id, kmImages.get(km.id).map( _ => imagePrefix + km.id ).getOrElse("/assets/images/kmNoImage.jpg")) ).toMap
             val km2Position = kmsSeq.map( km => (km.id, dbPositions.getOrElse(km.id, Position.Undecided))).toMap
             val km2Cmt = memberships.map( kv => kv._2.map(km =>(km,kv._1)) ).flatten.groupBy(_._1).map( kv => (kv._1, kv._2.map(_._2).toSet))
-            Ok( views.html.campaignPublic.campaignFrontPage(camp, campaignImage, texts.get, kmsSeq, parties, committees, km2Party, km2Image, km2Position, km2Cmt) )
+            Ok( views.html.campaignPublic.campaignFrontPage(camp, campaignImage, texts.get, kmsSeq, parties, committees,
+                km2Party, km2Image, km2Position, km2Cmt, conf.getOptional[String]("hearUs.analytics")) )
   }})})}
   
   def kmPage( campaignSlug:String, kmId:Long ) = deadbolt.WithAuthRequest()(){ implicit req =>
@@ -85,7 +85,8 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
               }
               Ok(views.html.campaignPublic.campaignKMPage(camp, campaignImage, texts.get, km, party,
                 effPosition, kmImageUrl, kmImageCredit, actions,
-                kmContact -- Set(Platform.Phone, Platform.Fax), emailMessageOpt, twitterMessageMap ))
+                kmContact -- Set(Platform.Phone, Platform.Fax), emailMessageOpt, twitterMessageMap,
+                conf.getOptional[String]("hearUs.analytics")))
             }
             case None => NotFound( views.html.errorPage(404, messagesApi.preferred(req)("errors.campaignNotFound")))
           }

@@ -2,7 +2,8 @@
         imageUrl:String, imageCredit:Option[String],
         actions:Seq[KmAction], contactOptions:Map[Platform.Value,Seq[ContactOption]],
         emailCndMsgOpt: Option[CannedMessage],
-        twitterCndMsgs:Map[ContactOption, String]
+        twitterCndMsgs:Map[ContactOption, String],
+        analyticsOpt:Option[String]=None
 )(implicit request: RequestHeader, msgs:MessagesProvider)
 
 @platformIcon(platformName:Option[Platform.Value])={
@@ -50,7 +51,11 @@
 </div>
 }
 
-@templates.publicCampaign(campaign, campaign.title + ": " + km.name, imageOpt, Html("")){
+@bottom={
+  @Html(campaign.analytics)
+}
+
+@templates.publicCampaign(campaign, campaign.title + ": " + km.name, imageOpt, Html(""), bottom, analyticsOpt){
   <div class="container">
     <div class="row my-2">
       <div class="col">
