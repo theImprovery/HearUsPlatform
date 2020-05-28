@@ -140,6 +140,8 @@ knessetMembers.empty=לא רשומים חברי כנסת במערכת
 
 contactPlatform.Email=אימייל
 contactPlatform.Phone=טלפון
+contactPlatform.WhatsApp=וואטסאפ
+contactPlatform.PhoneAndWhatsApp=טלפון+וואטסאפ
 contactPlatform.Mail=דואר
 contactPlatform.Fax=פקס
 contactPlatform.Facebook=פייסבוק

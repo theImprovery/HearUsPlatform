@@ -159,15 +159,15 @@
         </div>
 
         <div class="tab-pane" id="contactOptions">
-          <div class="row">
+          <div class="row mb-2">
             <div class="col">
               <h3>
-                <div class="pull-left">
-                  <button onclick="updateContactOptions(@km("id").value.getOrElse("-1"))" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("saveChanges")</button>
-                  <button type="button" class="btn btn-outline-success" onclick="addPlatform()"><i class="fa fa-plus"></i> @Messages("add")</button>
-                </div>
                 @Messages("contactOptions")
               </h3>
+            </div>
+            <div class="col text-left">
+                <button onclick="updateContactOptions(@km("id").value.getOrElse("-1"))" class="btn btn-primary"><i class="fa fa-save"></i> @Messages("saveChanges")</button>
+                <button type="button" class="btn btn-outline-success" onclick="addPlatform()"><i class="fa fa-plus"></i> @Messages("add")</button>
             </div>
           </div>
           <div class="row">
@@ -182,7 +182,7 @@
                 <ul id="platformList" style="list-style-type:none">
                   <li id="optionTemplate">
                     <input type="hidden" name="contactOptionId" value="">
-                    <select name="contactType" class="form-control" style="display:inline; width:auto" onchange="updateEditorField(this)">
+                    <select name="contactType" class="form-control custom-select" style="display:inline; width:auto" onchange="updateEditorField(this)">
                       @for(platform <- platforms){
                         <option name="@platform.toString" value="@platform">@Messages("contactPlatform." + platform.toString)</option>
                       }
