@@ -1,7 +1,12 @@
 package controllers
 
 import java.nio.file.{Files, Paths}
-import javax.inject.Inject
+
+import actors.InvalidateCacheActor.{InvalidateCampaigns, InvalidateKM}
+import akka.actor.ActorRef
+import akka.util.Timeout
+import javax.inject.{Inject, Named}
+
 import scala.concurrent.Future
 import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
 import play.api.{Configuration, Logger}
@@ -15,12 +20,18 @@ import models._
 import dataaccess._
 import dataaccess.JSONFormats._
 
+import scala.concurrent.duration._
+
+
+
 case class GroupData(id:Long, name:String, knessetKey:Long, kmsIds:String)
 
 class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                   images: ImagesDAO, groups: KmGroupDAO, langs:Langs, messagesApi:MessagesApi,
-                                  conf:Configuration, ws:WSClient) extends InjectedController {
-
+                                  @Named("cacheInvalidator")cacheActor:ActorRef,
+                                  conf:Configuration) extends InjectedController {
+  implicit val timeout:Timeout = Timeout(60.seconds)
+  
   implicit private val ec = cc.executionContext
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
@@ -108,6 +119,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         }
       },
       knessetMember => {
+        cacheActor ! InvalidateKM(knessetMember.id)
         val message = Informational(InformationalLevel.Success, Messages("knessetMember.update"))
         kms.addKM(knessetMember.copy(isActive=true)).map(newKm => Redirect(routes.KnessetMemberCtrl.showEditKM(newKm.id)).flashing(FlashKeys.MESSAGE -> message.encoded))
       }
@@ -120,6 +132,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       knessetMembers <- kms.getKms(None, true, SortBy.KnessetMember)
       parties <- kms.getAllActiveParties
     } yield {
+      cacheActor ! InvalidateKM(id)
       val partyMap = parties.map(p => p.id -> p).toMap
       Ok(views.html.knesset.knessetMembers(knessetMembers, None, true, SortBy.KnessetMember)).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("knessetMember.deleted"))
     }
@@ -136,6 +149,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         Future(BadRequest(Json.obj("status" -> "error", "data" -> JsError.toJson(errors))))
       },
       cos => {
+        cacheActor ! InvalidateKM(kmId)
         kms.setContactOptions(kmId, cos).map(_ => Ok(Json.toJson("message"->"ok")) )
       }
     )
@@ -152,6 +166,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         }
       },
       party => {
+        cacheActor ! InvalidateCampaigns(frontPageOnly = false)
         kms.addParty(party).map(newP => Ok(Json.toJson(newP)))
       }
     )
@@ -162,6 +177,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       deleted <- kms.deleteParty(id)
       parties <- kms.getAllActiveParties
     } yield {
+      cacheActor ! InvalidateCampaigns(frontPageOnly = true)
       Ok(views.html.knesset.parties(parties))
     }
   }
@@ -224,6 +240,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
         }
         groups.addGroup(insGroup).map { group =>
           val message = Informational(InformationalLevel.Success, Messages("groupEditor.savedSuccessfully", group.name))
+          cacheActor ! InvalidateCampaigns(frontPageOnly=true)
           Redirect(routes.KnessetMemberCtrl.showGroups()).flashing(FlashKeys.MESSAGE -> message.encoded)
         }
       }
@@ -235,6 +252,7 @@ class KnessetMemberCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
       deleted <- groups.deleteGroup(id)
       groups <- groups.allGroupsDN(None)
     } yield {
+      cacheActor ! InvalidateCampaigns(frontPageOnly=true)
       Ok(views.html.knesset.groups(groups))
     }
   }

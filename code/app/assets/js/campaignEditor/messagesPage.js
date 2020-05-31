@@ -23,15 +23,15 @@ function save( messageKey, content ) {
         text:content
     };
     ["male", "female"].forEach( function(g){
-       ["Email", "Twitter"].forEach( function(platform){
+       ["Email", "Twitter", "WhatsApp"].forEach( function(platform){
            positions.forEach(function(pos){
-               var key = {
+               const key = {
                  gender:g,
                  platform:platform,
                  position:pos
                };
-               var hasData = (load(key).trim().length > 0);
-               var $cell = $("#"+g+"_"+platform+"_"+pos);
+               const hasData = (load(key).trim().length > 0);
+               const $cell = $("#"+g+"_"+platform+"_"+pos);
                if ( hasData ) {
                    $cell.removeClass("noMessage");
                    $cell.addClass("hasMessage");
@@ -47,16 +47,16 @@ function save( messageKey, content ) {
 }
 
 function load( messageKey ) {
-    var message = messages[keyToString(messageKey)];
+    const message = messages[keyToString(messageKey)];
     return message ? message.text : "";
 }
 
-var lastClass="bg-success";
+let lastClass="bg-success";
 function updateCharacterCount() {
-    var charLen = $contentPane.val().length;
-    var left = 280-charLen;
+    const charLen = $contentPane.val().length;
+    const left = 280-charLen;
     counterSpan.textContent=String(left);
-    var curClass = "bg-success";
+    let curClass = "bg-success";
     if ( left < 100 ) {
         curClass = "bg-warning";
     } else if ( left < 0 ) {
@@ -75,16 +75,18 @@ function keyToString( aKey ) {
 }
 
 function getMessageKey() {
- var retVal = {};
- var status = $( "input:checked" ).map(function() {
+ const retVal = {};
+ const checkedIds = $( "input:checked" ).map(function() {
             return this.id;
         }).get();
 
- retVal.platform = (status.indexOf("platformTwitter")>-1) ? "Twitter" : "Email";
- retVal.gender = (status.indexOf("male")>-1) ? "male" : "female";
- for ( var itm in status ) {
-     if ( status[itm]!==retVal.gender && status[itm]!==retVal.media ) {
-         retVal.position = status[itm];
+ const platform = checkedIds.filter(e=>e.indexOf("platform")===0)[0];
+
+ retVal.platform = platform.replaceAll("platform","");
+ retVal.gender = (checkedIds.indexOf("male")>-1) ? "male" : "female";
+ for ( var itm in checkedIds ) {
+     if ( checkedIds[itm]!==retVal.gender && checkedIds[itm]!==retVal.media ) {
+         retVal.position = checkedIds[itm];
      }
  }
 
@@ -95,8 +97,8 @@ function saveMessages() {
     Informationals.loader(polyglot.t("saving"));
     messageSelectionChanged(); // save current message;
 
-    var arr = [];
-    for ( var k in messages ) {
+    const arr = [];
+    for ( const k in messages ) {
         arr.push( messages[k] );
     }
     new Playjax(beRoutes)
@@ -152,7 +154,7 @@ function loadMessages(){
 }
 
 function messageSelectionChanged() {
-    var key = getMessageKey();
+    const key = getMessageKey();
     twitterMode = (key.platform==="Twitter");
     if ( twitterMode ) {
         $characterCounter.slideDown();

@@ -72,7 +72,16 @@ object Helpers {
     req.subject.map( u=> u.asInstanceOf[HearUsSubject].user.roles.toSeq.sorted.flatMap(roleMap) )
       .getOrElse( Structure.publicItems )
   }
-
+  
+  /**
+    * Phone number for WhatsApp is 972xxxxxxxxx (no hyphens, no dashes, int'l  code, no leading zeros).
+    * @param phoneNum
+    * @return Phone number in WhatsApp compliant format
+    */
+  def whatsAppPhoneFmt(rawPhoneNum:String):String = {
+    "972" + rawPhoneNum.filter( Character.isDigit ).dropWhile( _ == '0' )
+  }
+  
   object TableHelper {
     def sortValue(isActive:Boolean, isAsc:Boolean):Option[String] = {
       Some(

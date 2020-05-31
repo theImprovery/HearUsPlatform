@@ -4,10 +4,11 @@ import java.sql.{Date, Timestamp}
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
+import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
 import com.sun.org.glassfish.gmbal.ManagedObjectManager.RegistrationDebugLevel
 import dataaccess._
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import models._
 import play.api.{Configuration, Logger}
 import play.api.i18n._
@@ -17,6 +18,7 @@ import play.api.mvc.{ControllerComponents, InjectedController, Result}
 import security.HearUsSubject
 import dataaccess.JSONFormats._
 import org.joda.time.DateTime
+import play.api.cache.AsyncCacheApi
 import play.api.data.{Form, _}
 import play.api.data.Forms._
 import play.api.data.format.Formatter
@@ -24,6 +26,9 @@ import play.mvc.BodyParser.AnyContent
 
 import scala.collection.mutable
 import scala.concurrent.Future
+import actors.InvalidateCacheActor._
+import akka.util.Timeout
+import scala.concurrent.duration._
 
 case class detailsCampaign(name:String, slug:String, campaigner:Long)
 
@@ -31,8 +36,8 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
                                 campaigns:CampaignDAO, users:UserDAO, usersCampaigns:UserCampaignDAO,
                                 groups:KmGroupDAO,
                                 langs:Langs, messagesApi:MessagesApi, images: ImagesDAO,
-                                conf:Configuration, ws:WSClient) extends InjectedController {
-
+                                conf:Configuration, @Named("cacheInvalidator")cacheActor:ActorRef) extends InjectedController {
+  implicit val timeout:Timeout = Timeout(60.seconds)
   implicit private val ec = cc.executionContext
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
@@ -96,6 +101,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           ).map(Some(_)) ).getOrElse(Future(None))
         } yield {
           var form = newCampaignForm.fill(adminCampaign)
+          cacheActor ! InvalidateCampaignBySlug(adminCampaign.slug, frontPageOnly=false)
           form = form.withError("slug", "error.campaignSlug.exists")
           rel.map(_=> Redirect(routes.CampaignAdminCtrl.showCampaigns()) )
             .getOrElse( BadRequest(views.html.campaignMgmt.createCampaign(form)) )
@@ -117,8 +123,8 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         campaign.map( c => Ok(views.html.knesset.campaignEditor(c, Position.values.toSeq, Platform.values.toSeq, imageOp,
           conf.get[String]("hearUs.files.camImages.url"), knessetMembers.sortBy(_.name),
           positions.map(p => (p.kmId, p.position.toString)).toMap, actions,
-          parties.map(p => (p.id, p.name)).toMap)))
-          .getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+          parties.map(p => (p.id, p.name)).toMap))
+        ).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
       }
     }
 
@@ -137,6 +143,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       req.body.validate[CampaignDetails].fold(
         errors => Future(BadRequest(Json.obj("message" -> "can't parse campaign", "details"->errors.mkString(",")))),
         campaignDtls => {
+          cacheActor ! InvalidateCampaignById(id, frontPageOnly = false)
           campaigns.updateDetails(id,campaignDtls).map(newC => Ok(Json.toJson(newC)))
         }
       )
@@ -177,8 +184,8 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           Future(BadRequest(Json.obj("message" -> "can't parse campaign", "details"->errors.mkString(","))))
         },
         texts => {
-          campaigns.updateTexts(texts.copy(campaignId=id)).map( i =>
-              Ok( Json.toJson(i)))
+          cacheActor ! InvalidateCampaignById(id, frontPageOnly = true)
+          campaigns.updateTexts(texts.copy(campaignId=id)).map( i => Ok(Json.toJson(i)))
         }
       )
     }
@@ -192,6 +199,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           Future(BadRequest(fwe.errors.mkString("\n")))
         },
         texts => {
+          cacheActor ! InvalidateCampaignById(id, frontPageOnly = true)
           campaigns.updateTexts(texts.copy(campaignId=id)).map( i =>
             Redirect( routes.CampaignMgrCtrl.showFrontPageEditor(id))
               .flashing(FlashKeys.MESSAGE ->
@@ -270,13 +278,13 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         }
       },
       action => {
+        cacheActor ! InvalidateKmInCampaign(camId, kmId)
         campaignEditorAction(camId){
           val message = Informational(InformationalLevel.Success, Messages("action.update"))
           campaigns.updateAction(action).map(newAction => Redirect(routes.CampaignMgrCtrl.allActions(action.camId, action.kmId)).flashing(FlashKeys.MESSAGE -> message.encoded))
         }
       }
     )
-
   }
 
   def deleteAction(id:Long, camId:Long, kmId:Long) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
@@ -287,7 +295,11 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         knessetMember <- kms.getKM(kmId)
         party <- knessetMember.map( km=> kms.getParty(km.partyId) ).getOrElse(Future(None))
         actions <- campaigns.getActions(camId, kmId)
-      } yield knessetMember.map(km => Ok(views.html.campaignMgmt.actions(campaignOpt.get, km, party, actions))).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+      } yield {
+        cacheActor ! InvalidateKmInCampaign(camId, kmId)
+        knessetMember.map(km => Ok(views.html.campaignMgmt.actions(campaignOpt.get, km, party, actions))
+                    ).getOrElse(NotFound("campaign with id " + camId + "does not exist"))
+      }
     }
 
   }
@@ -300,6 +312,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       },
       pos => {
         campaignEditorAction(pos.camId){
+          cacheActor ! InvalidateKmInCampaign(pos.camId, pos.kmId)
           campaigns.updatePosition(pos).map(ans => Ok(Json.toJson(ans)))
         }
       }
@@ -318,6 +331,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       }),
       labels => {
         campaignEditorAction(labels.head.camId){
+          cacheActor ! InvalidateCampaignById(labels.head.camId, frontPageOnly = true)
           campaigns.addLabelTexts(labels).map(ans => Ok(Json.toJson(ans)))
         }
       }
@@ -336,6 +350,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           Future(BadRequest(Json.obj("message"->"can't parse canned message", "details"->errors.mkString("\n"))))
         },
         msgs => {
+          cacheActor ! InvalidateCampaignById(id, frontPageOnly = false)
           campaigns.setMessages(id, msgs).map(_ => Ok(Json.obj("message"->"Messages Saved")))
         }
       )
@@ -353,6 +368,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         Future(BadRequest("can't parse social media details"))
       },
       sms => {
+        cacheActor ! InvalidateCampaignById(sms.head.camId, frontPageOnly=true)
         campaignEditorAction(sms.head.camId){
           campaigns.addSm(sms).map(ans => Ok(Json.toJson(ans)))
         }
@@ -483,25 +499,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
                                                                                           userOpt.get.username)).encoded)
   }}})}}
 
-  def showCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
-    campaignEditorAction(id) {
-      for {
-        campaign <- campaigns.getCampaign(id)
-        campImg  <- images.getImageForCampaign(id)
-      } yield campaign match {
-        case None => NotFound("Can't find campaign")
-        case Some(c) => {
-          val csses = c.themeData.split("/*---*/")
-          val cssMap = parseCampaignDesign(csses(0))
-          Ok( views.html.campaignMgmt.design(c, Position.values.toSeq,
-            campImg, conf.get[String]("hearUs.files.campaignImages.url"),
-            cssMap, if (csses.length>1){csses(1)}else{""})
-          )
-        }
-      }
-    }
-  }
-
   def showCampaignGroups( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
     campaignEditorAction(id) {
       for {
@@ -526,6 +523,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         Future(BadRequest("can't remove group"))
       },
       relGroup => {
+        cacheActor ! InvalidateCampaignById(relGroup.camId, frontPageOnly = true)
         campaignEditorAction(relGroup.camId){
           groups.removeGroupFromCamp(relGroup.camId, relGroup.groupId).map(ans => Ok(Json.toJson(ans)))
         }
@@ -540,13 +538,33 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         Future(BadRequest("can't remove group"))
       },
       relGroup => {
+        cacheActor ! InvalidateCampaignById(relGroup.camId, frontPageOnly = true)
         campaignEditorAction(relGroup.camId){
           groups.addGroupToCampaign(relGroup).map(ans => Ok(Json.toJson(ans)))
         }
       }
     )
   }
-
+  
+  def showCampaignDesign( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))(){ implicit req =>
+    campaignEditorAction(id) {
+      for {
+        campaign <- campaigns.getCampaign(id)
+        campImg  <- images.getImageForCampaign(id)
+      } yield campaign match {
+        case None => NotFound("Can't find campaign")
+        case Some(c) => {
+          val csses = c.themeData.split("/*---*/")
+          val cssMap = parseCampaignDesign(csses(0))
+          Ok( views.html.campaignMgmt.design(c, Position.values.toSeq,
+            campImg, conf.get[String]("hearUs.files.campaignImages.url"),
+            cssMap, if (csses.length>1){csses(1)}else{""})
+          )
+        }
+      }
+    }
+  }
+  
   val designForm = Form( tuple(
     "css"->text,
     "imageCredit"->text
@@ -567,6 +585,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         updatedImageOpt = campaignImage.map( ci => ci.copy(credit=bf.get._2) )
         updateImageRes <- Seq(newImageOpt, updatedImageOpt).flatten.headOption.map( images.storeImage ).getOrElse(Future(None))
       } yield {
+        cacheActor ! InvalidateCampaignById(id, frontPageOnly = false)
         Ok("done. Design Updated:" + designUpdated + " savedImage:" + updateImageRes)
       }
     }
@@ -578,6 +597,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
         image <- images.getImageForCampaign(id)
         deletedCount <- image.map( img => images.deleteImageRecord(img.id) ).getOrElse(Future(0))
       } yield {
+        cacheActor ! InvalidateCampaignById(id, frontPageOnly = false)
         image.filter( _ => deletedCount>0 ).foreach( img => images.deleteCampaignImageFile(img) )
         Ok("Deleted")
       }

@@ -45,16 +45,21 @@ ul.kmSelectList {
 
 .messagesTable td {
   text-align: center;
+  transition: background-color 1s;
 }
 
 td.hasMessage {
   background-color: #484;
   color: #0F0;
+  i.fa-times-circle-o {
+    display: none;
+  }
 }
 
 td.noMessage {
   background-color: #aaa;
-  i.fa {
+  color: #EEE;
+  i.fa-check-circle-o {
     display: none;
   }
 }

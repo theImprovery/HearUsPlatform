@@ -35,6 +35,10 @@ class KnessetMemberDAO @Inject() (protected val dbConfigProvider:DatabaseConfigP
   }
 
   def getAllKms:Future[Seq[KnessetMember]] = db.run( knessetMembers.result )
+  
+  def getAllActiveKmIds:Future[Seq[Long]] = db.run (
+    knessetMembers.filter( _.isActive ).map( _.id ).result
+  )
 
   def prepareView(searchStr: Option[String], sortBy: SortBy.Value, isAsc: Boolean) = {
     val searchedView = searchStr match {

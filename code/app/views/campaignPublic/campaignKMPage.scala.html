@@ -3,6 +3,7 @@
         actions:Seq[KmAction], contactOptions:Map[Platform.Value,Seq[ContactOption]],
         emailCndMsgOpt: Option[CannedMessage],
         twitterCndMsgs:Map[ContactOption, String],
+        whatsAppCndMsgs:Map[ContactOption, String],
         analyticsOpt:Option[String]=None
 )(implicit request: RequestHeader, msgs:MessagesProvider)
 
@@ -13,6 +14,7 @@
         case Platform.Phone => {<i class="fa fa-phone"></i>}
         case Platform.Email => {<i class="fa fa-at"></i>}
         case Platform.Mail => {<i class="fa fa-home"></i>}
+        case Platform.WhatsApp => {<i class="fa fa-whatsapp"></i>}
         case Platform.Fax => {<i class="fa fa-fax"></i>}
         case Platform.Facebook => {<i class="fa fa-facebook"></i>}
         case Platform.Twitter => {<i class="fa fa-twitter"></i>}
@@ -64,9 +66,9 @@
     </div>
     <div class="row my-2">
       <div class="col-sm-3 text-center">
-        <img style="width:100px" alt="picture of @km.name" src="@imageUrl" />
+        <img style="display:block" alt="picture of @km.name" src="@imageUrl" />
         @for( credit <- imageCredit ) {
-          <br><small class="text-muted">@Messages("public.mk.imageCredit") @credit</small>
+          <small class="text-muted">@Messages("public.mk.imageCredit") @credit</small>
         }
       </div>
       <div class="col-sm-9">
@@ -103,15 +105,22 @@
               }
               @for( cos<-contactOptions.get(Platform.Facebook)  ){
                 @for( co <- cos ){
-                  <li>@platformIcon(co.platformObj) <a class="fbLink" href="https://www.facebook.com/@co.details">@Messages("public.kmPage.openOnFacebook", co.details)</a></li>
+                  <li>@platformIcon(co.platformObj) <a class="fbLink" href="https://www.facebook.com/@co.details">@Messages("public.kmPage.openOnFacebook", co.title)</a></li>
                 }
+              }
+              @for( hdlMsgPair <- whatsAppCndMsgs  ){
+                <li>@platformIcon(Some(Platform.WhatsApp))
+                  <a target="_blank" href="https://wa.me/@Helpers.whatsAppPhoneFmt(hdlMsgPair._1.details)?text=@Html(helper.urlEncode(hdlMsgPair._2))">
+                    @Messages("public.kmPage.writeOnWhatsApp") @hdlMsgPair._1.details
+                    @views.Helpers.ifNotEmpty(hdlMsgPair._1.title){t=>(@t)}</a>
+                </li>
               }
               @for( cos<-contactOptions.get(Platform.Email); msg <-emailCndMsgOpt  ){
                 @for( co <- cos ){
                   <li>@platformIcon(cos.head.platformObj) @Messages("public.kmPage.sendEmail", co.details)
-                  <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")">
+                  <a class="btn btn-sm btn-outline-secondary" target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")">
                     <i class="fa fa-send"></i> @Messages("public.kmPage.openInGMail")</a>
-                    <a class="btn btn-outline-secondary btn-sm" target="_blank" href="mailto:@co.details?subject=@helper.urlEncode(campaign.title + ": " + campaign.slogan).replaceAll("\\+","%20")&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")">
+                    <a class="btn btn-sm btn-outline-secondary" target="_blank" href="mailto:@co.details?subject=@helper.urlEncode(campaign.title + ": " + campaign.slogan).replaceAll("\\+","%20")&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")">
                     <i class="fa fa-send-o"></i> @Messages("public.kmPage.openInLocalMail")</a>
                   </li>
                 }

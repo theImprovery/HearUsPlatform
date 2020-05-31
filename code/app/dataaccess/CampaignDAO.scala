@@ -29,6 +29,10 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
 
   def getAllCampaigns:Future[Seq[Campaign]] = db.run( campaigns.result )
   
+  def getCampaignSlugs:Future[Seq[String]] = db.run(
+    campaigns.map(_.slug).result
+  ).map( _.flatten )
+  
   def count:Future[Int] = db.run( campaigns.size.result )
   
   def store(cam: Campaign ):Future[Campaign] = {
@@ -200,6 +204,10 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   def getBySlug( slug:String ):Future[Option[Campaign]] = {
     db.run( campaigns.filter( _.slug.toLowerCase === slug.toLowerCase).result ).map( _.headOption )
   }
+  
+  def getSlug( id:Long ):Future[Option[String]] = db.run(
+    campaigns.filter( _.id === id ).map(_.slug).result
+  ).map( _.headOption.flatten )
 
   def updateStatus(campId:Long, status: CampaignStatus.Value ):Future[Int] = {
     import Mappers.campaignStatus
