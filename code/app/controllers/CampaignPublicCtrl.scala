@@ -16,6 +16,7 @@ import security.{HearUsRole, HearUsSubject}
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
+import scala.util.Random
 
 object CampaignPublicCtrl {
   def campaignCacheKey(slug:String) = s"CampaignPublicCtrl/campaign/$slug"
@@ -30,7 +31,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
   implicit private val ec = controllerComponents.executionContext
   val logger = Logger(this.getClass)
   
-  def index( campaignSlug:String ) = cached(_=>campaignCacheKey(campaignSlug), Duration(5, TimeUnit.MINUTES) ) {
+  def index( campaignSlug:String ) = cached(_=>campaignCacheKey(campaignSlug), Duration(30, TimeUnit.SECONDS) ) {
     deadbolt.WithAuthRequest()(){ implicit req =>
       campaigns.getBySlug(campaignSlug).flatMap({
         case None => Future(NotFound( views.html.errorPage(404, messagesApi.preferred(req)("errors.campaignNotFound"))))
@@ -38,7 +39,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
           case false => Future(Unauthorized( views.html.errorPage(401, messagesApi.preferred(req)("errors.userNotAuthorizedToSeeCampaign"))))
           case true => for {
               texts <- campaigns.getTextsFor(camp.id)
-              kmsSeq  <- kms.getAllActiveKms().map( _.sortBy(_.name) )
+              kmsSeq  <- kms.getAllActiveKms().map( Random.shuffle(_) )
               dbPositions <- campaigns.getPositions(camp.id).map( posSeq => posSeq.map( p => (p.kmId, p.position)).toMap )
               kmImages <- images.getAllKmImages
               bkgPrefix = conf.get[String]("hearUs.files.campaignImages.url")
