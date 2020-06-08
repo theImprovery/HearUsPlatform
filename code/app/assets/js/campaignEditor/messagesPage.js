@@ -69,7 +69,7 @@ function updateCharacterCount() {
         lastClass = curClass;
     }
 }
-
+//
 function keyToString( aKey ) {
     return aKey.platform + "/" + aKey.gender + "/" + aKey.position;
 }
@@ -82,7 +82,7 @@ function getMessageKey() {
 
  const platform = checkedIds.filter(e=>e.indexOf("platform")===0)[0];
 
- retVal.platform = platform.replaceAll("platform","");
+ retVal.platform = platform.replace("platform","");
  retVal.gender = (checkedIds.indexOf("male")>-1) ? "male" : "female";
  for ( var itm in checkedIds ) {
      if ( checkedIds[itm]!==retVal.gender && checkedIds[itm]!==retVal.media ) {

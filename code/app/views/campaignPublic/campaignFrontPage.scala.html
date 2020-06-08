@@ -62,15 +62,6 @@
           <div class="masthead-x">
             <h1 class="mx-auto">@texts.title</h1>
             <h2 class="mx-auto">@texts.subtitle</h2>
-            <ul class="socialLinks">
-              @defining( (helper.urlEncode(campaign.title + ": " + campaign.slogan), helper.urlEncode("https://"+request.host+request.uri))  ){ case (encText, url)=>
-                <li><a href="https://twitter.com/intent/tweet?text=@Html(encText)+@url"><i class="fa fa-twitter"></i></a></li>
-                <li><a href="https://www.facebook.com/sharer.php?u=@url"><i class="fa fa-facebook"></i></a></li>
-                <li><a href="mailto:?subject=@Html(encText.replaceAll("\\+","%20"))&body=@url"><i class="fa fa-envelope"></i></a></li>
-                <li><a href="whatsapp://send?text=@Html(encText) + @url" data-action="share/whatsapp/share"><i class="fa fa-whatsapp"></i></a></li>
-              }
-              @if(campaign.website.trim.nonEmpty){<li><a href="@campaign.website.trim" title="@Messages("public.mainSite")"><i class="fa fa-globe"></i></a></li>}
-            </ul>
             <a href="#sectionMainText" class="btn btn-round js-scroll-trigger"><i class="fa fa-angle-double-down animated"></i></a>
           </div>
         </div>
@@ -136,8 +127,23 @@
     </div>
   </section>
 
+
+
   <section id="footerSection" class="text-center">
     <div class="container">
+      <div class="row my-5">
+        <div class="col">
+          <ul class="socialLinks">
+            @defining( (helper.urlEncode(campaign.title + ": " + campaign.slogan), helper.urlEncode("https://"+request.host+request.uri))  ){ case (encText, url)=>
+            <li><a href="https://twitter.com/intent/tweet?text=@Html(encText)+@url"><i class="fa fa-twitter"></i></a></li>
+            <li><a href="https://www.facebook.com/sharer.php?u=@url"><i class="fa fa-facebook"></i></a></li>
+            <li><a href="mailto:?subject=@Html(encText.replaceAll("\\+","%20"))&body=@url"><i class="fa fa-envelope"></i></a></li>
+            <li><a href="whatsapp://send?text=@Html(encText) + @url" data-action="share/whatsapp/share"><i class="fa fa-whatsapp"></i></a></li>
+            }
+            @if(campaign.website.trim.nonEmpty){<li><a href="@campaign.website.trim" title="@Messages("public.mainSite")"><i class="fa fa-globe"></i></a></li>}
+          </ul>
+        </div>
+      </div>
       <div class="row my-5">
         <div class="col-lg-8 mx-auto">
           @if(campaign.website.trim.nonEmpty){
