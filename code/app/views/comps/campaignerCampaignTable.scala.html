@@ -1,4 +1,4 @@
-@(campaigns: Seq[Campaign])(implicit m:MessagesProvider)
+@(campaigns: Seq[Campaign], isAdmin:Set[Long])(implicit m:MessagesProvider)
 @if(campaigns.nonEmpty) {
   <table class="table table-striped">
   @for(c <- campaigns) {
@@ -11,17 +11,19 @@
       <td>
         <a class="btn btn-sm btn-outline-primary" href="@routes.CampaignMgrCtrl.details(c.id, false)"><i class="fa fa-edit"></i>
           @Messages("edit")</a>
-        <button type="button" id="deleteBtn" onclick="deleteCampaign(@c.id, 'campaigner');" class="btn btn-sm btn-outline-danger">
-          <i class="fa fa-trash"></i> @Messages("delete")</button>
-        @if(c.status != CampaignStatus.Published) {
-          <button type="button" id="publishBtn_@c.id" onclick="changeRequestStatus(1, @c.id, this);" class="btn btn-sm btn-outline-info"
-            @if(c.status == CampaignStatus.Published || c.status == CampaignStatus.PublicationRequested) {style="display: none"}>
-            <i class="fa fa-send"></i> @Messages("askForPublish")</button>
-          <button type="button" id="cancelPublishBtn_@c.id" onclick="changeRequestStatus(0, @c.id, this);" class="btn btn-sm btn-outline-danger"
-            @if(c.status != CampaignStatus.PublicationRequested) {style="display: none"}>
-            <i class="fa fa-times-circle"></i> @Messages("cancelRequest")</button>
-        </td>
-      }
+        @if( isAdmin(c.id) ) {
+          <button type="button" id="deleteBtn" onclick="deleteCampaign(@c.id, 'campaigner');" class="btn btn-sm btn-outline-danger">
+            <i class="fa fa-trash"></i> @Messages("delete")</button>
+          @if(c.status != CampaignStatus.Published) {
+            <button type="button" id="publishBtn_@c.id" onclick="changeRequestStatus(1, @c.id, this);" class="btn btn-sm btn-outline-info"
+              @if(c.status == CampaignStatus.Published || c.status == CampaignStatus.PublicationRequested) {style="display: none"}>
+              <i class="fa fa-send"></i> @Messages("askForPublish")</button>
+            <button type="button" id="cancelPublishBtn_@c.id" onclick="changeRequestStatus(0, @c.id, this);" class="btn btn-sm btn-outline-danger"
+              @if(c.status != CampaignStatus.PublicationRequested) {style="display: none"}>
+              <i class="fa fa-times-circle"></i> @Messages("cancelRequest")</button>
+          }
+        }
+      </td>
     </tr>
   }
   </table>

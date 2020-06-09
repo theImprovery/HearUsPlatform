@@ -39,7 +39,7 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     for {
       camps <- campaigns.getAllCampaigns
       contacts <- campaigns.getCampaignContact
-      myCampaignIds <- userCampaigns.getCampaginsForUser(userId).map( _.map(_.id).toSet )
+      myCampaignIds <- userCampaigns.getCampaignsForUser(userId).map( _._1.map(_.id).toSet )
     } yield Ok(views.html.campaignAdmin.allCampaigns(camps.sortBy(c => CampaignAdminCtrl.statusSortOrder(c.status) + c.title), contacts, myCampaignIds))
   }
 

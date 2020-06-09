@@ -149,9 +149,12 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       ptCount <- knesset.countParties
       comCount <- committees.countGroups()
       campaignCount <- campaigns.count
-      camps <- usersCampaigns.getCampaginsForUser(user.id)
+      camps <- usersCampaigns.getCampaignsForUser(user.id)
     } yield {
-      Ok( views.html.users.userHome(user, mkCount, ptCount, comCount, campaignCount, camps) )
+      Ok( views.html.users.userHome(
+            user, mkCount, ptCount, comCount, campaignCount,
+            camps._1.toSeq.sortBy(_.title), camps._2)
+      )
     }
   }
 

@@ -1,5 +1,5 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(u:User, mkCount:Int, ptCount:Int, comCount:Int, campaignCount:Int, camps:Seq[Campaign])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(u:User, mkCount:Int, ptCount:Int, comCount:Int, campaignCount:Int, camps:Seq[Campaign], isAdmin:Set[Long])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/userHome.js")"></script>
@@ -58,7 +58,7 @@
       </div>
       <div class="row my-3">
         <div class="col">
-          @comps.campaignerCampaignTable( camps )
+          @comps.campaignerCampaignTable( camps, isAdmin )
         </div>
       </div>
 

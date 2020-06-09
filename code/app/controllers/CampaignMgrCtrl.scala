@@ -66,8 +66,9 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
 
   def index() = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     val userId = req.asInstanceOf[AuthenticatedRequest[_]].subject.get.asInstanceOf[HearUsSubject].user.id
-    usersCampaigns.getCampaginsForUser( userId ).map( cmps =>
-      Ok( views.html.campaignMgmt.index(cmps.sortBy(_.title)) )
+    usersCampaigns.getCampaignsForUser( userId ).map(cmps =>{
+      Ok( views.html.campaignMgmt.index(cmps._1.toSeq.sortBy(_.title), cmps._2) )
+    }
     )
   }
 
@@ -76,7 +77,6 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     for {
       campaign <- campaigns.store(CampaignFactory.createWithDefaults(title, conf.getOptional[String]("hearUs.defaultCampaignStyle").getOrElse("")))
       rel <- usersCampaigns.connectUserToCampaign(UserCampaign(userId, campaign.id, isAdmin=true))
-      camps <- usersCampaigns.getCampaginsForUser( userId )
       _ <- campaigns.initializeCampaignPositions(campaign.id)
     } yield {
       Redirect(routes.CampaignMgrCtrl.details(campaign.id, true))

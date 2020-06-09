@@ -1,7 +1,7 @@
 package dataaccess
 
 import javax.inject.Inject
-import models.{CampaignTeam, UserCampaign}
+import models.{Campaign, CampaignTeam, UserCampaign}
 import play.api.Configuration
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.dbio.DBIOAction
@@ -18,11 +18,18 @@ class UserCampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigPr
   private val campaigns = TableQuery[CampaignTable]
   private val users = TableQuery[UserTable]
   
-  def getCampaginsForUser( userId:Long ) = db.run(
+  /**
+    * Returns the set of campaigns a user is involved in, and the
+    * set of campaigns that she manages.
+    * @param userId
+    * @return
+    */
+  def getCampaignsForUser(userId:Long ):Future[(Set[Campaign], Set[Long])] = db.run(
     userCampaign.join(campaigns).on((uc, c) => uc.campaignId === c.id )
-      .filter( _._1.userId ===userId )
-      .map( _._2).result
-  )
+      .filter( _._1.userId ===userId ).result
+  ).map( res => res.foldLeft((Set[Campaign](), Set[Long]()))( (res, row)=>{
+    ( res._1 + row._2, if (row._1.isAdmin) res._2+row._1.campaignId else res._2 )
+  }))
   
   def disconnectUserFromCampaign(userId:Long, campaignId:Long) = db.run{ userCampaign.filter(r => r.userId===userId && r.campaignId === campaignId).delete }
   
