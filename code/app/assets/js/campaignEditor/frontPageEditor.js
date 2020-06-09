@@ -4,34 +4,34 @@ function frontPageEditorSetup(){
     $("#bodyText").summernote({
         height: 500,
         fontSizes: ['8', '9', '10', '12', '14', '16', '24', '36', '48' , '64', '82', '150'],
-        toolbar: [
-            // [groupName, [list of button]]
-            ['font', ['fontname', 'fontsize', 'forecolor','backcolor']],
-            ['style', ['bold', 'italic', 'underline', 'clear', 'strikethrough']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph', 'left', 'center', 'right']],
-            ['insert', ['link','picture','video','hr']],
-            ['misc',['fullscreen','codeview']]
+        styleTags: [
+            { title: 'כותרת ראשית', tag: 'h1', className: '', value: 'h1' },
+            { title: 'כותרת משנה', tag: 'h2', className: '', value: 'h2' },
+            { title: 'כותרת', tag: 'h3', className: '', value: 'h3' },
+            { title: 'כותרת קטנה', tag: 'h4', className: '', value: 'h4' }
         ],
-        fontNames: ['Alef', 'Arial', 'Courier New'],
-        fontNamesIgnoreCheck:['Alef']
-
+        toolbar: [
+            ['minimal', ['bold', 'italic', 'underline', 'clear', 'strikethrough',
+                'ul', 'ol', 'paragraph', 'left', 'center', 'right',
+                'link','picture','video'
+            ]],
+            ['style', ['style']]
+        ]
     });
 
 }
 
 function prepareForm() {
-    var groupValue = positionStrings.map((pos) => document.getElementById("group" + pos).value).join("\t");
+    const groupValue = positionStrings.map((pos) => document.getElementById("group" + pos).value).join("\t");
     document.getElementById("groupLabels").value = groupValue;
-    var mkValues = [];
-    for (var g in genderStrings) {
-        for (var p in positionStrings) {
-            var key = genderStrings[g] + positionStrings[p] + "Label";
+    const mkValues = [];
+    for (let g in genderStrings) {
+        for (let p in positionStrings) {
+            let key = genderStrings[g] + positionStrings[p] + "Label";
             mkValues.push(document.getElementById(key).value);
         }
     }
     document.getElementById("kmLabels").value = mkValues.join("\t");
-
 }
 
 window.onbeforeunload = function() {
