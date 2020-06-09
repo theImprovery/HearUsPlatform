@@ -134,7 +134,8 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id){
       for {
         campaignOpt <- campaigns.getCampaign(id)
-      } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c, tour))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
+        isAdmin <- campaigns.isAllowedToManage(req.subject.get.asInstanceOf[HearUsSubject], id)
+      } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c, tour, isAdmin))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
     }
   }
 
@@ -615,7 +616,7 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {
     campaigns.isAllowedToEdit(req.subject.get.asInstanceOf[HearUsSubject], camId).flatMap(ans => {
-      if(ans) {
+      if ( ans ) {
         action
       } else {
         Future(Unauthorized("Permission Denied"))

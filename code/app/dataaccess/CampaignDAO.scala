@@ -195,8 +195,20 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
       Future(true)
     } else {
       db.run(
-        usersCampaigns.filter(row => (row.userId === subject.user.id) && (row.campaignId === campaignId) ).result
-      ) map ( _.nonEmpty)
+        usersCampaigns.filter(row => (row.userId === subject.user.id) &&
+                                     (row.campaignId === campaignId) ).exists.result
+      )
+    }
+  }
+  
+  def isAllowedToManage(subject:HearUsSubject, campaignId: Long ):Future[Boolean] = {
+    if ( subject.roles.contains(HearUsRole(UserRole.Admin.toString)) ) {
+      Future(true)
+    } else {
+      db.run(
+        usersCampaigns.filter(row => (row.userId === subject.user.id) &&
+                                     (row.campaignId === campaignId) &&
+                                     row.admin).exists.result)
     }
   }
 

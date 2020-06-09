@@ -30,7 +30,7 @@ class CampaignStatusCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompon
   }
 
   def changeRequestStatus(id:Long, status:Int) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
-    campaigns.isAllowedToEdit(req.subject.get.asInstanceOf[HearUsSubject], id).flatMap(ans => {
+    campaigns.isAllowedToManage(req.subject.get.asInstanceOf[HearUsSubject], id).flatMap(ans => {
       if (ans) {
         campaigns.updateStatus(id, CampaignStatus(status)).map(c =>
           Ok("updated"))

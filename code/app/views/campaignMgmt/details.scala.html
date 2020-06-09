@@ -1,5 +1,5 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaign:Campaign, tour:Boolean)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+@(campaign:Campaign, tour:Boolean, isAdmin:Boolean)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/campaignEditor/detailsPage.js")"></script>
@@ -14,7 +14,7 @@
   </script>
 }
 
-@createSpan(status:CampaignStatus.Value, id:Long) = {
+@statusSpan(status:CampaignStatus.Value, id:Long) = {
   @status match {
     case CampaignStatus.Rejected => {
       <span id="lblRej_@id" class="badge badge-danger">@Messages("rejected")</span>
@@ -61,16 +61,18 @@
   <div class="form-group row">
     <label for="title" class="col-sm-2" id="sampleFieldTitle">@Messages("campaigns.status")</label>
     <div class="col-sm-10">
-      @createSpan(campaign.status, campaign.id)
-      @if(campaign.status != CampaignStatus.Published) {
-        <button type="button" id="publishBtn_@campaign.id" onclick="changeRequestStatus(1, @campaign.id, this);" class="btn btn-sm btn-outline-primary"
-          @if(campaign.status == CampaignStatus.Published || campaign.status == CampaignStatus.PublicationRequested) {
-            style="display: none"}>
-          <i class="fa fa-send"></i> @Messages("askForPublish")</button>
-        <button type="button" id="cancelPublishBtn_@campaign.id" onclick="changeRequestStatus(0, @campaign.id, this);" class="btn btn-sm btn-outline-danger"
-          @if(campaign.status != CampaignStatus.PublicationRequested) {
-            style="display: none"}>
-          <i class="fa fa-times-circle"></i> @Messages("cancelRequest")</button>
+      @statusSpan(campaign.status, campaign.id)
+      @if( isAdmin ) {
+        @if(campaign.status != CampaignStatus.Published) {
+          <button type="button" id="publishBtn_@campaign.id" onclick="changeRequestStatus(1, @campaign.id, this);" class="btn btn-sm btn-outline-primary"
+            @if(campaign.status == CampaignStatus.Published || campaign.status == CampaignStatus.PublicationRequested) {
+              style="display: none"}>
+            <i class="fa fa-send"></i> @Messages("askForPublish")</button>
+          <button type="button" id="cancelPublishBtn_@campaign.id" onclick="changeRequestStatus(0, @campaign.id, this);" class="btn btn-sm btn-outline-danger"
+            @if(campaign.status != CampaignStatus.PublicationRequested) {
+              style="display: none"}>
+            <i class="fa fa-times-circle"></i> @Messages("cancelRequest")</button>
+        }
       }
     </div>
   </div>

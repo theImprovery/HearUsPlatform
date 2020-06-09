@@ -23,6 +23,7 @@ polyglot.extend({
         "toReject":"האם את/ה בטוח/ה שברצונך לדחות את הקמפיין?",
         "publish":"מפורסם",
         "reject":"נדחה",
+        "statusChangeFailed":"שינוי סטטוס הקמפיין נכשל"
     },
     "invitation": {
         "delete":"האם את/ה בטוח/ה שברצונך למחוק את ההזמנה?",

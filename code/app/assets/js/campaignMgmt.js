@@ -50,7 +50,7 @@ function changeRequestStatus(status, camId) {
                     document.getElementById("lblPr_"+camId).style.display = "none";
                 }
             } else {
-                Informationals.makeDanger(polyglot.t("km.failed"), polyglot.t("server_logs_details"), 1500).show();
+                Informationals.makeDanger(polyglot.t("campaign.statusChangeFailed"), polyglot.t("server_logs_details"), 1500).show();
             }
         });
 }
