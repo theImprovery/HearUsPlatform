@@ -614,12 +614,11 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
   }
   
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {
-    val userId = req.subject.get.asInstanceOf[HearUsSubject].user.id
-    campaigns.isAllowToEdit(userId, camId).flatMap( ans => {
+    campaigns.isAllowedToEdit(req.subject.get.asInstanceOf[HearUsSubject], camId).flatMap(ans => {
       if(ans) {
         action
       } else {
-        Future(Unauthorized("A user (" + userId +") cannot edit campaign (" + camId + ") without permission."))
+        Future(Unauthorized("Permission Denied"))
       }
     })
   }

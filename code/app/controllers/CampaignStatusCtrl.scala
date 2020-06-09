@@ -30,14 +30,13 @@ class CampaignStatusCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompon
   }
 
   def changeRequestStatus(id:Long, status:Int) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
-    val userId = req.subject.get.asInstanceOf[HearUsSubject].user.id
-    campaigns.isAllowToEdit(userId, id).flatMap(ans => {
+    campaigns.isAllowedToEdit(req.subject.get.asInstanceOf[HearUsSubject], id).flatMap(ans => {
       if (ans) {
         campaigns.updateStatus(id, CampaignStatus(status)).map(c =>
           Ok("updated"))
       }
       else {
-        Future(Unauthorized("A user (" + userId + ") cannot edit campaign (" + id + ") without permission."))
+        Future(Unauthorized("Permission Denied"))
       }
     })
   }

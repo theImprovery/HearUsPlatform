@@ -4,6 +4,7 @@ import javax.inject.Inject
 import models._
 import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import security.{HearUsRole, HearUsSubject}
 import slick.jdbc.JdbcProfile
 
 import scala.collection.mutable
@@ -189,10 +190,14 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
 
   def deleteAction( id:Long ):Future[Int] = db.run( actions.filter( _.id === id ).delete )
 
-  def isAllowToEdit( userId:Long, campaignId: Long ):Future[Boolean] = {
-    db.run(
-      usersCampaigns.filter(row => (row.userId === userId) && (row.campaignId === campaignId) ).result
-    ) map ( _.nonEmpty)
+  def isAllowedToEdit(subject:HearUsSubject, campaignId: Long ):Future[Boolean] = {
+    if ( subject.roles.contains(HearUsRole(UserRole.Admin.toString)) ) {
+      Future(true)
+    } else {
+      db.run(
+        usersCampaigns.filter(row => (row.userId === subject.user.id) && (row.campaignId === campaignId) ).result
+      ) map ( _.nonEmpty)
+    }
   }
 
   def campaignSlugExists( name:String ):Future[Boolean] = {
