@@ -54,3 +54,29 @@ function changeRequestStatus(status, camId) {
             }
         });
 }
+
+function takePublishedCampaignDown(camId) {
+    swal({
+        title:polyglot.t("campaign.takeDown.areYouSure"),
+        text:polyglot.t("campaign.takeDown.explanation"),
+        icon:"warning",
+        buttons: {
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
+        }
+    }).then( function(doTakeDown){
+        if (doTakeDown) {
+            new Playjax(beRoutes)
+                .using(function(c){
+                    return c.CampaignStatusCtrl.takePublishedCampaignDown(camId);}).fetch()
+                .then( function(res){
+                    if (res.ok) {
+                        window.location.reload();
+                    } else {
+                        console.log( res );
+                        Informationals.makeDanger(polyglot.t("campaign.takeDown.failed"), polyglot.t("server_logs_details"), 1500).show();
+                    }
+                });
+        }
+    });
+}

@@ -1,8 +1,10 @@
 package controllers
 
+import actors.InvalidateCacheActor.InvalidateCampaignById
+import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
 import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UserDAO}
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import models.{CampaignStatus, UserRole}
 import play.api.{Configuration, Logger}
 import play.api.i18n.{Langs, Messages, MessagesApi, MessagesImpl, MessagesProvider}
@@ -13,9 +15,9 @@ import security.HearUsSubject
 
 import scala.concurrent.Future
 
-class CampaignStatusCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
-                                   users:UserDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
-                                   userCampaigns:UserCampaignDAO,
+class CampaignStatusCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents,
+                                   campaigns: CampaignDAO,
+                                   @Named("cacheInvalidator")uncacheActor:ActorRef,
                                    langs:Langs, messagesApi:MessagesApi, conf:Configuration, ws:WSClient) extends InjectedController {
 
   implicit private val ec = cc.executionContext
@@ -36,6 +38,18 @@ class CampaignStatusCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompon
           Ok("updated"))
       }
       else {
+        Future(Unauthorized("Permission Denied"))
+      }
+    })
+  }
+  
+  def takePublishedCampaignDown( id:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    logger.info(s"Taking down campaign $id")
+    campaigns.isAllowedToManage(req.subject.get.asInstanceOf[HearUsSubject], id).flatMap(ans => {
+      if (ans) {
+        uncacheActor.tell(InvalidateCampaignById(id, frontPageOnly=false), ActorRef.noSender )
+        campaigns.updateStatus(id, CampaignStatus.WorkInProgress).map( c=>Ok("updated") )
+      } else {
         Future(Unauthorized("Permission Denied"))
       }
     })

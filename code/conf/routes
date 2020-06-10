@@ -65,6 +65,7 @@ PUT     /bkpfc/campaigns/:id/slug/         controllers.CampaignMgrCtrl.apiCheckA
 
 GET     /bkofc/campaigns/:id/messages/     controllers.CampaignMgrCtrl.editMessages(id:Long)
 PUT     /bkofc/api/campaigns/:id/messages  controllers.CampaignMgrCtrl.updateMessages(id:Long)
+PUT     /bkofc/api/campaigns/:id/takedown  controllers.CampaignStatusCtrl.takePublishedCampaignDown(id:Long)
 GET     /api/campaigns/:id/messages        controllers.CampaignMgrCtrl.getMessages(id:Long)
 
 GET     /bkofc/campaigns/:id/frontPage    controllers.CampaignMgrCtrl.showFrontPageEditor(id:Long)
@@ -120,7 +121,6 @@ GET     /api/image/:id               controllers.FilesCtrl.apiGetImage(id:Long)
 
 # API
 ## Front end
-POST    /api/sayHi controllers.HomeCtrl.apiSayHi
 
 ## back office
 POST    /bkofc/api/users/                         controllers.UserCtrl.apiAddUser

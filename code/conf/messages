@@ -356,6 +356,7 @@ campaigns.table.delete=מחיקה
 campaigns.table.preview=תצוגה מקדימה
 askForPublish=שלח לאישור
 cancelRequest=בטל בקשה
+takePublishedCampaignDown=בטל פרסום קמפיין
 loadingLabels=טוען תוויות
 groupName=שם הוועדה
 Against=נגד

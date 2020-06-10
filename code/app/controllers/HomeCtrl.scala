@@ -53,7 +53,6 @@ class HomeCtrl @Inject()( cc: ControllerComponents
   def frontEndRoutes = Action { implicit request =>
       Ok(
         routing.JavaScriptReverseRouter("feRoutes")(
-          routes.javascript.HomeCtrl.apiSayHi,
           routes.javascript.UserCtrl.showSignupPage,
           routes.javascript.CampaignMgrCtrl.createCampaign,
           routes.javascript.UserCtrl.showSignupPageForNewCampaign
@@ -96,6 +95,7 @@ class HomeCtrl @Inject()( cc: ControllerComponents
           routes.javascript.CampaignAdminCtrl.getCampaigners,
           routes.javascript.CampaignStatusCtrl.updateStatus,
           routes.javascript.CampaignStatusCtrl.changeRequestStatus,
+          routes.javascript.CampaignStatusCtrl.takePublishedCampaignDown,
           routes.javascript.CampaignAdminCtrl.deleteCampaign,
           routes.javascript.CampaignAdminCtrl.showCampaigns,
           routes.javascript.CampaignMgrCtrl.createCampaign,

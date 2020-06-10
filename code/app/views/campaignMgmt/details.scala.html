@@ -72,6 +72,9 @@
             @if(campaign.status != CampaignStatus.PublicationRequested) {
               style="display: none"}>
             <i class="fa fa-times-circle"></i> @Messages("cancelRequest")</button>
+        }else{
+          <button type="button" id="unpublishBtn_@campaign.id" onclick="takePublishedCampaignDown(@campaign.id);" class="btn btn-sm btn-outline-danger">
+            <i class="fa fa-send"></i> @Messages("takePublishedCampaignDown")</button>
         }
       }
     </div>
