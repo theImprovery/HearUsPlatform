@@ -94,7 +94,7 @@ function getMessageKey() {
 }
 
 function saveMessages() {
-    Informationals.loader(polyglot.t("saving"));
+    const msgDiv = Informationals.showBackgroundProcess(polyglot.t("update.messages"));
     messageSelectionChanged(); // save current message;
 
     const arr = [];
@@ -106,11 +106,11 @@ function saveMessages() {
             return c.CampaignMgrCtrl.updateMessages(campaignId);
         }).fetch(arr)
         .then( function (res) {
-            Informationals.loader.dismiss();
             if (res.ok) {
-                Informationals.makeSuccess(polyglot.t("update.success"), "", 1500).show();
+                msgDiv.success();
                 return true;
             } else {
+                msgDiv.dismiss();
                 Informationals.makeDanger(polyglot.t("update.failed"), "", 2500).show();
                 res.json().then(function(body){
                     console.log(body);
@@ -170,45 +170,7 @@ function messageSelectionChanged() {
     updateCharacterCount();
 }
 
-function saveMessagesBeforeUnload() {
-    messageSelectionChanged(); // save current message;
-
-    var arr = [];
-    for ( var k in messages ) {
-        arr.push( messages[k] );
-    }
-
-    var msgDiv = Informationals.showBackgroundProcess(polyglot.t("update.messages"));
-    var call = beRoutes.controllers.CampaignMgrCtrl.updateMessages(campaignId);
-    $.ajax({ url: call.url,
-        type: call.type,
-        data: JSON.stringify(arr),
-        dataType: "json",
-        async: false,
-        contentType: "application/json; charset=utf-8",
-        headers:{
-            'Csrf-Token': document.getElementById("Playjax_csrfTokenValue").innerText
-        }
-    }).done(function(){
-        msgDiv.success();
-        return true;
-    }).always(function(){
-        msgDiv.dismiss();
-    }).fail( function(req, status, error){
-        if ( req.readyState === 4 ) {
-            // don't fire if we're navigating away from the page.
-            console.log("Error");
-            console.log( req );
-            console.log( status );
-            console.log( error );
-            Informationals.show( Informationals.makeDanger("Error updating campaign", status + "\n" + error));
-        }
-    });
-}
-
-window.onbeforeunload = function() {
-    return saveMessagesBeforeUnload();
-};
+window.onbeforeunload = saveMessages;
 
 window.onload = function() {
     Promise.prototype.finally = Promise.prototype.finally || {
