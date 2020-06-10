@@ -1,5 +1,7 @@
 package models
 
+import java.time.LocalDateTime
+
 object UserRole extends Enumeration {
   val Admin = Value
   val Campaigner = Value
@@ -15,3 +17,9 @@ case class User(id:Long,
 }
 
 case class UserDN( id:Long, username:String, email:String, name:String )
+
+case class EmailChange( userId: Long,
+                        previousAddress: Option[String],
+                        newAddress: Option[String],
+                        changeDate: LocalDateTime
+)

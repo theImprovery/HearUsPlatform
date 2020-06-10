@@ -1,8 +1,10 @@
 package dataaccess
 
+import java.time.LocalDateTime
+
 import dataaccess.SortBy.Value
 import javax.inject.Inject
-import models.{User, UserRole}
+import models.{EmailChange, User, UserRole}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.{Configuration, Logger}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -16,6 +18,7 @@ class UserDAO @Inject()(protected val dbConfigProvider:DatabaseConfigProvider, c
 
   import profile.api._
   private val Users = TableQuery[UserTable]
+  private val EmailChanges = TableQuery[EmailChangeTable]
 
   def addUser( u:User ):Future[User] = {
     db.run( Users.returning(Users.map(_.id))
@@ -26,7 +29,14 @@ class UserDAO @Inject()(protected val dbConfigProvider:DatabaseConfigProvider, c
     if ( u.id==0 ) {
       addUser(u)
     } else {
-      db.run( Users.filter(_.id===u.id).update(u) ).map( _ => u )
+      for {
+        prevEmail <- db.run( Users.filter(_.id === u.id).map(_.email).result ).map( _.headOption )
+        newEmail = u.email
+        _ <- if ( !prevEmail.contains(newEmail) ) {
+          db.run( EmailChanges += EmailChange(u.id, prevEmail, Some(newEmail), LocalDateTime.now) )
+        } else Future(())
+        updatedUser <- db.run( Users.filter(_.id===u.id).update(u) ).map( _ => u )
+      } yield updatedUser
     }
   }
   

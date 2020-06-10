@@ -1,6 +1,7 @@
 package dataaccess
 
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 import models.{Party, _}
 import slick.ast.ColumnOption.AutoInc
@@ -42,8 +43,17 @@ class UserTable(tag:Tag) extends Table[User](tag,"users") {
   def * = (id, username, name, email, userRoles, encryptedPassword) <> (User.tupled, User.unapply)
 }
 
+class EmailChangeTable(tag:Tag) extends Table[EmailChange](tag, "email_changes") {
+  def userId     = column[Long]("user_id", O.PrimaryKey)
+  def previous   = column[Option[String]]("previous_address")
+  def next       = column[Option[String]]("new_address")
+  def changeDate = column[LocalDateTime]("change_date", O.PrimaryKey)
+  
+  def * = (userId, previous, next, changeDate) <> (EmailChange.tupled, EmailChange.unapply)
+}
+
 class UserCampaignTable(tag:Tag) extends Table[UserCampaign](tag,"user_campaign") {
-  def userId     = column[Long]("user_id", O.PrimaryKey                                       )
+  def userId     = column[Long]("user_id", O.PrimaryKey)
   def campaignId = column[Long]("campaign_id", O.PrimaryKey)
   def admin      = column[Boolean]("admin")
   
