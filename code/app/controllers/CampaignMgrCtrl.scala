@@ -4,6 +4,7 @@ import java.sql.{Date, Timestamp}
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
+import actors.EmailSendingActor
 import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
 import com.sun.org.glassfish.gmbal.ManagedObjectManager.RegistrationDebugLevel
@@ -28,15 +29,18 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import actors.InvalidateCacheActor._
 import akka.util.Timeout
+
 import scala.concurrent.duration._
 
 case class detailsCampaign(name:String, slug:String, campaigner:Long)
 
 class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                 campaigns:CampaignDAO, users:UserDAO, usersCampaigns:UserCampaignDAO,
-                                groups:KmGroupDAO,
+                                groups:KmGroupDAO, conf:Configuration,
                                 langs:Langs, messagesApi:MessagesApi, images: ImagesDAO,
-                                conf:Configuration, @Named("cacheInvalidator")cacheActor:ActorRef) extends InjectedController {
+                                @Named("cacheInvalidator")cacheActor:ActorRef,
+                                @Named("email-actor")emailActor:ActorRef
+                               ) extends InjectedController {
   implicit val timeout:Timeout = Timeout(60.seconds)
   implicit private val ec = cc.executionContext
   implicit val messagesProvider: MessagesProvider = {
@@ -79,7 +83,8 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
       rel <- usersCampaigns.connectUserToCampaign(UserCampaign(userId, campaign.id, isAdmin=true))
       _ <- campaigns.initializeCampaignPositions(campaign.id)
     } yield {
-      Redirect(routes.CampaignMgrCtrl.details(campaign.id, true))
+      emailActor ! EmailSendingActor.NewCampaignStarted(campaign.id)
+      Redirect(routes.CampaignMgrCtrl.details(campaign.id, tour=true))
     }
   }
 

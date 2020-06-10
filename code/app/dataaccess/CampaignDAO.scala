@@ -257,6 +257,13 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
                .map( kv => (kv._1, kv._2.map(t=>(t._2, t._3))))
     )
   }
+  
+  def getCampaignManagers(campId:Long):Future[Seq[User]] = {
+    val adminIds = usersCampaigns.filter( r => r.admin && r.campaignId===campId ).map( _.userId )
+    db.run(
+      users.join(adminIds).on( (ut,id)=>ut.id === id  ).map( _._1 ).result
+    )
+  }
 
   def initializeCampaignPositions(camId:Long) = {
     for {
