@@ -1,5 +1,6 @@
 package controllers
 
+import actors.EmailSendingActor
 import actors.InvalidateCacheActor.InvalidateCampaignById
 import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.{DeadboltActions, allOfGroup}
@@ -18,6 +19,7 @@ import scala.concurrent.Future
 class CampaignStatusCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents,
                                    campaigns: CampaignDAO,
                                    @Named("cacheInvalidator")uncacheActor:ActorRef,
+                                   @Named("email-actor")emailActor:ActorRef,
                                    langs:Langs, messagesApi:MessagesApi, conf:Configuration, ws:WSClient) extends InjectedController {
 
   implicit private val ec = cc.executionContext
@@ -34,8 +36,16 @@ class CampaignStatusCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompon
   def changeRequestStatus(id:Long, status:Int) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
     campaigns.isAllowedToManage(req.subject.get.asInstanceOf[HearUsSubject], id).flatMap(ans => {
       if (ans) {
-        campaigns.updateStatus(id, CampaignStatus(status)).map(c =>
-          Ok("updated"))
+        val newStatus = CampaignStatus(status)
+        for {
+          update <- campaigns.updateStatus(id, newStatus)
+        } yield {
+          if ( newStatus == CampaignStatus.PublicationRequested ) {
+            emailActor ! EmailSendingActor.PublicationRequest(id)
+          }
+          Ok("updated")
+        }
+        
       }
       else {
         Future(Unauthorized("Permission Denied"))

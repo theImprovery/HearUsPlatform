@@ -1,6 +1,6 @@
 package actors
 
-import actors.EmailSendingActor.NewCampaignStarted
+import actors.EmailSendingActor.{NewCampaignStarted, PublicationRequest}
 import akka.actor.Actor
 import dataaccess.{CampaignDAO, KnessetMemberDAO, UserDAO}
 import javax.inject.Inject
@@ -37,6 +37,24 @@ class EmailSendingActor @Inject() (anEx:ExecutionContext, campaigns:CampaignDAO,
             val htmlContent = views.html.emailTemplates.newCampaignStarted(camp, mgrs, cfg.get[String]("psps.server.publicUrl") ).body
             mailer.send(new Email(
               "[Hear-Us] New campaign created", "noreply@hear-us.org.il", Seq(cfg.get[String]("hearUs.adminEmail")),
+              None, Some(htmlContent), Some("utf-8"))
+            )
+          }
+          case None => logger.warn(s"Got a message about nonexistent new campaign, with id=$camId")
+        }
+      }
+    }
+
+    case PublicationRequest(camId) => {
+      for {
+        c <- campaigns.getCampaign(camId)
+        mgrs <- campaigns.getCampaignManagers(camId)
+      } yield {
+        c match {
+          case Some(camp) => {
+            val htmlContent = views.html.emailTemplates.campaignPublicationRequest(camp, mgrs, cfg.get[String]("psps.server.publicUrl") ).body
+            mailer.send(new Email(
+              "[Hear-Us] A campaign wants to become public", "noreply@hear-us.org.il", Seq(cfg.get[String]("hearUs.adminEmail")),
               None, Some(htmlContent), Some("utf-8"))
             )
           }
