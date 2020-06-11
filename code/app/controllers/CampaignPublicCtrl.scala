@@ -2,14 +2,17 @@ package controllers
 
 import java.util.concurrent.TimeUnit
 
+import actors.EmailSendingActor
+import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.DeadboltActions
 import be.objectify.deadbolt.scala.models.Subject
 import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UserDAO}
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import models.{Campaign, CampaignStatus, CannedMessage, ContactOption, Platform, Position, UserRole}
 import play.api.cache.Cached
 import play.api.{Configuration, Logger}
 import play.api.i18n.{I18nSupport, Langs, MessagesApi, MessagesImpl, MessagesProvider}
+import play.api.libs.json.{JsNumber, JsObject, JsString}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, ControllerComponents, InjectedController}
 import security.{HearUsRole, HearUsSubject}
@@ -25,6 +28,7 @@ object CampaignPublicCtrl {
 
 class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO,
                                    images: ImagesDAO, groups:KmGroupDAO,
+                                   @Named("email-actor") emailActor:ActorRef,
                                    campaigns:CampaignDAO, userCampaigns:UserCampaignDAO, messagesApi:MessagesApi, deadbolt:DeadboltActions,
                                    conf:Configuration, cached:Cached) extends AbstractController(cc) with I18nSupport {
   import CampaignPublicCtrl._
@@ -113,6 +117,25 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
         })
       })
   }}
+  
+  
+  def doReportAsOffensive(campaignSlug:String) = Action.async(cc.parsers.tolerantJson){ req =>
+    val payload = req.body.asInstanceOf[JsObject]
+    for {
+      maybeCampaignId <- campaigns.getId( campaignSlug )
+    } yield {
+      maybeCampaignId match {
+        case None => NotFound("Campaign not found")
+        case Some(campaignId) => {
+          emailActor ! EmailSendingActor.OffensiveContentReport(campaignId,
+            payload("url").as[JsString].toString,
+            payload("report").as[JsString].toString
+          )
+          Ok("reported")
+        }
+      }
+    }
+  }
   
   
   val roleAdmin = HearUsRole( UserRole.Admin.toString )

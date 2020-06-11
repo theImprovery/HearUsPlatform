@@ -10,6 +10,7 @@ GET     /navbar                   controllers.HomeCtrl.sampleNavbar
 GET     /campaigns/:slug          controllers.CampaignPublicCtrl.index(slug)
 GET     /campaigns/:slug/KnessetMembers/:kmId          controllers.CampaignPublicCtrl.kmPage(slug, kmId:Long)
 GET     /-x-                      controllers.HomeCtrl.notImplYet
+POST    /api/campaigns/:slug/offensiveReport  controllers.CampaignPublicCtrl.doReportAsOffensive(slug)
 
 GET     /signup                      controllers.UserCtrl.showSignupPage
 GET     /signup/campaign             controllers.UserCtrl.showSignupPageForNewCampaign(title:String)

@@ -1,0 +1,32 @@
+@(campaign:Campaign, managers:Seq[User], url:String, report:String)
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <p style="font-size: 16pt">
+      Reporting abusive content in campaign "@campaign.title":
+      <a href="@url">@url</a>
+    </p>
+    <p>
+      <strong>Report</strong>
+    </p>
+    <p style="direction:rtl">
+      @report
+    </p>
+    <hr>
+    <p>
+      <strong>Contact info:</strong>
+    </p>
+    <ul>
+      <li>Contact email: <a href="mailto:@campaign.contactEmail">@campaign.contactEmail</a></li>
+      <li>Campaign managers:
+        <ul>
+        @for(u <- managers) {
+          <li><a href="mailto:@u.email">@u.name (@u.email)</a></li>
+        }
+        </ul>
+      </li>
+    </ul>
+  </body>
+</html>

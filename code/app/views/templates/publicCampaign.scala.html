@@ -7,13 +7,12 @@
   <meta property="og:site_name" content="@campaign.title"/>
 @*  <meta property="og:image" content="@campaign." />*@
   <meta property="og:description" content="@campaign.title - @campaign.slogan"/>
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="@campaign.title - @campaign.slogan" />
 @*  <meta name="twitter:site" content="{{ site.twitter_username }}" />*@
   <meta name="twitter:title" content="@campaign.title" />
   <meta name="twitter:description" content="@campaign.title - @campaign.slogan" />
 @*  <meta name="twitter:image" content="{{site.url}}{{site.baseurl}}{% if include.twimage %}{{ include.twimage }}{% else %}{{ site.twimage }}{% endif %}" />*@
   <meta name="twitter:url" content="@campaign.website" />
-
   <meta name="description" content="@campaign.title - @campaign.slogan">
   <link rel="canonical" href="@campaign.website">
 @*  <link rel="icon" type="image/x-icon" href="{{ "/favicon.ico"  | prepend: site.baseurl }}" />*@
@@ -37,6 +36,7 @@
   @campaign.analytics
   @extraBottom
   <script src="@routes.Assets.versioned("vnd/grayscale/grayscale.min.js")"></script>
+  <script src="@routes.Assets.versioned("js/publicPages.js")"></script>
   @for(s<-analyticsOpt){@Html(s)}
 }
 
@@ -53,10 +53,37 @@
         @*Layout based on <a href="https://startbootstrap.com/themes/grayscale/">Grayscale</a>.
         <a class="poweredBy" href="https://www.nirshman.com/" target="_blank"><img src="@routes.Assets.versioned("images/NirHirshman.png")" alt="NirHirshman Logo"></a>
         <a class="poweredBy" href="http://codeworth.io" target="_blank"><img src="@routes.Assets.versioned("images/codeworthLogo.png")" alt="CodeWorth Logo"></a> *@
+      <button class="btn btn-outline-secondary"  data-toggle="modal" data-target="#flagAsOffensiveMdl">@Messages("public.flagAsOffensive")</button>
     </div>
     <!-- Created by Nirshman (https://www.nirshman.com/) and codeworth.io (http://codeworth.io). Layout based on Grayscale (https://startbootstrap.com/themes/grayscale) -->
   </footer>
   @if(campaign.status!=CampaignStatus.Published){
     <div class="notPublishedBadge">@Messages("campaigns.notPublished")</div>
   }
+  <div id="flagAsOffensiveMdl" class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">@Messages("public.flagAsOffensive")</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col">@Messages("public.flagAsOffensive.info")</div>
+          </div>
+          <div class="row">
+            <div class="col"><textarea autocomplete="off" class="form-control" name="offensiveText" id="offensiveText" cols="30" rows="10"></textarea></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">@Messages("cancel")</button>
+        <button type="button" class="btn btn-primary" onclick='reportAsOffensive("@campaign.slug.getOrElse("")", "@Messages("public.flagAsOffensive.sent")")'>@Messages("public.reportAsOffensive")</button>
+      </div>
+    </div>
+  </div>
+  </div>
 }

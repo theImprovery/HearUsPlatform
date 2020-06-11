@@ -1,6 +1,6 @@
 package actors
 
-import actors.EmailSendingActor.{NewCampaignStarted, PublicationRequest}
+import actors.EmailSendingActor.{NewCampaignStarted, OffensiveContentReport, PublicationRequest}
 import akka.actor.Actor
 import dataaccess.{CampaignDAO, KnessetMemberDAO, UserDAO}
 import javax.inject.Inject
@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
 object EmailSendingActor {
   case class NewCampaignStarted(campaignId:Long)
   case class PublicationRequest(campaignId:Long)
-  case class OffensiveContentReport(campaignId:Long, report:String)
+  case class OffensiveContentReport(campaignId:Long, url:String, report:String)
 }
 
 /**
@@ -59,6 +59,24 @@ class EmailSendingActor @Inject() (anEx:ExecutionContext, campaigns:CampaignDAO,
             )
           }
           case None => logger.warn(s"Got a message about nonexistent new campaign, with id=$camId")
+        }
+      }
+    }
+
+    case OffensiveContentReport(campaignId, url, report) => {
+      for {
+        c <- campaigns.getCampaign(campaignId)
+        mgrs <- campaigns.getCampaignManagers(campaignId)
+      } yield {
+        c match {
+          case Some(camp) => {
+            val htmlContent = views.html.emailTemplates.abusiveContentReport(camp, mgrs, url, report).body
+            mailer.send(new Email(
+              s"[Hear-Us] Offensive content report about campaign ${camp.title}", "noreply@hear-us.org.il", Seq(cfg.get[String]("hearUs.adminEmail")),
+              None, Some(htmlContent), Some("utf-8"))
+            )
+          }
+          case None => logger.warn(s"Got a message about nonexistent new campaign, with id=$campaignId")
         }
       }
     }

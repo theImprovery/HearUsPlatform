@@ -225,6 +225,10 @@ class CampaignDAO @Inject() (protected val dbConfigProvider:DatabaseConfigProvid
   def getSlug( id:Long ):Future[Option[String]] = db.run(
     campaigns.filter( _.id === id ).map(_.slug).result
   ).map( _.headOption.flatten )
+  
+  def getId( slug:String ):Future[Option[Long]] = db.run (
+    campaigns.filter( _.slug === slug ).map(_.id).result
+  ).map( _.headOption )
 
   def updateStatus(campId:Long, status: CampaignStatus.Value ):Future[Int] = {
     import Mappers.campaignStatus
