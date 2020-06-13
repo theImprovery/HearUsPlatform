@@ -5,7 +5,7 @@
         twitterCndMsgs:Map[ContactOption, String],
         whatsAppCndMsgs:Map[ContactOption, String],
         analyticsOpt:Option[String]=None
-)(implicit request: RequestHeader, msgs:MessagesProvider)
+)(implicit request: RequestHeader, msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @platformIcon(platformName:Option[Platform.Value])={
   @platformName match {

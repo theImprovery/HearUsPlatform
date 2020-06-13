@@ -1,5 +1,6 @@
-@(campaign:Campaign, pageTitle:String, campaignImage:Option[String], extraHead: Html=Html(""), extraBottom: Html=Html(""), analyticsOpt:Option[String]=None)(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
-
+@import play.api.Configuration
+@(campaign:Campaign, pageTitle:String, campaignImage:Option[String], extraHead: Html=Html(""),
+        extraBottom: Html=Html(""), analyticsOpt:Option[String]=None)(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider, cfg:Configuration)
 @top = {
   <meta property="og:title" content="@campaign.title"/>
   <meta property="og:type" content="website"/>
@@ -44,19 +45,27 @@
   @content
 
   <footer class="small text-center">
-    <div class="container" style="direction: ltr">
-      @Messages("public.createdWith") <a href="@Messages("application.url")">@Messages("application.title")</a> @Html(Messages("application.slogan"))
-      <hr>
-      <a onclick="chooseTitleForCampaign(feRoutes)" class="makeYourOwnCampaignBanner">
-        @Messages("public.footer.createYourOwn")
-      </a>
-        @*Layout based on <a href="https://startbootstrap.com/themes/grayscale/">Grayscale</a>.
-        <a class="poweredBy" href="https://www.nirshman.com/" target="_blank"><img src="@routes.Assets.versioned("images/NirHirshman.png")" alt="NirHirshman Logo"></a>
-        <a class="poweredBy" href="http://codeworth.io" target="_blank"><img src="@routes.Assets.versioned("images/codeworthLogo.png")" alt="CodeWorth Logo"></a> *@
-      <button class="btn btn-outline-secondary"  data-toggle="modal" data-target="#flagAsOffensiveMdl">@Messages("public.flagAsOffensive")</button>
+    <div class="container">
+      <div class="row">
+        <div class="col-md text-center text-md-right">
+          @Messages("public.createdWith") <a href="@Messages("application.url")">@Messages("application.title")</a> @Html(Messages("application.slogan"))
+          <a onclick="chooseTitleForCampaign(feRoutes)" class="makeYourOwnCampaignBanner">
+            @Messages("public.footer.createYourOwn")
+          </a>
+        </div>
+        <div class="col-md text-center text-md-left">
+          <ul class="linkList">
+            <li><a href="@cfg.get[String]("hearUs.contactUsPage")">@Messages("footer.hearUs.contactUsPage")</a></li>
+            <li><a href="@cfg.get[String]("hearUs.eulaPage")">@Messages("footer.hearUs.eulaPage")</a></li>
+            <li><a href="@cfg.get[String]("hearUs.privacyPolicyPage")">@Messages("footer.hearUs.privacyPolicyPage")</a></li>
+          </ul>
+          <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#flagAsOffensiveMdl">@Messages("public.flagAsOffensive")</button>
+        </div>
+      </div>
     </div>
-    <!-- Created by Nirshman (https://www.nirshman.com/) and codeworth.io (http://codeworth.io). Layout based on Grayscale (https://startbootstrap.com/themes/grayscale) -->
+
   </footer>
+  <!-- Created by Nirshman (https://www.nirshman.com/) and codeworth.io (http://codeworth.io). Layout based on Grayscale (https://startbootstrap.com/themes/grayscale) -->
   @if(campaign.status!=CampaignStatus.Published){
     <div class="notPublishedBadge">@Messages("campaigns.notPublished")</div>
   }

@@ -1,7 +1,7 @@
 @(campaign:Campaign, imageOpt:Option[String], texts:CampaignText, kms:Seq[KnessetMember], parties:Seq[Party], committees:Seq[KmGroupDN],
   km2Party:Map[Long,Party],  km2Image:Map[Long,String], km2Pos:Map[Long,models.Position.Value], km2Cmt:Map[Long,Iterable[Long]],
   analyticsOpt:Option[String]=None
-)(implicit request: RequestHeader, msgs:MessagesProvider)
+)(implicit request: RequestHeader, msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @scripts={
   <script>

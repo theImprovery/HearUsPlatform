@@ -34,6 +34,7 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
   import CampaignPublicCtrl._
   implicit private val ec = controllerComponents.executionContext
   val logger = Logger(this.getClass)
+  implicit val cfg:Configuration = conf
   
   def index( campaignSlug:String ) = cached(_=>campaignCacheKey(campaignSlug), Duration(30, TimeUnit.SECONDS) ) {
     deadbolt.WithAuthRequest()(){ implicit req =>

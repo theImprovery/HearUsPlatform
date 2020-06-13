@@ -1,7 +1,7 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 application.title=תשמעו אותנו
 application.slogan=מערכת קמפיינים ישירים, מבית <a href="https://www.digitalrights.org.il">התנועה לזכויות דיגיטליות</a>
-application.url=http://hear-us.mbarsinai.com
+application.url=http://hear-us.org.il
 
 account.created=החשבון נוצר בהצלחה
 
@@ -395,7 +395,7 @@ public.kmPage.emailText=להלן נוסח מוצע למכתב - אתם מוזמ�
 public.kmPage.openInGMail=לפתיחה ב-GMail
 public.kmPage.openInLocalMail=לפתיחה בתוכנת אימייל
 public.kmPage.actions=פעולות של ח״כ
-public.contactUs=צרו קשר
+public.contactUs=צרו קשר עם צוות הקמפיין
 public.mainSite=לעמוד הרשמי
 public.createdWith=נוצר בעזרת 
 public.footer.createYourOwn=רוצים ליצור קמפיין גם? לחצו כאן!
@@ -431,3 +431,6 @@ signup.sentence.6=אף פעם אל תוותרו על חלום בגלל שייק�
 signup.sentence.7=אני מאמין גדול במזל, ושמתי לב שככל שאני עובד קשה יותר, יש לי יותר מזל
 signup.sentence.8=האמיצים אולי לא יחיו לנצח, אבל הזהירים לא חיים בכלל
 signup.sentence.9=הדבר היחיד שהוא יותר גרוע מלהתחיל ולהיכשל, הוא לא להתחיל בכלל
+footer.hearUs.contactUsPage=צרו קשר
+footer.hearUs.eulaPage=תנאי שימוש
+footer.hearUs.privacyPolicyPage=מדיניות פרטיות
