@@ -1,6 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @(campaign:Campaign,positions:Seq[Position.Value], imageOpt:Option[KMImage], prefix:String,
-        cssMap:Map[(String,String),String], extraCss:String )(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+        cssMap:Map[(String,String),String], extraCss:String )(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/campaignEditor/design.js")"></script>

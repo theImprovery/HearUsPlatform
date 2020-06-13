@@ -1,6 +1,7 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import models.Position.Position
-@(campaign:Campaign, km:KnessetMember, party:Option[Party], actions: Seq[KmAction])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(campaign:Campaign, km:KnessetMember, party:Option[Party], actions: Seq[KmAction])(
+        implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   <script src="@routes.Assets.versioned("/js/campaignEditor/actionEditor.js")"></script>

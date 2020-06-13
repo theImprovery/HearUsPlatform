@@ -13,37 +13,12 @@ import views.PaginationInfo
   * application's home page.
   */
 
-class HomeCtrl @Inject()( cc: ControllerComponents
+class HomeCtrl @Inject()( cc: ControllerComponents,
+                          conf:Configuration
                         ) extends AbstractController(cc) with I18nSupport {
-  
-//  implicit val mApiImplicit = messagesApi
-  /**
-    * Create an Action to render an HTML page.
-    *
-    * The configuration in the `routes` file means that this method
-    * will be called when the application receives a `GET` request with
-    * a path of `/`.
-    */
+  implicit val cnf:Configuration = conf
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.publicIndex())
-  }
-  
-  def sampleNavbar = Action { implicit req =>
-    Ok(views.html.sampleNavbar("Parametrized Message"))
-  }
-  
-  def apiSayHi = Action(cc.parsers.tolerantJson) { implicit req =>
-    val json = req.body.as[JsObject]
-    val name = json("name")
-    Ok(Json.obj("message"->s"Hello, $name."))
-  }
-  
-  def informationals = Action{ implicit req =>
-    Ok( views.html.informationalsSample() )
-  }
-
-  def styledInputs = Action{ implicit req =>
-    Ok( views.html.styledInputsSample() )
   }
   
   /**

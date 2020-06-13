@@ -1,5 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaign:Campaign, campaignGroups:Seq[KmGroupDN], currentUser:User, allGroups:Seq[KmGroupDN])(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+@(campaign:Campaign, campaignGroups:Seq[KmGroupDN], currentUser:User, allGroups:Seq[KmGroupDN])(
+        implicit request: AuthenticatedRequest[_], msgs: MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   <script src="@routes.Assets.versioned("/js/campaignEditor/campaignGroups.js")"></script>

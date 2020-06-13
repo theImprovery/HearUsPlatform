@@ -1,6 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 
-@(parties:Seq[Party])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(parties:Seq[Party])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @head = {
   <script src="@routes.Assets.versioned("js/partiesPage.js")"></script>

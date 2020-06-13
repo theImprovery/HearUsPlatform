@@ -1,5 +1,5 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(invitations: Seq[Invitation], isAdmin:Boolean=true)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(invitations: Seq[Invitation], isAdmin:Boolean=true)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 @scripts = {
   <script >
           $(document).ready( function(){

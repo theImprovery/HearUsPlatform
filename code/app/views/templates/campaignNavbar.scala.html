@@ -1,7 +1,8 @@
 @import views._
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @(title:String, sections:Seq[TopSiteSection[_]], currentSection:CampaignEditorSections.Value, extraHead: Html=Html(""),
-        extraBottom: Html=Html(""), navbarExtras:Option[Html]=None)(content:Html)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+        extraBottom: Html=Html(""), navbarExtras:Option[Html]=None)(content:Html)(
+        implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @showSection(mi:TopSiteSection[_], isSelected:Boolean) = {
   @mi match {

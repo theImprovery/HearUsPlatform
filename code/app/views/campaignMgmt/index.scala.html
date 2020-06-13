@@ -1,7 +1,8 @@
 @import views.BackOfficeSections
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 
-@(campaigns:Seq[Campaign], isAdmin:Set[Long])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(campaigns:Seq[Campaign], isAdmin:Set[Long])(
+        implicit request:AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @bottom = {
   <script src="@routes.Assets.versioned("js/campaignMgmt.js")"></script>

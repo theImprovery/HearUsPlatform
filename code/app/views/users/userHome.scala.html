@@ -1,5 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(u:User, mkCount:Int, ptCount:Int, comCount:Int, campaignCount:Int, camps:Seq[Campaign], isAdmin:Set[Long])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(u:User, mkCount:Int, ptCount:Int, comCount:Int, campaignCount:Int, camps:Seq[Campaign], isAdmin:Set[Long])(
+        implicit request:AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/userHome.js")"></script>

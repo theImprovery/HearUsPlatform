@@ -1,6 +1,6 @@
 @import views._
 @(title:String, sections:Seq[TopSiteSection[_]], currentSection:Object, extraHead: Html=Html(""), extraBottom: Html=Html(""),
-        navbarExtras:Option[Html]=None)(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
+        navbarExtras:Option[Html]=None)(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @showSection(mi:TopSiteSection[_], isSelected:Boolean) = {
   @mi match {
@@ -60,8 +60,15 @@
 <footer>
   <div class="container">
     <div class="row my-4">
-      <div class="col text-center">
+      <div class="col text-center text-md-right" style="padding-top:7px">
         @Messages("index.title.hear")<strong> @Messages("index.title.us")</strong> @Html(Messages("application.slogan"))
+      </div>
+      <div class="col-md text-center text-md-left">
+        <ul class="linkList">
+          <li><a href="@cfg.get[String]("hearUs.contactUsPage")">@Messages("footer.hearUs.contactUsPage")</a></li>
+          <li><a href="@cfg.get[String]("hearUs.eulaPage")">@Messages("footer.hearUs.eulaPage")</a></li>
+          <li><a href="@cfg.get[String]("hearUs.privacyPolicyPage")">@Messages("footer.hearUs.privacyPolicyPage")</a></li>
+        </ul>
       </div>
     </div>
   </div>

@@ -1,32 +1,24 @@
 package controllers
 
 import java.sql.{Date, Timestamp}
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 
 import actors.EmailSendingActor
 import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
-import com.sun.org.glassfish.gmbal.ManagedObjectManager.RegistrationDebugLevel
 import dataaccess._
 import javax.inject.{Inject, Named}
 import models._
 import play.api.{Configuration, Logger}
 import play.api.i18n._
-import play.api.libs.json.{JsObject, Json}
-import play.api.libs.ws.WSClient
+import play.api.libs.json.Json
 import play.api.mvc.{ControllerComponents, InjectedController, Result}
 import security.HearUsSubject
 import dataaccess.JSONFormats._
-import org.joda.time.DateTime
-import play.api.cache.AsyncCacheApi
 import play.api.data.{Form, _}
 import play.api.data.Forms._
-import play.api.data.format.Formatter
-import play.mvc.BodyParser.AnyContent
 
 import scala.collection.mutable
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import actors.InvalidateCacheActor._
 import akka.util.Timeout
 
@@ -42,7 +34,8 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
                                 @Named("email-actor")emailActor:ActorRef
                                ) extends InjectedController {
   implicit val timeout:Timeout = Timeout(60.seconds)
-  implicit private val ec = cc.executionContext
+  implicit private val ec:ExecutionContext = cc.executionContext
+  implicit private val cnf:Configuration = conf
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }

@@ -1,7 +1,8 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import models.ActionType.ActionType
 @import Helpers._
-@(action:Form[KmAction], km:KnessetMember, campaign:Campaign, actionTypes:Seq[ActionType])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(action:Form[KmAction], km:KnessetMember, campaign:Campaign, actionTypes:Seq[ActionType])(
+        implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/campaignEditor/actionEditor.js")"></script>

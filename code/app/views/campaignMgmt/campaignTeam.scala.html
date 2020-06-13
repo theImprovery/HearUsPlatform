@@ -1,5 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaign:Campaign, team:CampaignTeam, currentUser:User)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+@(campaign:Campaign, team:CampaignTeam, currentUser:User)(
+        implicit request: AuthenticatedRequest[_], msgs: MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   @if( team.isAdmin(currentUser) ) {

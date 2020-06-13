@@ -1,6 +1,6 @@
 @import Helpers._
 @(form:Form[UserFormData], destination:Call, isNew:Boolean, isInvited:Boolean, activeFirst:Boolean=true, randomSentence:String="", randomWord:Int=0
-)(implicit req:RequestHeader, msgs:MessagesProvider)
+)(implicit req:RequestHeader, msgs:MessagesProvider, cfg:play.api.Configuration)
 
 <div class="container">
   @if( isNew ){

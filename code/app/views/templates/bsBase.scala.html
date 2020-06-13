@@ -1,5 +1,5 @@
 @import controllers.Informational
-@(title:String, extraHead: Html=Html(""), extraBottom: Html=Html(""))(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider)
+@(title:String, extraHead: Html=Html(""), extraBottom: Html=Html(""))(content:Html)(implicit request: RequestHeader, msgs:MessagesProvider, cfg:play.api.Configuration)
 <!DOCTYPE html>
 <html>
     <head>

@@ -1,9 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import Helpers._
-
-@import Platform.Platform
-@import dataaccess.KnessetMemberDAO
-@(group:Form[GroupData], kms:Seq[KnessetMember])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(group:Form[GroupData], kms:Seq[KnessetMember])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/groupPage.js")"></script>

@@ -1,6 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @import Helpers._
-@(newCampaignForm:Form[detailsCampaign])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(newCampaignForm:Form[detailsCampaign])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/createCampaignAdminPage.js")"></script>

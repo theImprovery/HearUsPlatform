@@ -2,7 +2,8 @@
 @import dataaccess.SortBy
 
 @import views.Helpers.TableHelper
-@(knessetMembers:Seq[KmsParties], search:Option[String], isAsc:Boolean, sortBy:SortBy.Value)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(knessetMembers:Seq[KmsParties], search:Option[String], isAsc:Boolean, sortBy:SortBy.Value)(
+        implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @tableHead(sb:SortBy.Value, isAsc:Boolean, text:String) = {
   @defining( sortBy==sb ){ active =>

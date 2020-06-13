@@ -30,11 +30,12 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
 
   implicit private val ec = cc.executionContext
   implicit private val logger = Logger(classOf[CampaignAdminCtrl])
+  implicit private val cnf:Configuration = conf
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(langs.availables.head, messagesApi)
   }
   
-  def showCampaigns = deadbolt.SubjectPresent()() { implicit req =>
+  def showCampaigns = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
     val userId = req.asInstanceOf[AuthenticatedRequest[_]].subject.get.asInstanceOf[HearUsSubject].user.id
     for {
       camps <- campaigns.getAllCampaigns

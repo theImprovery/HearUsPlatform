@@ -2,7 +2,7 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 @(title:String, currentSection:BackOfficeSections.Value, extraHead: Html=Html(""), extraBottom: Html=Html("")
 )(content:Html
-)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @internalExtraHead = {
   <link rel="stylesheet" href="@routes.Assets.versioned("css/backend.min.css")">

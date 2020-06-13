@@ -2,7 +2,8 @@
 @import views.Helpers.TableHelper
 @import dataaccess.SortBy
 
-@(users:Seq[User], curUser:User, search:Option[String])(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider)
+@(users:Seq[User], curUser:User, search:Option[String])(
+        implicit request:AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @bottom = {
   <script src="@routes.Assets.versioned("js/userListPage.js")"></script>

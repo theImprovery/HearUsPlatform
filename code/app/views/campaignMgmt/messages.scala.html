@@ -1,5 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaign:Campaign, positions:Seq[Position.Value])(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+@(campaign:Campaign, positions:Seq[Position.Value])(
+        implicit request: AuthenticatedRequest[_], msgs: MessagesProvider, cfg:play.api.Configuration)
 
 @scripts = {
   <script src="@routes.Assets.versioned("js/campaignEditor/messagesPage.js")"></script>

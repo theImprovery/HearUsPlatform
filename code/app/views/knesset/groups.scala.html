@@ -1,6 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
 
-@(groups:Seq[KmGroupDN])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+@(groups:Seq[KmGroupDN])(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @templates.backEndBase(Messages("groups.title"), views.BackOfficeSections.Knesset, Html("")) {
   @comps.pageTitleRow(Messages("groups.title"), Messages("groups.subtitle")){

@@ -3,7 +3,7 @@
 @import Helpers._
 
 @(form:Form[UserFormData], destination:Call, isNew:Boolean, isInvited:Boolean, activeFirst:Boolean=true, randomSentence:String="", randomWord:Int=0
-)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider)
+)(implicit request: AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @templates.backEndBase("Profile Editor", BackOfficeSections.Users ){
   @users.userEditorForm(form, destination, isNew, isInvited, activeFirst, randomSentence, randomWord)

@@ -1,5 +1,6 @@
 @import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(campaign:Campaign, texts:CampaignText, positions:Position.ValueSet, genders:Gender.ValueSet)(implicit request: AuthenticatedRequest[_], msgs: MessagesProvider)
+@(campaign:Campaign, texts:CampaignText, positions:Position.ValueSet, genders:Gender.ValueSet)(
+        implicit request: AuthenticatedRequest[_], msgs: MessagesProvider, cfg:play.api.Configuration)
 
 @head = {
   <link rel="stylesheet" href="@routes.Assets.versioned("/lib/summernote/summernote-bs4.css")">
