@@ -55,6 +55,7 @@
 
 @bottom={
   @Html(campaign.analytics)
+  <script src="@routes.Assets.versioned("js/publicKMPage.js")"></script>
 }
 
 @templates.publicCampaign(campaign, campaign.title + ": " + km.name, imageOpt, Html(""), bottom, analyticsOpt){
@@ -135,5 +136,26 @@
       </div>
     }
 
+  </div>
+  <div class="modal fade" id="eulaApprovalModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">@Messages("public.kmPage.eulaModal.title")</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          @Messages("public.kmPage.eulaModal.text")
+          <a target="_blank" href="@cfg.get[String]("hearUs.eulaPage")">@Messages("public.kmPage.eulaModal.page")</a>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">@Messages("public.kmPage.eulaModal.decline")</button>
+          <button type="button" onclick="PublicKMPage.approveEula()" class="btn btn-primary">@Messages("public.kmPage.eulaModal.approve")</button>
+        </div>
+      </div>
+    </div>
   </div>
 }
