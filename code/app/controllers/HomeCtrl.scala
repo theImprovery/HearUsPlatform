@@ -1,6 +1,10 @@
 package controllers
 
+import java.util.concurrent.TimeUnit
+
+import dataaccess.SettingsDAO
 import javax.inject._
+import models.SettingKey
 import play.api._
 import play.api.cache.Cached
 import play.api.i18n.{I18nSupport, Langs, MessagesApi}
@@ -8,18 +12,31 @@ import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
 import views.PaginationInfo
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.Duration
+
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
   */
 
-class HomeCtrl @Inject()( cc: ControllerComponents,
+class HomeCtrl @Inject()( cc: ControllerComponents, cached:Cached,
+                          settings: SettingsDAO,
                           conf:Configuration
                         ) extends AbstractController(cc) with I18nSupport {
   implicit val cnf:Configuration = conf
-  def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.publicIndex())
-  }
+  implicit val ec:ExecutionContext = cc.executionContext
+  private val logger = Logger( classOf[HomeCtrl] )
+  
+  def index() = cached(_=>SettingKey.HOME_PAGE_TEXT.toString, Duration(30, TimeUnit.SECONDS)) {
+    Action.async { implicit request: Request[AnyContent] =>
+      logger.info("Creating front page")
+      for {
+        stg <- settings.get( SettingKey.HOME_PAGE_TEXT )
+      } yield {
+        Ok(views.html.publicIndex(stg.map(_.value)))
+      }
+  }}
   
   /**
     * Routes for the front-end.
@@ -45,6 +62,7 @@ class HomeCtrl @Inject()( cc: ControllerComponents,
       Ok(
         routing.JavaScriptReverseRouter("beRoutes")(
           routes.javascript.Assets.versioned,
+          routes.javascript.CampaignAdminCtrl.apiPutFrontPageData,
           routes.javascript.UserCtrl.apiAddUser,
           routes.javascript.UserCtrl.apiReInviteUser,
           routes.javascript.UserCtrl.apiDeleteInvitation,

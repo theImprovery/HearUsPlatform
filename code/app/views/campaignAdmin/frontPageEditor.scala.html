@@ -1,0 +1,30 @@
+@import views.BackOfficeSections
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@(frontPageRawText:String)(implicit request:AuthenticatedRequest[_], msgs:MessagesProvider, cfg:play.api.Configuration)
+
+@head={
+  <link rel="stylesheet" href="@routes.Assets.versioned("/lib/summernote/summernote-bs4.css")">
+}
+
+@scripts={
+  <script src="@routes.Assets.versioned("/lib/summernote/summernote-bs4.js")"></script>
+  <script src="@routes.Assets.versioned("/lib/summernote/lang/summernote-he-IL.js")"></script>
+  <script src="@routes.Assets.versioned("js/frontPageEditor.js")"></script>
+  <script >
+  $(document).ready(function(){
+      FrontPageEditor.setup();
+  });
+</script>
+}
+
+@templates.backEndBase("campaigns", BackOfficeSections.Home, head, scripts) {
+  @comps.pageTitleRow(Messages("admin.frontPageEditor.title")){
+    <button class="btn btn-outline-primary" onclick="FrontPageEditor.savePage('beRoutes')"><i class="fa fa-save"></i> @Messages("save")</button>
+  }
+
+  <div class="row">
+    <div class="col">
+      <textarea id="frontPageText" name="frontPageText">@frontPageRawText</textarea>
+    </div>
+  </div>
+}

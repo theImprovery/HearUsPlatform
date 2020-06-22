@@ -11,7 +11,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 scalaVersion := "2.13.1"
 
 libraryDependencies ++= Seq(
-  ehcache,
+  caffeine,
   ws,
   guice,
   "org.webjars" % "jquery" % "3.4.1",

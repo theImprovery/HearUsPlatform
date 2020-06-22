@@ -14,31 +14,34 @@
           <h3>@Messages("userHome.adminActions")</h3>
           <div class="buttonBox">
             @if(u.roles.contains(UserRole.Admin)){
-              <a href="@routes.KnessetMemberCtrl.showKms(None, None, None)" class="btn btn-lg btn-primary">
-                @Messages("userHome.editKMs")
+              <a href="@routes.KnessetMemberCtrl.showKms(None, None, None)" class="btn btn-primary">
+               <i class="fa fa-user"></i> @Messages("userHome.editKMs")
               </a>
-              <a href="@routes.KnessetMemberCtrl.showParties()" class="btn btn-lg btn-primary">
-                @Messages("userHome.editParties")
+              <a href="@routes.KnessetMemberCtrl.showParties()" class="btn btn-primary">
+                <i class="fa fa-users"></i> @Messages("userHome.editParties")
               </a>
 
-              <a href="@routes.CampaignAdminCtrl.showCampaigns()" class="btn btn-lg btn-success">
-                @Messages("userHome.editCampaigns")
+              <a href="@routes.CampaignAdminCtrl.showCampaigns()" class="btn btn-success">
+                <i class="fa fa-exclamation"></i> @Messages("userHome.editCampaigns")
               </a>
-              <button type="button" onclick="updateKmsAndPartes()" class="btn btn-lg btn-danger">
-                @Messages("km.api.update")
+              <a href="@routes.CampaignAdminCtrl.showFrontPageEditor()" class="btn btn-success">
+                <i class="fa fa-edit"></i> @Messages("userHome.editFrontPage")
+              </a>
+              <button type="button" onclick="updateKmsAndPartes()" class="btn btn-danger">
+               <i class="fa fa-import"></i> @Messages("km.api.update")
               </button>
-              <button type="button" onclick="updateCommittees()" class="btn btn-lg btn-danger">
-                @Messages("committee.api.update")
+              <button type="button" onclick="updateCommittees()" class="btn btn-danger">
+                <i class="fa fa-import"></i> @Messages("committee.api.update")
               </button>
             }
 
-            <a href="@routes.UserCtrl.showEditUserPage()" class="btn btn-lg btn-secondary">
+            <a href="@routes.UserCtrl.showEditUserPage()" class="btn btn-secondary">
               @Messages("userEditor.title")
             </a>
-            <a href="@routes.UserCtrl.showInviteUser()" class="btn btn-lg btn-secondary">
+            <a href="@routes.UserCtrl.showInviteUser()" class="btn btn-secondary">
               @Messages("users.inviteUser")
             </a>
-            <button class="btn btn-lg btn-primary" onclick="chooseTitleForCampaign('beRoutes')">@Messages("startNewCampaign")</button>
+            <button class="btn btn-primary" onclick="chooseTitleForCampaign('beRoutes')">@Messages("startNewCampaign")</button>
           </div>
         </div>
         <div class="col-md-6">

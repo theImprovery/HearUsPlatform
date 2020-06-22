@@ -18,7 +18,6 @@ function frontPageEditorSetup(){
             ['style', ['style']]
         ]
     });
-
 }
 
 function prepareForm() {

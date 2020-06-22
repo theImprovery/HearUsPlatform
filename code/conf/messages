@@ -119,6 +119,7 @@ userHome.editKMs=עריכת חברי כנסת
 userHome.editParties=עריכת מפלגות
 userHome.editCampaigns=עריכת קמפיינים
 userHome.adminActions=ניהול
+userHome.editFrontPage=עריכת דף ראשי
 
 parties.title=מפלגות
 parties.empty=לא רשומות מפלגות כרגע.
@@ -248,6 +249,8 @@ campaign.status.WorkInProgress=בהכנה
 campaign.status.PublicationRequested=הוגש לפרסום
 campaign.status.Published=באוויר
 campaign.status.Rejected=נדחה
+
+admin.frontPageEditor.title=עריכת העמוד הראשי
 
 campaigns.delete=מחיקת קמפיין
 campaigns.deleted=הקמפיין נמחק בהצלחה

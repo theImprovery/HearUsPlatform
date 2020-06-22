@@ -277,6 +277,16 @@ class SystemEventTable(tag:Tag ) extends Table[SystemEvent](tag, "system_events"
   def * = (id, userId, date, message, details) <> (SystemEvent.tupled, SystemEvent.unapply)
 }
 
+class SettingTable(tag:Tag) extends Table[Setting](tag, "settings") {
+  def key = column[String]("key", O.PrimaryKey)
+  def value = column[String]("value")
+  
+  def * = (key, value) <> (
+    (t:(String, String)) => Setting(SettingKey.withName(t._1), t._2),
+    (s:Setting) => Some((s.key.toString, s.value))
+  )
+}
+
 object TableClasses {
   val parties = TableQuery[PartyTable]
   val knessetMembers = TableQuery[KnessetMemberTable]

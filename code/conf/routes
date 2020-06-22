@@ -34,6 +34,8 @@ GET     /bkofc/newUserInvitation/:id controllers.UserCtrl.showNewUserInvitation(
 POST    /bkofc/newUserInvitation/    controllers.UserCtrl.doNewUserInvitation
 POST    /bkofc/changePassword        controllers.UserCtrl.doChangePassword
 PATCH   /bkofc/changeRole            controllers.UserCtrl.updateRole
+GET     /bkofc/frontPage             controllers.CampaignAdminCtrl.showFrontPageEditor
+PUT     /bkofc/frontPage             controllers.CampaignAdminCtrl.apiPutFrontPageData
 
 GET     /bkofc/parties                controllers.KnessetMemberCtrl.showParties
 PATCH   /bkofc/party                  controllers.KnessetMemberCtrl.updateParty

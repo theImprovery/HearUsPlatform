@@ -10,6 +10,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{ControllerComponents, InjectedController, Result}
 import dataaccess.JSONFormats._
+import play.api.cache.AsyncCacheApi
 import security.HearUsSubject
 
 import scala.concurrent.Future
@@ -23,10 +24,10 @@ object CampaignAdminCtrl {
   )
 }
 
-class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
-                                  users:UserDAO, campaigns:CampaignDAO, images: ImagesDAO, groups: KmGroupDAO,
-                                  userCampaigns:UserCampaignDAO,
-                                  langs:Langs, messagesApi:MessagesApi, conf:Configuration, ws:WSClient) extends InjectedController {
+class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents,
+                                  users:UserDAO, campaigns:CampaignDAO, cache:AsyncCacheApi,
+                                  userCampaigns:UserCampaignDAO, settings: SettingsDAO,
+                                  langs:Langs, messagesApi:MessagesApi, conf:Configuration) extends InjectedController {
 
   implicit private val ec = cc.executionContext
   implicit private val logger = Logger(classOf[CampaignAdminCtrl])
@@ -64,7 +65,28 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
   def updateAction = deadbolt.SubjectPresent()()  { implicit req =>
     Future(Ok("IMPL"))
   }
-
+  
+  def showFrontPageEditor() = deadbolt.Restrict( allOfGroup(UserRole.Admin.toString))(){ implicit req =>
+    for {
+      fpsOpt <- settings.get(SettingKey.HOME_PAGE_TEXT)
+      pageText = fpsOpt.map(_.value).getOrElse("HearUs: Front page text")
+    } yield {
+      Ok( views.html.campaignAdmin.frontPageEditor(pageText))
+    }
+  }
+  
+  def apiPutFrontPageData() = deadbolt.Restrict( allOfGroup(UserRole.Admin.toString))(cc.parsers.byteString) { req =>
+    val payload = req.body.decodeString("UTF-8")
+    val stg = Setting( SettingKey.HOME_PAGE_TEXT, payload )
+    for {
+      _ <- settings.store(stg)
+    } yield {
+      cache.remove(SettingKey.HOME_PAGE_TEXT.toString)
+      logger.info("Home page text removed")
+      Ok("updated")
+    }
+  }
+  
   private def campaignEditorAction(camId:Long)(action:Future[Result])(implicit req:AuthenticatedRequest[_]) = {
     campaigns.isAllowedToEdit(req.subject.get.asInstanceOf[HearUsSubject], camId).flatMap(ans => {
       if(ans) {

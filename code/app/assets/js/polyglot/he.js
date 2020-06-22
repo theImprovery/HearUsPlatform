@@ -151,6 +151,10 @@ polyglot.extend({
             "content":"צוות הקמפיין. מנהלי קמפיין יכולים גם לקבוע את הרכב הצוות"
         }
     },
+    "frontPageEditor": {
+        "saving":"שומר דף...",
+        "failed":"שׁמירת הדף נכשלה"
+    },
     "tour": {
         "detailsPage":{
             currentSection: {
@@ -275,6 +279,6 @@ polyglot.extend({
                 title:"טבלת פעולות",
                 content:""
             }
-        }
+        },
     }
 });
