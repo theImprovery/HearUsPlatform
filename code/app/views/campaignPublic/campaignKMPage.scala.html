@@ -23,21 +23,6 @@
   }
 }
 
-@showContactOption(conOp:ContactOption)={
-  <div class="contactOption contactOption-@conOp.platform">@defining(Platform.tryConvert(conOp.platform)){ platformOpt =>
-    @platformIcon(platformOpt) @conOp.title: @platformOpt match {
-      case Some(Platform.Mail)=>{ <address>@Html(conOp.details.trim.replaceAll("\\n", "<br>"))</address> }
-      case Some(Platform.Fax)=>{ <a href="tel:@conOp.details.trim">@conOp.details.trim</a> }
-      case Some(Platform.Phone)=>{ <a href="tel:@conOp.details.trim">@conOp.details.trim</a> }
-      case Some(Platform.Email)=>{ <a href="mailto:@conOp.details.trim">@conOp.details.trim</a> }
-      case Some(Platform.Twitter)=>{ <a href="https://twitter.com/@conOp.details.trim">@conOp.details.trim@@</a> }
-      case Some(Platform.Facebook)=>{ <a href="https://www.facebook.com/@conOp.details.trim">@conOp.details.trim@@</a> }
-      case other:Option[Platform.Value] => {@conOp.details}
-    }
-    @if( conOp.note.trim.nonEmpty ){<small>@conOp.note</small>}
-  }</div>
-}
-
 @actionIcon( actType:ActionType.Value )={@actType match {
   case ActionType.Interview =>{<i class="fa fa-newspaper-o"></i>}
   case ActionType.Vote =>{<i class="fa fa-hand-pointer-o"></i>}
@@ -56,6 +41,12 @@
 @bottom={
   @Html(campaign.analytics)
   <script src="@routes.Assets.versioned("js/publicKMPage.js")"></script>
+  <script>
+    $(document).ready(function(){
+        PublicKMPage.setKm(@km.id);
+        PublicKMPage.setCampaign(@campaign.id);
+    });
+  </script>
 }
 
 @templates.publicCampaign(campaign, campaign.title + ": " + km.name, imageOpt, Html(""), bottom, analyticsOpt){
@@ -100,29 +91,29 @@
             <ul class="mkItemList">
               @for( hdlMsgPair <- twitterCndMsgs  ){
                 <li>@platformIcon(hdlMsgPair._1.platformObj)
-                  @Messages("public.kmPage.tweetOnTwitter")<a target="_blank" href="https://twitter.com/intent/tweet?text=@Html(helper.urlEncode(hdlMsgPair._2))">@@@hdlMsgPair._1.details
-                    @views.Helpers.ifNotEmpty(hdlMsgPair._1.title){t=>(@t)}</a>
+                  @Messages("public.kmPage.tweetOnTwitter")<button class="btn btn-sm btn-outline-light" onclick="PublicKMPage.contactKm('twitter', 'https://twitter.com/intent/tweet?text=@Html(helper.urlEncode(hdlMsgPair._2))')">@@@hdlMsgPair._1.details
+                    @views.Helpers.ifNotEmpty(hdlMsgPair._1.title){t=>(@t)}</button>
                 </li>
               }
               @for( cos<-contactOptions.get(Platform.Facebook)  ){
                 @for( co <- cos ){
-                  <li>@platformIcon(co.platformObj) <a class="fbLink" href="https://www.facebook.com/@co.details">@Messages("public.kmPage.openOnFacebook", co.title)</a></li>
+                  <li>@platformIcon(co.platformObj) <button class="btn btn-sm btn-outline-light" onclick="PublicKMPage.contactKm('facebook','https://www.facebook.com/@co.details')">@Messages("public.kmPage.openOnFacebook", co.title)</button></li>
                 }
               }
               @for( hdlMsgPair <- whatsAppCndMsgs  ){
                 <li>@platformIcon(Some(Platform.WhatsApp))
-                  <a target="_blank" href="https://wa.me/@Helpers.whatsAppPhoneFmt(hdlMsgPair._1.details)?text=@Html(helper.urlEncode(hdlMsgPair._2))">
+                  <button class="btn btn-sm btn-outline-light" onclick="PublicKMPage.contactKm('whatsapp', 'https://wa.me/@Helpers.whatsAppPhoneFmt(hdlMsgPair._1.details)?text=@Html(helper.urlEncode(hdlMsgPair._2))')">
                     @Messages("public.kmPage.writeOnWhatsApp") @hdlMsgPair._1.details
-                    @views.Helpers.ifNotEmpty(hdlMsgPair._1.title){t=>(@t)}</a>
+                    @views.Helpers.ifNotEmpty(hdlMsgPair._1.title){t=>(@t)}</button>
                 </li>
               }
               @for( cos<-contactOptions.get(Platform.Email); msg <-emailCndMsgOpt  ){
                 @for( co <- cos ){
                   <li>@platformIcon(cos.head.platformObj) @Messages("public.kmPage.sendEmail", co.details)
-                  <a class="btn btn-sm btn-outline-secondary" target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")">
-                    <i class="fa fa-send"></i> @Messages("public.kmPage.openInGMail")</a>
-                    <a class="btn btn-sm btn-outline-secondary" target="_blank" href="mailto:@co.details?subject=@helper.urlEncode(campaign.title + ": " + campaign.slogan).replaceAll("\\+","%20")&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")">
-                    <i class="fa fa-send-o"></i> @Messages("public.kmPage.openInLocalMail")</a>
+                  <button class="btn btn-sm btn-outline-light" onclick="PublicKMPage.contactKm('gmail','https://mail.google.com/mail/?view=cm&fs=1&to=@co.details&su=@helper.urlEncode(campaign.title + ": " + campaign.slogan)&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")')">
+                    <i class="fa fa-send"></i> @Messages("public.kmPage.openInGMail")</button>
+                  <button class="btn btn-sm btn-outline-light" onclick="PublicKMPage.contactKm('email','mailto:@co.details?subject=@helper.urlEncode(campaign.title + ": " + campaign.slogan).replaceAll("\\+","%20")&body=@helper.urlEncode(msg.text).replaceAll("\\+","%20")');">
+                    <i class="fa fa-send-o"></i> @Messages("public.kmPage.openInLocalMail")</button>
                   </li>
                 }
                 <li>@Messages("public.kmPage.emailText")
