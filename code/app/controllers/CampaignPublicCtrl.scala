@@ -1,18 +1,19 @@
 package controllers
 
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 import actors.EmailSendingActor
 import akka.actor.ActorRef
 import be.objectify.deadbolt.scala.DeadboltActions
 import be.objectify.deadbolt.scala.models.Subject
-import dataaccess.{CampaignDAO, ImagesDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UserDAO}
+import dataaccess.{CampaignDAO, ImagesDAO, InteractionRecordDAO, KmGroupDAO, KnessetMemberDAO, UserCampaignDAO, UserDAO}
 import javax.inject.{Inject, Named}
-import models.{Campaign, CampaignStatus, CannedMessage, ContactOption, Platform, Position, UserRole}
+import models.{Campaign, CampaignStatus, CannedMessage, ContactOption, InteractionRecord, Platform, Position, UserRole}
 import play.api.cache.Cached
 import play.api.{Configuration, Logger}
 import play.api.i18n.{I18nSupport, Langs, MessagesApi, MessagesImpl, MessagesProvider}
-import play.api.libs.json.{JsNumber, JsObject, JsString}
+import play.api.libs.json.{JsError, JsNumber, JsObject, JsString, JsSuccess, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, ControllerComponents, InjectedController}
 import security.{HearUsRole, HearUsSubject}
@@ -27,7 +28,7 @@ object CampaignPublicCtrl {
 }
 
 class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO,
-                                   images: ImagesDAO, groups:KmGroupDAO,
+                                   images: ImagesDAO, groups:KmGroupDAO, interactions:InteractionRecordDAO,
                                    @Named("email-actor") emailActor:ActorRef,
                                    campaigns:CampaignDAO, userCampaigns:UserCampaignDAO, messagesApi:MessagesApi, deadbolt:DeadboltActions,
                                    conf:Configuration, cached:Cached) extends AbstractController(cc) with I18nSupport {
@@ -134,6 +135,17 @@ class CampaignPublicCtrl @Inject()(cc:ControllerComponents, kms:KnessetMemberDAO
           )
           Ok("reported")
         }
+      }
+    }
+  }
+  
+  def apiReportInteraction() = Action.async(cc.parsers.tolerantJson){ req =>
+    import dataaccess.JSONFormats.interactionRecordFormat
+    
+    req.body.validate[InteractionRecord] match {
+      case JsError(errors) => Future(BadRequest( Json.obj("errors" -> errors.toString) ))
+      case JsSuccess(value, path) => {
+        interactions.store(value.copy(time=Some(LocalDateTime.now))).map( res => Ok(Json.obj("result"->res)) )
       }
     }
   }

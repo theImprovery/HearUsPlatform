@@ -48,7 +48,8 @@ class HomeCtrl @Inject()( cc: ControllerComponents, cached:Cached,
           routes.javascript.UserCtrl.showSignupPage,
           routes.javascript.CampaignMgrCtrl.createCampaign,
           routes.javascript.UserCtrl.showSignupPageForNewCampaign,
-          routes.javascript.CampaignPublicCtrl.doReportAsOffensive
+          routes.javascript.CampaignPublicCtrl.doReportAsOffensive,
+          routes.javascript.CampaignPublicCtrl.apiReportInteraction
         )).as("text/javascript")
   }
   

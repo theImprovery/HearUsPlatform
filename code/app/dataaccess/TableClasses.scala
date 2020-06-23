@@ -287,6 +287,17 @@ class SettingTable(tag:Tag) extends Table[Setting](tag, "settings") {
   )
 }
 
+class InteractionRecordTable(t:Tag) extends Table[InteractionRecord](t, "interactions") {
+  def id          = column[Int]("id",O.PrimaryKey, O.AutoInc)
+  def campaign_id = column[Int]("campaign_id")
+  def km_id       = column[Int]("km_id")
+  def medium      = column[String]("medium")
+  def link        = column[String]("link")
+  def time        = column[Option[LocalDateTime]]("time")
+
+  def * = (id, campaign_id, km_id, medium, link, time) <> (InteractionRecord.tupled, InteractionRecord.unapply)
+}
+
 object TableClasses {
   val parties = TableQuery[PartyTable]
   val knessetMembers = TableQuery[KnessetMemberTable]

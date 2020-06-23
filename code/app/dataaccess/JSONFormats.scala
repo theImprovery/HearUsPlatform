@@ -68,5 +68,6 @@ object JSONFormats {
   implicit val campaignDetailsFormat:Format[CampaignDetails] = Json.format[CampaignDetails]
   implicit val groupsDNFormat:Format[KmGroupDN] = Json.format[KmGroupDN]
   implicit val campaignTextFormat:Format[CampaignText] = Json.format[CampaignText]
-  implicit val releventGroupFormat:Format[RelevantGroup] = Json.format[RelevantGroup]
+  implicit val relevantGroupFormat:Format[RelevantGroup] = Json.format[RelevantGroup]
+  implicit val interactionRecordFormat:Format[InteractionRecord] = Json.format[InteractionRecord]
 }
