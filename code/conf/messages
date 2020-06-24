@@ -69,10 +69,11 @@ passwordReset.success=הסיסמה עודכנה בהצלחה
 passwordReset.title=שנה סיסמה
 password.changed=הסיסמה עודכנה בהצלחה
 
-signup.title=Sign up for an account at a PSPS Server
-signup.body=A sign up process at a PSPS server was started for this email address (hopefully by you). To continue, please click the link below.\n{0}
-signup.confirmationMessage=Invitation email sent
-signup.confirmationDetails=To email address {0}
+signup.title=רישום למערכת ״תשמעו אותנו״
+signup.body=איזה יופי שהחלטתם.ן להצטרף! אנחנו רק צריכים כתובת דוא״ל לשלוח אליה הזמנה מסודרת. בהזמנה יהיה קישור שיאפשר להמשיך בתהליך הרישום.
+signup.confirmationMessage=ההזמנה נשלחה בהצלחה
+signup.confirmationDetails=לכתובת {0}
+signup.sendInvite=שילחו לי הזמנה
 
 error.email=כתובת אימייל לא תקינה
 error.email.exists=משתמש עם כתובת אימייל זו כבר רשום במערכת

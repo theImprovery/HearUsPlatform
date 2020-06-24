@@ -38,6 +38,7 @@ case class LoginFormData( username:String, password:String )
 case class ForgotPassFormData ( email:String )
 case class ResetPassFormData ( password1:String, password2:String, uuid:String)
 case class ChangePassFormData ( previousPassword:String, password1:String, password2:String)
+case class RequestInviteFormData( email:String, answer:String )
 
 /**
   * Controller for user-related actions (login, account mgmt...)
@@ -89,7 +90,13 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     "email" -> email
     )(ForgotPassFormData.apply)(ForgotPassFormData.unapply)
   )
-
+  
+  private val requestInviteForm = Form(mapping(
+    "email" -> email,
+    "answer" -> text
+  )(RequestInviteFormData.apply)(RequestInviteFormData.unapply)
+  )
+  
   private val resetPassForm = Form(mapping(
     "password1" -> text,
     "password2" -> text,
@@ -332,6 +339,50 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
             Future(BadRequest(views.html.users.userEditorBS(form, routes.UserCtrl.doSignupForNewCampaign(title),
               isNew = true, false, randomSentence=randomSentence, randomWord=randomWord
             )(req, messagesProvider, cfg)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
+          }
+        }
+      }
+    )
+  }
+  
+  private def showSignupForm( frm:Form[RequestInviteFormData])(implicit req:Request[_] ) = {
+    val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
+    val words = randomSentence.replace(",","").replace(".", "").split("\\s")
+    val wordNum = Random.nextInt(words.length)
+    
+    Ok( views.html.users.requestInvite(frm, randomSentence, wordNum) ).addingToSession("answer"->words(wordNum))
+  }
+  
+  def showRequestInvite() = Action { implicit req =>
+    showSignupForm(requestInviteForm)
+  }
+  
+  def doRequestInvite() = Action.async { implicit req =>
+    requestInviteForm.bindFromRequest().fold(
+      fwe => Future(showSignupForm(fwe)),
+      reqInviteData => {
+        for {
+          emailExists <- users.emailExists( reqInviteData.email )
+          answerOk = req.session("answer") == reqInviteData.answer
+          invitationId = UUID.randomUUID.toString
+          inviteOpt <- if (!emailExists && answerOk ) {
+            invitations.add(Invitation(reqInviteData.email, new Timestamp(System.currentTimeMillis()), invitationId, "")).map(Some(_))
+          } else Future(None)
+          
+        } yield inviteOpt match {
+          case None => {
+            var frm = requestInviteForm.fill(reqInviteData)
+            if (emailExists) frm = frm.withError("email", "error.email.exists")
+            if (!answerOk) frm = frm.withError("answer", "signup.wrongAnswer")
+            showSignupForm(frm)
+          }
+          
+          case Some(invite) => {
+            sendInvitationEmail(invite)
+            val message = Informational(InformationalLevel.Success,
+              Messages("inviteEmail.confirmationMessage"),
+              Messages("inviteEmail.confirmationDetails",reqInviteData.email))
+            Redirect(routes.HomeCtrl.index()).flashing(FlashKeys.MESSAGE->message.encoded)
           }
         }
       }

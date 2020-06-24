@@ -15,6 +15,8 @@ GET     /signup/campaign             controllers.UserCtrl.showSignupPageForNewCa
 POST    /signup                      controllers.UserCtrl.doSignup
 POST    /signup/campaign             controllers.UserCtrl.doSignupForNewCampaign(title:String)
 
+GET     /limbo/requestInvite         controllers.UserCtrl.showRequestInvite()
+POST    /limbo/requestInvite         controllers.UserCtrl.doRequestInvite()
 GET     /limbo/newUserInvitation/:id controllers.UserCtrl.showNewUserInvitation(id)
 POST    /limbo/newUserInvitation/    controllers.UserCtrl.doNewUserInvitation
 
