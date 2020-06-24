@@ -28,8 +28,8 @@ case class detailsCampaign(name:String, slug:String, campaigner:Long)
 
 class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponents, kms:KnessetMemberDAO,
                                 campaigns:CampaignDAO, users:UserDAO, usersCampaigns:UserCampaignDAO,
-                                groups:KmGroupDAO, conf:Configuration,
-                                langs:Langs, messagesApi:MessagesApi, images: ImagesDAO,
+                                groups:KmGroupDAO, images: ImagesDAO, interactions: InteractionRecordDAO,
+                                conf:Configuration, langs:Langs, messagesApi:MessagesApi,
                                 @Named("cacheInvalidator")cacheActor:ActorRef,
                                 @Named("email-actor")emailActor:ActorRef
                                ) extends InjectedController {
@@ -132,8 +132,14 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
     campaignEditorAction(id){
       for {
         campaignOpt <- campaigns.getCampaign(id)
-        isAdmin <- campaigns.isAllowedToManage(req.subject.get.asInstanceOf[HearUsSubject], id)
-      } yield campaignOpt.map(c => Ok(views.html.campaignMgmt.details(c, tour, isAdmin))).getOrElse(NotFound("campaign with id " + id + "does not exist"))
+        isAdmin     <- campaigns.isAllowedToManage(req.subject.get.asInstanceOf[HearUsSubject], id)
+        interactionStats  <- interactions.summaryForCampaign(id)
+      } yield {
+        campaignOpt match {
+          case Some(c) => Ok(views.html.campaignMgmt.details(c, tour, isAdmin, interactionStats))
+          case None    => NotFound("campaign with id " + id + "does not exist")
+        }
+      }
     }
   }
 
@@ -146,6 +152,20 @@ class CampaignMgrCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerComponent
           campaigns.updateDetails(id,campaignDtls).map(newC => Ok(Json.toJson(newC)))
         }
       )
+    }
+  }
+  
+  def downloadDetailedInteractionStatistics( campId:Long ) = deadbolt.Restrict(allOfGroup(UserRole.Campaigner.toString))() { implicit req =>
+    campaignEditorAction(campId) {
+      for {
+        detailed <- interactions.detailsForCampaign(campId)
+      } yield {
+        Ok(
+          (Seq("Campaign ID", "KM ID", "Party ID", "Time", "Medium", "KM Name", "Party Name") +:
+            detailed.map( dtl => Seq(dtl.campaignId, dtl.kmId, dtl.partyId, dtl.time, dtl.medium, dtl.kmName, dtl.partyName) )
+          ).map( s => s.mkString("\t") ).mkString("\n")
+        ).withHeaders("Content-disposition"->s"attachment; filename=interactions-$campId.tsv").as("text/tab-separated-values")
+      }
     }
   }
   

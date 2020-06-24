@@ -90,6 +90,7 @@ PATCH   /bkofc/campaigns/changeRequestStatus/:id/:status    controllers.Campaign
 
 GET     /bkofc/campaigns/:id/details/      controllers.CampaignMgrCtrl.details(id:Long, tour:Boolean)
 GET     /bkofc/campaigns/:id/positions/    controllers.CampaignMgrCtrl.positions(id:Long)
+GET     /bkofc/campaigns/:id/interactionDetails    controllers.CampaignMgrCtrl.downloadDetailedInteractionStatistics(id:Long)
 
 GET     /bkofc/campaigns/:id/design/      controllers.CampaignMgrCtrl.showCampaignDesign(id:Long)
 POST    /bkofc/campaigns/:id/design/      controllers.CampaignMgrCtrl.doUpdateCampaignDesign(id:Long)

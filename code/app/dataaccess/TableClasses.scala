@@ -288,14 +288,35 @@ class SettingTable(tag:Tag) extends Table[Setting](tag, "settings") {
 }
 
 class InteractionRecordTable(t:Tag) extends Table[InteractionRecord](t, "interactions") {
-  def id          = column[Int]("id",O.PrimaryKey, O.AutoInc)
-  def campaign_id = column[Int]("campaign_id")
-  def km_id       = column[Int]("km_id")
+  def id          = column[Long]("id",O.PrimaryKey, O.AutoInc)
+  def campaign_id = column[Long]("campaign_id")
+  def km_id       = column[Long]("km_id")
   def medium      = column[String]("medium")
   def link        = column[String]("link")
   def time        = column[Option[LocalDateTime]]("time")
 
   def * = (id, campaign_id, km_id, medium, link, time) <> (InteractionRecord.tupled, InteractionRecord.unapply)
+}
+
+class InteractionSummaryView(t:Tag) extends Table[InteractionSummary](t, "interaction_summary") {
+  def campaignId = column[Long]("campaign_id")
+  def medium     = column[String]("medium")
+  def count      = column[Long]("count")
+  
+  def * = (campaignId, medium, count) <> (InteractionSummary.tupled, InteractionSummary.unapply)
+}
+
+class InteractionDetailsView(t:Tag) extends Table[InteractionDetails](t, "interaction_details") {
+  def campaignId = column[Long]("campaign_id")
+  def time       = column[LocalDateTime]("time")
+  def medium     = column[String]("medium")
+  def kmId       = column[Long]("km_id")
+  def kmName     = column[String]("km_name")
+  def partyId    = column[Long]("party_id")
+  def partyName  = column[String]("party_name")
+  
+  def * = (campaignId, time, medium, kmId, kmName, partyId, partyName
+                  ) <> (InteractionDetails.tupled, InteractionDetails.unapply)
 }
 
 object TableClasses {
