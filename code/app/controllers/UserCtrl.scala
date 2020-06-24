@@ -191,10 +191,23 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       fData => {
         for {
           userOpt <- users.get(user.id)
-          _ <- userOpt.map( user => users.updateUser(fData.update(user)) ).getOrElse(Future(()))
+          userByEmail <- fData.email.map( eml => users.getUserByEmail(eml.trim) ).getOrElse( Future(None) )
+          canUpdate = userByEmail.isEmpty || userOpt.forall(u => userByEmail.get.id == u.id)
+          _ <- if (canUpdate) {
+                  userOpt.map( user => users.updateUser(fData.update(user)) ).getOrElse(Future(()))
+                } else Future(())
         } yield {
           userOpt match {
-            case Some(_) => Redirect(routes.UserCtrl.showUserList(None))
+            case Some(_) => {
+              if ( canUpdate ) {
+                Redirect(routes.UserCtrl.showUserList(None))
+              } else {
+                val form = userForm.fill(fData).withError("email","error.email.exists")
+                Ok( views.html.users.userEditorBackEnd(form,
+                  routes.UserCtrl.doSaveUser(),
+                  isNew=false, isInvited=false))
+              }
+            }
             case None => notFound(user.id.toString)
           }
         }
@@ -348,11 +361,20 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
     } yield res
   }
 
-  def showNewUserInvitation(uuid:String) = Action { implicit req =>
-    val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
-    val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-    Ok( views.html.users.userEditorBS( userForm.bind(Map("uuid"->uuid)).discardingErrors, routes.UserCtrl.doNewUserInvitation,
-      isNew=true, false, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider, cfg)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
+  def showNewUserInvitation(uuid:String) = Action.async { implicit req =>
+    for {
+      invitationOpt <- invitations.get(uuid)
+    } yield invitationOpt match {
+      case None => NotFound(views.html.errorPage(404,"Invitation not found"))
+      case Some(inv) => {
+        val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
+        val randomWord = Random.nextInt(randomSentence.split("\\s").length)
+        Ok( views.html.users.userEditorBS( userForm.bind(Map("uuid"->uuid, "email"->inv.email)).discardingErrors,
+          routes.UserCtrl.doNewUserInvitation,
+          isNew=true, isInvited=true, randomSentence=randomSentence, randomWord=randomWord)(req, messagesProvider, cfg)
+        ).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord))
+      }
+    }
   }
 
   def doNewUserInvitation() = Action.async { implicit req =>
@@ -360,8 +382,12 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
       fwe => {
         val randomSentence = Messages("signup.sentence." + Random.nextInt(10))
         val randomWord = Random.nextInt(randomSentence.split("\\s").length)
-        Future(BadRequest(views.html.users.userEditorBS(fwe, routes.UserCtrl.doNewUserInvitation, isNew=true, false, randomSentence=randomSentence, randomWord=randomWord
-                                                     )(req, messagesProvider, cfg)).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
+        logger.info(fwe.data.mkString("\n"))
+        Future(
+          BadRequest(views.html.users.userEditorBS(fwe, routes.UserCtrl.doNewUserInvitation,
+            isNew=true, isInvited=true, activeFirst=true, randomSentence, randomWord
+          )(req, messagesProvider, cfg)
+          ).addingToSession("answer"->randomSentence.replace(",","").replace(".", "").split("\\s")(randomWord)))
       },
       fData => {
         val res = for {

@@ -15,13 +15,14 @@ GET     /signup/campaign             controllers.UserCtrl.showSignupPageForNewCa
 POST    /signup                      controllers.UserCtrl.doSignup
 POST    /signup/campaign             controllers.UserCtrl.doSignupForNewCampaign(title:String)
 
+GET     /limbo/newUserInvitation/:id controllers.UserCtrl.showNewUserInvitation(id)
+POST    /limbo/newUserInvitation/    controllers.UserCtrl.doNewUserInvitation
+
 # back office
 GET     /bkofc/                      controllers.UserCtrl.userHome
 GET     /bkofc/login                 controllers.UserCtrl.showLogin
 POST    /bkofc/login                 controllers.UserCtrl.doLogin
 POST    /bkofc/logout                controllers.UserCtrl.doLogout
-GET     /bkofc/users/                controllers.UserCtrl.showUserList(search:Option[String])
-GET     /bkofc/users/new             controllers.UserCtrl.showNewUserPage
 POST    /bkofc/users/                controllers.UserCtrl.doSaveNewUser
 GET     /bkofc/users/myProfile       controllers.UserCtrl.showEditUserPage()
 POST    /bkofc/users/myProfile       controllers.UserCtrl.doSaveUser()
@@ -31,9 +32,9 @@ GET     /bkofc/resetPassword/:id     controllers.UserCtrl.showResetPassword(id)
 POST    /bkofc/resetPassword/        controllers.UserCtrl.doResetPassword
 GET     /bkofc/inviteUser/           controllers.UserCtrl.showInviteUser
 POST    /bkofc/inviteUser/           controllers.UserCtrl.doInviteUser
-GET     /bkofc/newUserInvitation/:id controllers.UserCtrl.showNewUserInvitation(id)
-POST    /bkofc/newUserInvitation/    controllers.UserCtrl.doNewUserInvitation
 POST    /bkofc/changePassword        controllers.UserCtrl.doChangePassword
+GET     /bkofc/users/                controllers.UserCtrl.showUserList(search:Option[String])
+GET     /bkofc/users/new             controllers.UserCtrl.showNewUserPage
 PATCH   /bkofc/changeRole            controllers.UserCtrl.updateRole
 GET     /bkofc/frontPage             controllers.CampaignAdminCtrl.showFrontPageEditor
 PUT     /bkofc/frontPage             controllers.CampaignAdminCtrl.apiPutFrontPageData
