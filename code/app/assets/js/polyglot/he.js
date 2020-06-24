@@ -155,6 +155,11 @@ polyglot.extend({
         "saving":"שומר דף...",
         "failed":"שׁמירת הדף נכשלה"
     },
+    warning: {
+        unsaved: {
+            changes: "חלק מהשינויים לא נשמרו. לעבור דף?"
+        }
+    },
     "tour": {
         "detailsPage":{
             currentSection: {

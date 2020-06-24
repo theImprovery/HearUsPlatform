@@ -5,11 +5,16 @@ var counterSpan;
 var curMessageKey;
 var messages = {};
 var $contentPane;
+let messageChanged = false;
+
+const setMessageChanged = function(){messageChanged=true;};
 
 function messagesPageSetup(){
     $characterCounter = $("#characterCounter");
     counterSpan = $characterCounter.find("span")[0];
     $contentPane = $("#content");
+
+    $contentPane.on("keypress",setMessageChanged);
     messageSelectionChanged();
     loadMessages();
 }
@@ -22,6 +27,7 @@ function save( messageKey, content ) {
         camId:campaignId,
         text:content
     };
+    messageChanged = false;
     ["male", "female"].forEach( function(g){
        ["Email", "Twitter", "WhatsApp"].forEach( function(platform){
            positions.forEach(function(pos){
@@ -95,7 +101,12 @@ function getMessageKey() {
 
 function saveMessages() {
     const msgDiv = Informationals.showBackgroundProcess(polyglot.t("update.messages"));
-    messageSelectionChanged(); // save current message;
+
+    const curContent = $contentPane.val();
+    if ( curContent.trim().length > 0 ) {
+        const msgKey = getMessageKey();
+        save( msgKey, curContent );
+    }
 
     const arr = [];
     for ( const k in messages ) {
@@ -108,6 +119,7 @@ function saveMessages() {
         .then( function (res) {
             if (res.ok) {
                 msgDiv.success();
+                messageChanged = false;
                 return true;
             } else {
                 msgDiv.dismiss();
@@ -167,10 +179,17 @@ function messageSelectionChanged() {
     }
     curMessageKey = key;
     $contentPane.val( load(curMessageKey) );
+    messageChanged = false;
     updateCharacterCount();
 }
 
-window.onbeforeunload = saveMessages;
+
+window.addEventListener('beforeunload', function (e) {
+    if (messageChanged) {
+        e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+        e.returnValue = '';
+    }
+});
 
 window.onload = function() {
     Promise.prototype.finally = Promise.prototype.finally || {
