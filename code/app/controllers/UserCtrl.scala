@@ -480,7 +480,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
 
   }
 
-  def showUserList(search:Option[String]) = deadbolt.SubjectPresent()(){ implicit req =>
+  def showUserList(search:Option[String]) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))(){ implicit req =>
     val effectiveSearch = search.map(_.trim).flatMap(v => if (v.isEmpty) None else Some(v))
     val sqlSearch = search.map(s => "%" + s.trim + "%")
     val user = req.subject.get.asInstanceOf[HearUsSubject].user
