@@ -36,9 +36,9 @@ object Informational {
       case _ => Informational( InformationalLevel.Danger, "CANNOT PARSE INFORMATIONAL", enc)
     }
   }
-   def defaultTimes = Map(InformationalLevel.Success -> 2000,
-     InformationalLevel.Info -> 2000,
-     InformationalLevel.Warning -> 3000,
+   def defaultTimes = Map(InformationalLevel.Success -> 4000,
+     InformationalLevel.Info -> 4000,
+     InformationalLevel.Warning -> 6000,
      InformationalLevel.Danger ->10000
    )
 

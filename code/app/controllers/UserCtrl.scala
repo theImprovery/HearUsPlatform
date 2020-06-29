@@ -207,7 +207,9 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
           userOpt match {
             case Some(_) => {
               if ( canUpdate ) {
-                Redirect(routes.UserCtrl.showUserList(None))
+                val message = Informational(InformationalLevel.Success,
+                  Messages("userEditor.changesSaved"))
+                Redirect(routes.UserCtrl.showEditUserPage()).flashing(FlashKeys.MESSAGE->message.encoded)
               } else {
                 val form = userForm.fill(fData).withError("email","error.email.exists")
                 Ok( views.html.users.userEditorBackEnd(form,

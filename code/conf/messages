@@ -40,7 +40,7 @@ navbar.campaigns.mgmt.CampaignGroups=ועדות רלוונטיות
 admin.campaign-table.title=קמפיינים במערכת
 
 forgotPassword.title=איפוס סיסמה
-forgotPassword.emailNotFound=מצטערים, לא מצאנו את האימייל הזה במערכת שלנו.
+forgotPassword.emailNotFound=מצטערים - לא מצאנו את שילוב
 forgotPassword.emailSent=אימייל איפוס סיסמה נשלח ל-{0}. אם אתם לא מוצאים אותו שם, חפשו בתיקיית הספאם.
 forgotPassword.help=הכניסו את כתובת המייל איתה נרשמתם לאתר, ונשלח לכם מייל לאיפוס הסיסמה.
 forgotPassword.formProcessError=משהו לא עובד פה - כתובת האימייל תקינה?
@@ -112,6 +112,7 @@ userEditor.previousPassword=סיסמה קודמת
 userEditor.updatePassword=עידכון סיסמה
 userEditor.updateDetails=שמירת פרטים
 userEditor.existingUserLogin=כבר יש לך חשבון במערכת?
+userEditor.changesSaved=השינויים נשמרו בהצלחה
 
 userHome.title=תשמעו אותנו: מסך הבית
 userHome.commonActions=פעולות נפוצות
