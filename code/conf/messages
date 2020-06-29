@@ -278,6 +278,7 @@ campaigns.notPublished=קמפיין זה עדיין לא פורסם
 campaignMgmt.index.title=הקמפיינים שלי
 campaignMgmt.myCampaigns.noCampaigns=אין כרגע קמפיינים בהשתתפותך
 campaignMgmt.details.help=עריכת פרטים כלליים של הקמפיין
+campaignMgmt.details.deleteCampaign=מחיקת קמפיין
 campaignMgmt.messages.help=עריכת המסרים בקמפיין, לפי מדיה (אימייל/טוויטר), עמדה, ומגדר הח״כ.
 campaignMgmt.actions.help=רישום פעולות שקשורות לקמפיין, עבור ח״כ מסויים.
 campaignMgmt.design.help=עיצוב אתר הקמפיין: פונטים, צבעים, ורקעים. אפשר לפתוח את אתר הקמפיין בחלון נוסף, ולראות אין העיצוב משתנה כשלוחצים ״עדכון״ (לא לשכוח לרענן את הדף!)

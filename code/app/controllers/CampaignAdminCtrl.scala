@@ -1,6 +1,6 @@
 package controllers
 
-import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup}
+import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltActions, allOfGroup, anyOf, allOf}
 import dataaccess._
 import javax.inject.Inject
 import models.{CampaignStatus, _}
@@ -50,15 +50,20 @@ class CampaignAdminCtrl @Inject()(deadbolt:DeadboltActions, cc:ControllerCompone
     users.allCampaigners(Some(sqlSearch)).map( ans => Ok(Json.toJson(ans.map(_.dn))))
   }
   
-  def deleteCampaign(id:Long, from:String) = deadbolt.Restrict(allOfGroup(UserRole.Admin.toString))() { implicit req =>
+  def deleteCampaign(id:Long, from:String) = deadbolt.Restrict(anyOf(allOf(UserRole.Admin.toString), allOf(UserRole.Campaigner.toString)))() { implicit req =>
     for {
-      deleted <- campaigns.deleteCampaign(id)
+      canDelete <- campaigns.isAllowedToManage(req.subject.get.asInstanceOf[HearUsSubject], id)
+      deleted   <- if (canDelete) campaigns.deleteCampaign(id) else Future(())
     } yield {
-      val goTo = from match {
-        case "admin" => routes.CampaignAdminCtrl.showCampaigns().url
-        case "campaigner" => routes.CampaignMgrCtrl.index().url
+      if ( canDelete ) {
+        val goTo = from match {
+          case "admin" => routes.CampaignAdminCtrl.showCampaigns().url
+          case "campaigner" => routes.CampaignMgrCtrl.index().url
+        }
+        Ok(goTo).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("campaigns.deleted"))
+      } else {
+        Unauthorized("Computer says no")
       }
-      Ok(goTo).flashing(FlashKeys.MESSAGE -> messagesProvider.messages("campaigns.deleted"))
     }
   }
 
