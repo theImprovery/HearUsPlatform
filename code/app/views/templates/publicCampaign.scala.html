@@ -6,17 +6,16 @@
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="@campaign.website"/>
   <meta property="og:site_name" content="@campaign.title"/>
-@*  <meta property="og:image" content="@campaign." />*@
+  <meta property="og:image" content="@routes.Assets.versioned("images/social-image.png")" />
   <meta property="og:description" content="@campaign.title - @campaign.slogan"/>
   <meta name="twitter:card" content="@campaign.title - @campaign.slogan" />
-@*  <meta name="twitter:site" content="{{ site.twitter_username }}" />*@
   <meta name="twitter:title" content="@campaign.title" />
   <meta name="twitter:description" content="@campaign.title - @campaign.slogan" />
-@*  <meta name="twitter:image" content="{{site.url}}{{site.baseurl}}{% if include.twimage %}{{ include.twimage }}{% else %}{{ site.twimage }}{% endif %}" />*@
+  <meta name="twitter:image" content="@routes.Assets.versioned("images/social-image.png")" />
   <meta name="twitter:url" content="@campaign.website" />
   <meta name="description" content="@campaign.title - @campaign.slogan">
   <link rel="canonical" href="@campaign.website">
-@*  <link rel="icon" type="image/x-icon" href="{{ "/favicon.ico"  | prepend: site.baseurl }}" />*@
+  <link rel="icon" type="image/x-icon" href="@routes.Assets.versioned("images/favicon.ico")">
   <link rel="stylesheet" href="@routes.Assets.versioned("vnd/grayscale/grayscale.min.css")">
   <link rel="stylesheet" href="@routes.Assets.versioned("css/publics.min.css")">
   <style type="text/css">
