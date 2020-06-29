@@ -1,4 +1,4 @@
-@(frontPageTextOpt:Option[String])(implicit request:RequestHeader, msgs:MessagesProvider, cnf:play.api.Configuration)
+@(frontPageTextOpt:Option[String])(implicit request:RequestHeader, msgs:MessagesProvider, cfg:play.api.Configuration)
 
 @ehead={
   <style>
@@ -14,7 +14,22 @@
       z-index: -1000;
       opacity: .5;
     }
-
+    ul.inlineLinks {
+      list-style: none;
+      padding: 0;
+    }
+    ul.inlineLinks li {
+      display: inline-block;
+    }
+    ul.inlineLinks li a {
+      display: inline-block;
+      text-decoration: none;
+      color: #cccccc;
+      padding: 0 1em;
+    }
+    ul.inlineLinks li a:hover {
+      color: #00FFAA;
+    }
   </style>
 }
 
@@ -57,8 +72,16 @@
   </div>
   <div class="container-fluid" style="position: fixed; bottom:0; left:0; right:0; height:4em;">
     <div class="row py-1 bg-dark text-white">
-      <div class="col">
+      <div class="col-md">
         <p class="my-4 text-center">@Messages("index.note")</p>
+      </div>
+      <div class="col-md text-center text-md-left">
+        <ul class="my-4 inlineLinks">
+          <li><a href="@cfg.get[String]("hearUs.contactUsPage")">@Messages("footer.hearUs.contactUsPage")</a></li>
+          <li><a href="@cfg.get[String]("hearUs.eulaPage")">@Messages("footer.hearUs.eulaPage")</a></li>
+          <li><a href="@cfg.get[String]("hearUs.privacyPolicyPage")">@Messages("footer.hearUs.privacyPolicyPage")</a></li>
+          <li><a href="@cfg.get[String]("hearUs.blogPage")">@Messages("footer.hearUs.blog")</a></li>
+        </ul>
       </div>
     </div>
   </div>
