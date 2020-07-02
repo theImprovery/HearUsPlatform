@@ -17,6 +17,20 @@ function messagesPageSetup(){
     $contentPane.on("keypress",setMessageChanged);
     messageSelectionChanged();
     loadMessages();
+    $("#messageTable td").on( "click", function(){
+        if ( this.id.trim().length > 0 ) {
+            const comps = this.id.trim().split("_");
+            const key = {
+                gender: comps[0],
+                platform: comps[1],
+                position: comps[2]
+            };
+            document.getElementById("platform"+key.platform).checked = true;
+            document.getElementById(key.gender).checked = true;
+            document.getElementById(key.position).checked = true;
+            messageSelectionChanged();
+        }
+    });
 }
 
 function save( messageKey, content ) {
@@ -181,6 +195,10 @@ function messageSelectionChanged() {
     $contentPane.val( load(curMessageKey) );
     messageChanged = false;
     updateCharacterCount();
+    const $msgTbl = $("#messageTable");
+    $msgTbl.find("td").removeClass("current");
+    $msgTbl.find("td#" + key.gender + "_" + key.platform + "_" + key.position).addClass("current");
+
 }
 
 

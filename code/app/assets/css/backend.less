@@ -45,7 +45,7 @@ ul.kmSelectList {
 
 .messagesTable td {
   text-align: center;
-  transition: background-color 1s;
+  transition: background-color .3s;
 }
 
 td.hasMessage {
@@ -53,6 +53,9 @@ td.hasMessage {
   color: #0F0;
   i.fa-times-circle-o {
     display: none;
+  }
+  &:hover {
+    background-color: #6A6;
   }
 }
 
@@ -62,5 +65,11 @@ td.noMessage {
   i.fa-check-circle-o {
     display: none;
   }
+  &:hover {
+    background-color: #ddd;
+  }
 }
 
+td.current {
+  border: 2px solid yellow;
+}

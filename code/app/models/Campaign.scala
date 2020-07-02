@@ -70,7 +70,7 @@ case class CampaignText( campaignId: Long,
                          bodyText:String,
                          footer:String,
                          groupLabels:String,
-                         kmLabels:String) {
+                         kmLabels:String ) {
   val groupLabel:Map[Position.Value, String] = Position.values.toSeq.zipAll( groupLabels.split("\t").take(Position.values.size).map(_.trim), Position.For, "" ).toMap
   val kmLabel:Map[(Gender.Value,Position.Value),String] = Gender.values.toSeq.flatMap( g => Position.values.toSeq.map(p=>(g,p)) )
                                                                 .zipAll(kmLabels.split("\t").map(_.trim)
@@ -84,7 +84,7 @@ case class LabelText( camId: Long,
                       gender: String,
                       text: String )
 
-case class RelevantGroup( camId: Long, groupId: Long)
+case class RelevantGroup( camId: Long, groupId: Long )
 
 case class CannedMessage( camId: Long,
                           position: Position.Value,
@@ -92,7 +92,7 @@ case class CannedMessage( camId: Long,
                           platform: Platform.Value,
                           text: String ){
   
-  def process(km: KnessetMember, twitterHandle:Option[String]) = {
+  def process(km: KnessetMember, twitterHandle:Option[String]): CannedMessage = {
     val updatedText = text.replaceAll("@name", km.name)
     val effTwitterHdl = twitterHandle.map(t => t.trim).map( t=> if (t.startsWith("@")) t else "@"+t )
     copy( text=updatedText.replaceAll("@twitter", effTwitterHdl.getOrElse(km.name)))
