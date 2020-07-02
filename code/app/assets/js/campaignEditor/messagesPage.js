@@ -33,37 +33,53 @@ function messagesPageSetup(){
     });
 }
 
-function save( messageKey, content ) {
-    messages[keyToString(messageKey)] =  {
+
+function forAllKeys( f ) {
+    ["male", "female"].forEach( function(g){
+        ["Email", "Twitter", "WhatsApp"].forEach( function(platform){
+            positions.forEach(function(pos){
+                f({
+                    gender:g,
+                    platform:platform,
+                    position:pos
+                });
+            });
+        });
+    });
+}
+
+function updateMessageTable() {
+    forAllKeys(function(key){
+        const hasData = (load(key).trim().length > 0);
+        const $cell = $("#"+key.gender+"_"+key.platform+"_"+key.position);
+        if ( hasData ) {
+            $cell.removeClass("noMessage");
+            $cell.addClass("hasMessage");
+            if ( (key.platform === "Twitter") && (load(key).trim().length > 255) ) {
+                $cell.addClass("hasWarning");
+            } else {
+                $cell.removeClass("hasWarning");
+            }
+        } else {
+            $cell.removeClass("hasMessage");
+            $cell.addClass("noMessage");
+        }
+    });
+}
+
+function makeMessage( messageKey, content ) {
+    return {
         platform:messageKey.platform,
         gender:messageKey.gender,
         position:messageKey.position,
         camId:campaignId,
         text:content
     };
-    messageChanged = false;
-    ["male", "female"].forEach( function(g){
-       ["Email", "Twitter", "WhatsApp"].forEach( function(platform){
-           positions.forEach(function(pos){
-               const key = {
-                 gender:g,
-                 platform:platform,
-                 position:pos
-               };
-               const hasData = (load(key).trim().length > 0);
-               const $cell = $("#"+g+"_"+platform+"_"+pos);
-               if ( hasData ) {
-                   $cell.removeClass("noMessage");
-                   $cell.addClass("hasMessage");
-               } else {
-                   $cell.removeClass("hasMessage");
-                   $cell.addClass("noMessage");
-               }
-           });
-       });
-    });
+}
 
-
+function save( messageKey, content ) {
+    messages[keyToString(messageKey)] =  makeMessage(messageKey, content);
+    updateMessageTable();
 }
 
 function load( messageKey ) {
@@ -193,7 +209,6 @@ function messageSelectionChanged() {
     }
     curMessageKey = key;
     $contentPane.val( load(curMessageKey) );
-    messageChanged = false;
     updateCharacterCount();
     const $msgTbl = $("#messageTable");
     $msgTbl.find("td").removeClass("current");
@@ -201,6 +216,67 @@ function messageSelectionChanged() {
 
 }
 
+
+function copyToEmpty() {
+    const key = getMessageKey();
+    const content = $contentPane.val();
+    save( key, content );
+    forAllKeys( function(key){
+        const keyAsString = keyToString(key);
+        const msg = messages[keyAsString];
+        if ( !msg || msg.text.trim().length===0 ) {
+            messages[keyAsString] = makeMessage(key, content);
+        }
+    });
+
+    updateMessageTable();
+    setMessageChanged();
+    Informationals.makeSuccess(polyglot.t("campaignMgr.content.success"),"",1000).show();
+}
+
+function copyToSamePos() {
+    const curKey = getMessageKey();
+    const content = $contentPane.val();
+    save( curKey, content );
+    forAllKeys( function(key){
+        if ( curKey.position === key.position ) {
+            const keyAsString = keyToString(key);
+            const msg = messages[keyAsString];
+            messages[keyAsString] = makeMessage(key, content);
+        }
+    });
+
+    updateMessageTable();
+    setMessageChanged();
+    Informationals.makeSuccess(polyglot.t("campaignMgr.content.success"),"",1000).show();
+}
+
+function copyToAll() {
+    swal({
+        title: polyglot.t("campaignMgr.content.copyToAll.title"),
+        text: polyglot.t("campaignMgr.content.copyToAll.text"),
+        icon: "warning",
+        buttons: {
+            cancel:polyglot.t("cancel"),
+            confirm:polyglot.t("confirm")
+        },
+        dangerMode: true,
+    }).then((copyToAll) => {
+        if (copyToAll) {
+            const key = getMessageKey();
+            const content = $contentPane.val();
+            save( key, content );
+            forAllKeys( function(key){
+                const keyAsString = keyToString(key);
+                const msg = messages[keyAsString];
+                messages[keyAsString] = makeMessage(key, content);
+            });
+            updateMessageTable();
+            setMessageChanged();
+            Informationals.makeSuccess(polyglot.t("campaignMgr.content.success"),"",1000).show();
+        }
+    });
+}
 
 window.addEventListener('beforeunload', function (e) {
     if (messageChanged) {
