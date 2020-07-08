@@ -508,7 +508,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
           if ( emailExists ){
             val bodyText = "To reset your password, please click the link below: \n " + conf.get[String]("psps.server.publicUrl") +
               routes.UserCtrl.showResetPassword(userSessionId).url
-            val email = Email("Forgot my password", conf.get[String]("play.mailer.user"), Seq(fd.email), bodyText = Some(bodyText))
+            val email = Email("Forgot my password", conf.get[String]("hearUs.mailerUserName"), Seq(fd.email), bodyText = Some(bodyText))
             mailerClient.send(email)
             val msg = Informational( InformationalLevel.Success, Messages("forgotPassword.emailSent", fd.email), "")
             Redirect( routes.UserCtrl.showLogin() ).flashing( FlashKeys.MESSAGE->msg.encoded )
@@ -620,15 +620,7 @@ class UserCtrl @Inject()(deadbolt:DeadboltActions, conf:Configuration,
   def sendInvitationEmail( invi:Invitation ): Unit = {
     val link = conf.get[String]("psps.server.publicUrl") + routes.UserCtrl.showNewUserInvitation(invi.uuid).url
     val bodyText = Messages("inviteEmail.body", link)
-    val email = Email(Messages("inviteEmail.title"), conf.get[String]("play.mailer.user"), Seq(invi.email), Some(bodyText))
-    mailerClient.send(email)
-    invitations.updateLastSend( invi.uuid, java.time.LocalDateTime.now() )
-  }
-
-  def sendSignupEmail( invi:Invitation ): Unit = {
-    val link = conf.get[String]("psps.server.publicUrl") + routes.UserCtrl.showNewUserInvitation(invi.uuid).url
-    val bodyText = Messages("signup.body", link)
-    val email = Email(Messages("signup.title"), conf.get[String]("play.mailer.user"), Seq(invi.email), Some(bodyText))
+    val email = Email(Messages("inviteEmail.title"), conf.get[String]("hearUs.mailerUserName"), Seq(invi.email), Some(bodyText))
     mailerClient.send(email)
     invitations.updateLastSend( invi.uuid, java.time.LocalDateTime.now() )
   }

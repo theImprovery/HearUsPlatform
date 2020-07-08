@@ -48,9 +48,12 @@
       <div class="row">
         <div class="col-md text-center text-md-right">
           @Messages("public.createdWith") <a href="@Messages("application.url")">@Messages("application.title")</a> @Html(Messages("application.slogan"))
-          <a onclick="chooseTitleForCampaign(feRoutes)" class="makeYourOwnCampaignBanner">
+          <a href="@routes.UserCtrl.showRequestInvite()" class="makeYourOwnCampaignBanner">
             @Messages("public.footer.createYourOwn")
           </a>
+@*          <a onclick="chooseTitleForCampaign(feRoutes)" class="makeYourOwnCampaignBanner">*@
+@*            @Messages("public.footer.createYourOwn")*@
+@*          </a>*@
         </div>
         <div class="col-md text-center text-md-left">
           <ul class="linkList">

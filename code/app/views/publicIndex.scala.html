@@ -30,26 +30,65 @@
     ul.inlineLinks li a:hover {
       color: #00FFAA;
     }
+    ul.inlineLinks li a:active {
+      color: #88FFFF;
+    }
+    ul.indexNavs li {
+      margin-right: .5em;
+    }
+
+    footer {
+      position: fixed;
+      bottom:0;
+      left:0;
+      right:0;
+      height: 5em;
+      padding: 0;
+      margin: 0;
+    }
+
+    @@media(max-width: 768px) {
+      ul.indexNavs li {
+        margin: .3em 0;
+        text-align: left;
+        display: block;
+      }
+      footer {
+        position: static;
+        height: auto;
+      }
+      body{
+        padding-bottom: 0;
+      }
+    }
   </style>
 }
 
 @templates.bsBase(Messages("application.title"), ehead ) {
   <img id="bgImg" src="@routes.Assets.versioned("images/campaignScreenshot.png")" alt="background campaign image">
-  <div class="container-fluid">
-    <div class="row py-4 bg-dark text-white">
-      <div class="col text-right">
-        <h3>
-          @Messages("index.title.hear")
-          <strong>@Messages("index.title.us")</strong>
-        </h3>
-      </div>
-      <div class="col text-left">
-          <a class="btn btn-outline-info" href="@routes.UserCtrl.showLogin" style="margin-left: 2em">@Messages("login") </a>
-          <a class="btn btn-outline-info" href="@routes.UserCtrl.showRequestInvite" style="margin-left: 2em">@Messages("signup")</a>
-          <button class="btn btn-outline-success" onclick="chooseTitleForCampaign('feRoutes')">@Messages("startNewCampaign")</button>
-      </div>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark text-white">
+    <span class="navbar-brand mb-0 h1">
+      @Messages("index.title.hear")
+      <strong>@Messages("index.title.us")</strong>
+    </span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto indexNavs">
+        <li class="nav-item">
+          <a class="btn btn-outline-info" href="@routes.UserCtrl.showLogin">@Messages("login") </a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-outline-info" href="@routes.UserCtrl.showRequestInvite">@Messages("signup")</a>
+        </li>
+@*        <li class="nav-item">*@
+@*          <button class="btn btn-outline-success" onclick="chooseTitleForCampaign('feRoutes')">@Messages("startNewCampaign")</button>*@
+@*        </li>*@
+      </ul>
     </div>
-  </div>
+  </nav>
   <div class="container">
     <div class="row withCampBkg">
       <div class="col py-4">
@@ -70,7 +109,7 @@
       </div>
     </div>
   </div>
-  <div class="container-fluid" style="position: fixed; bottom:0; left:0; right:0; height:4em;">
+  <footer class="container-fluid">
     <div class="row py-1 bg-dark text-white">
       <div class="col-md">
         <p class="my-4 text-center">@Messages("index.note")</p>
@@ -84,5 +123,5 @@
         </ul>
       </div>
     </div>
-  </div>
+  </footer>
 }
