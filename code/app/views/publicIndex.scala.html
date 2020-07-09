@@ -2,9 +2,18 @@
 
 @ehead={
   <style>
-    body{
-      padding-bottom: 5em;
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
+
+    footer {
+      margin-top: auto;
+      padding: 0;
+    }
+
     #bgImg {
       position: fixed;
       pointer-events: none;
@@ -37,14 +46,9 @@
       margin-right: .5em;
     }
 
-    footer {
-      position: fixed;
-      bottom:0;
-      left:0;
-      right:0;
-      height: 5em;
-      padding: 0;
-      margin: 0;
+    .customText {
+      background-color: #e9ecefaa;
+      padding: 1em;
     }
 
     @@media(max-width: 768px) {
@@ -52,13 +56,6 @@
         margin: .3em 0;
         text-align: left;
         display: block;
-      }
-      footer {
-        position: static;
-        height: auto;
-      }
-      body{
-        padding-bottom: 0;
       }
     }
   </style>
@@ -104,7 +101,11 @@
               </div>
             </div>
           }
-            case Some(s)=>{@Html(s)}
+            case Some(s)=>{
+              <div class="customText">
+                @Html(s)
+              </div>
+            }
         }
       </div>
     </div>
